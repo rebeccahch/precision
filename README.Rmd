@@ -1,13 +1,17 @@
----
-output: github_document
----
+# PaiREd miCrorna sImulation Study desIgn mOlecular classificatioN (PRECISION)
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using our unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classifier building and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
+`PRECISION` package is currently availabe on GitHub. To load the package, type the following command in R console:
+
+```{r load.pkg, message = FALSE, eval = FALSE}
+library(devtools) # devtools is required
+
+install_github("rebeccahch/precision")
+library(PRECISION)
+
 ```
+
+When using `PRECISION`, please cite the following:
+
+Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)

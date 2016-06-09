@@ -1,0 +1,613 @@
+---
+title: "PRECISION Vignette"
+author: "Huei-Chung Huang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PRECISION Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+### Introduction
+
+`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using our unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classifier building and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
+
+This document familiarizes users with the data and the functions available in the package, but more importantly allows users to simulate datasets for a molecular classification study. It also walks through the process of extending our existing study to normalization and classification method comparison studies using user-defined functions.
+
+```{r prestore.obj, echo = FALSE, error = FALSE, warning = FALSE, results = "hide"}
+# load pre-stored R objects for the vignette.
+load(file = "prestore.obj.Rdata")
+
+```
+
+When use `PRECISION`, please cite the following papers:
+
+Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
+
+
+## Load PRECISION
+
+The first step is to install `PRECISION` from `CRAN` by typing the following command in R console:
+
+```{r load.pkg, message = FALSE}
+if(!require(PRECISION)) install.packages("PRECISION")
+library(PRECISION)
+
+```
+
+## Data
+
+The unique pair of datasets are generated from the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples using blocking (by both array slide and row-column location on each slide). The second dataset was handled by two technicians in five batches. Its arrays were assigned in the order of sample collection without blocking to mimick typical practice. More details on the data can be found in Qin et al.[^1] The datasets are publically available on `GEO` [here](http://).
+
+[^1]: Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [here](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
+
+This package includes two example datasets (probe level): randomized data `r.data.pl` and non-randomized data `non.r.data.pl`, both coming from the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
+
+```{r load.data, eval = FALSE}
+data("r.data.pl")
+data("non.r.data.pl")
+
+```
+
+```{r data.tab, results = "asis", echo = FALSE}
+knitr::kable(r.data.pl[1:15, 1:5], caption = "Randomized Data")
+
+knitr::kable(non.r.data.pl[1:15, 1:5], caption = "Non-randomized Data")
+
+```
+
+Originally, each probe has 10 to 40 replicates. We recommend truncating the number of replicates to a fixed number across probes to save data preprocessing time. We are safe to do so because we have previously observed that the variation among replicates for the same probe is small. Here, we provide `per.unipbset.truncate()` to truncate the number of replicates in data. In our simulation study, we used only the first 10 replicates for each unique probe.
+
+```{r per.unipbset.truncate, eval = FALSE}
+r.data.pl.p5 <- per.unipbset.truncate(data = r.data.pl,
+                                      num.per.unipbset = 5)
+```
+
+In most of the analyses, only **non-control probe** data were used. An exception was when batch effects were adjusted by RUV-4 (exampled in a later section). The following code identifies and **filters** out the control probes from the data.
+
+```{r ctrl.genes}
+# negatively biological control probes
+ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+
+r.data.pl.nc <- r.data.pl[!rownames(r.data.pl) %in% ctrl.genes, ] # nc for non-control probes
+```
+
+## Data Simulation
+
+We used the randomized dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the randomized dataset and the other from the non-randomized dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
+
+```{r est.eff, results = "hide", message = FALSE}
+smp.eff <- estimate.smp.eff(r.data = r.data.pl)
+
+ary.eff <- estimate.ary.eff(r.data = r.data.pl, 
+                             non.r.data = non.r.data.pl)
+
+smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
+ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
+
+```
+
+The 192 samples were **randomly split** in a 2:1 ratio into a training set and a test set, balanced by tumor type; the 192 arrays were **non-randomly** split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing) and a test set (n=64, the middle 64 arrays) -- allowing the training set to have roughly an equal number of arrays done by the two technicians.
+
+```{r data.split, comment = ">", message = FALSE, eval = FALSE}
+set.seed(101)
+group.id <- substr(colnames(smp.eff.nc), 7, 7)
+
+# randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples
+smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
+smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
+
+# non-randomly split array effect data into training and test set; technician effect as proxy
+ary.eff.train.ind <- colnames(ary.eff.nc)[c(1:64, 129:192)]
+ary.eff.test.ind <- colnames(ary.eff.nc)[65:128]
+
+group.id.list <- list("all" = group.id,
+                 "tr" = substr(smp.eff.train.ind, 7, 7),
+                 "te" = substr(smp.eff.test.ind, 7, 7))
+ary.to.smp.assign <- list("all" = c(rep(c("E", "V"), each = 64),
+                                    rep(c("V", "E"), each = 32)),
+                          "tr" = rep(c("E", "V"), each = 64),
+                          "te" = rep(c("V", "E"), each = 32))
+
+```
+
+Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the array effect for its assigned array. For the test set, we used the test data from the randomized dataset; no data simulation is needed. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`) and `rehybridize()` is provided to sum biological effects to array effects, given array-to-sample assignments. 
+
+```{r study.design}
+set.seed(101)
+
+# Complete Confounding
+cc.ind <- confounding.design(seed = 1, num.smp = 128, 
+                               degree = "complete", rev.order = FALSE)
+
+# Partial Confounding Reversed
+pc.rev.ind <- confounding.design(seed = 1, num.smp = 128, 
+                               degree = "partial", rev.order = TRUE)
+
+# Stratification
+batch.id <- list(1:40, 41:64, (129:160) - 64, (161:192) - 64)
+str.ind <- stratification.design(seed = 1, num.smp = 128,
+                                       batch.id = batch.id)
+
+# Blocking
+blk.ind <- blocking.design(seed = 1, num.smp = 128)
+
+```
+
+Here is one of the possible array-to-sample-group splits for the study designs. Each stem is an array and the color of each stem represents which sample group the array is assigned to.
+
+```{r study.design.fig, fig.align = "hold", fig.height = 4, fig.width = 6, echo = FALSE}
+par(mar = c(1, 1, 1, 1))
+plot(1:128, pch = "",
+     xlab = "", ylab = "", yaxt = "n", xaxt = "n", 
+     ylim = c(0.25, 2.5))
+
+points(1:128, rep(2, 128), 
+     col = ifelse(cc.ind < 65, 2, 4), pch = "|")
+
+points(1:128, rep(1.5, 128), 
+     col = ifelse(pc.rev.ind < 65, 2, 4), pch = "|")
+
+points(1:128, rep(1, 128), 
+     col = ifelse(str.ind < 65, 2, 4), pch = "|")
+
+points(1:128, rep(0.5, 128), 
+     col = ifelse(blk.ind < 65, 2, 4), pch = "|")
+
+text(x = 64.5, y = 2.25, labels = "Complete confounding")
+text(x = 64.5, y = 1.75, labels = "Partial confounding reversed")
+text(x = 64.5, y = 1.25, labels = "Stratification")
+text(x = 64.5, y = 0.75, labels = "Blocking")
+
+```
+
+We also incorporated batch effect adjustment methods[^2] into the rehybridization step. The adjustment can be turned on by specifying `icombat = TRUE`, `isva = TRUE` or `iruv = TRUE`, or else by default, no batch adjustment will be performed. Note that when RUV is selected, control-probe data must be supplied. 
+
+[^2]: ComBat and sva: Leek JT, Johnson WE, Parker HS, Fertig EJ, Jaffe AE and Storey JD (2016). sva: Surrogate Variable Analysis. R package version 3.20.0. 
+RUV: Johann Gagnon-Bartsch (2015). ruv: Detect and Remove Unwanted Variation using Negative Controls. R package version 0.9.6.
+
+
+```{r rehybridize, eval = FALSE}
+assign.ind <- confounding.design(seed = 1, num.smp = 192, 
+                               degree = "complete", rev.order = FALSE)
+group.id <- substr(colnames(smp.eff.nc), 7, 7)
+
+# rehybridize
+sim.data.raw <- rehybridize(smp.eff = smp.eff.nc,
+                            ary.eff = ary.eff.nc,
+                            group.id = group.id,
+                            ary.to.smp.assign = assign.ind)
+
+# rehybridize + adjust batch effects with SVA
+sim.data.sva <- rehybridize(smp.eff = smp.eff.nc,
+                            ary.eff = ary.eff.nc,
+                            group.id = group.id,
+                            ary.to.smp.assign = assign.ind, 
+                            isva = TRUE)
+
+# rehybridize + adjust batch effects with RUV-4
+smp.eff.ctrl <- smp.eff[rownames(smp.eff) %in% ctrl.genes, ]
+ary.eff.ctrl <- ary.eff[rownames(ary.eff) %in% ctrl.genes, ]
+
+sim.data.ruv <- rehybridize(smp.eff = smp.eff.nc,
+                            ary.eff = ary.eff.nc,
+                            group.id = group.id,
+                            ary.to.smp.assign = assign.ind, 
+                            iruv = TRUE,
+                            smp.eff.ctrl = smp.eff.ctrl,
+                            ary.eff.ctrl = ary.eff.ctrl)
+
+```
+
+## Data Preprocess 
+
+Data preprocessing in the study includes three steps: 
+
+1. log2 transformation. Logged-2 was performed at the step of generating data matrix.
+
+2. normalization for training data and frozen normalization for test data (that is, mapping the empirical distribution of each individual test-set sample to the "frozen" empirical distribution of the normalized training data).
+
+3. probe-replicate summarization using the median.
+
+We provide `med.norm()`, `quant.norm()`, and `vs.norm()` for median normalization, quantile normalization[^3], and variance stabilizing normalization[^4], respectively. When parameter `test` is not supplied, the functions only normalize on training data and return `NULL` on the frozen normalized test. Note: as number of probes increases, VSN can be computationally intensive.
+
+[^3]: Bolstad BM, Irizarry RA, Astrand M, Speed TP: A comparison of normalization methods for high density oligonucleotide array data based on variance and bias. Bioinformatics 2003, 19(2):185-193.
+Bolstad BM: preprocessCore: A collection of pre-processing functions. R package version 1.34.0. 2016.
+[^4]: Huber W, von Heydebreck A, Sultmann H, Poustka A, Vingron M: Variance stabilization applied to microarray data calibration and to the quantification of differential expression. Bioinformatics 2002, 18 Suppl 1(suppl 1):S96-104.
+
+```{r normalize, comment = ">", message = FALSE, eval = FALSE}
+set.seed(101)
+group.id <- substr(colnames(sim.data.raw), 7, 7)
+
+# randomly split data into training and test set with equal number of endometrial and ovarian samples
+train.ind <- colnames(smp.eff)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))]
+
+train.dat <- sim.data.raw[, train.ind]
+test.dat <- sim.data.raw[, !colnames(sim.data.raw) %in%train.ind]
+
+
+# median normalize (normalize training data only)
+data.mn <- med.norm(train = train.dat)
+
+# median normalize (normalize training data + frozen normaliz test data)
+data.mn <- med.norm(train = train.dat, test = test.dat)
+
+# quantile normalize
+data.qn <- quant.norm(train = train.dat, test = test.dat)
+
+# varaince stabilizing normalize
+data.vsn <- vs.norm(train = train.dat, test = test.dat)
+
+```
+
+To summarize replicate level data to unique probe level, based on within-probe medians, `med.sum.pbset()` can be used:
+
+```{r med.sum.pbset, eval = FALSE}
+r.data.psl <- med.sum.pbset(data = r.data.pl, 
+                            num.per.unipbset = 10)
+```
+
+## Classification 
+
+Regardless of classification methods, internal cross-validation should used to build a classifier and tune parameter(s) and external validation should be used to validate the performance. In our simulation study, we focused on reporting two classification methods: one non-parametric method, prediction analysis for microarrays (PAM)[^5] and one parametric method, the least absolute shrinkage and selection operator (LASSO)[^6]. Examples of model-building and predicting functions in `PRECISION` are `pam.intcv()` and `pam.predict()` for PAM and `lasso.intcv()` and `lasso.predict()` for LASSO.
+
+[^5]: Tibshirani R, Hastie T, Narasimhan B, Chu G: Diagnosis of multiple cancer types by shrunken centroids of gene expression. Proceedings of the National Academy of Sciences of the United States of America 2002, 99(10):6567-6572.
+Hastie T, R., Narasimhan B, Chu G: pamr: Pam: prediction analysis for microarrays; 2014.
+
+[^6]: Tibshirani R: Regression shrinkage and selection via the Lasso. J Roy Stat Soc B Met 1996, 58(1):267-288.
+Friedman J, Hastie T, Tibshirani R: Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw 2010, 33(1):1-22.
+
+```{r classification, eval = FALSE}
+set.seed(101)
+# randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples
+smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
+smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
+
+smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
+smp.eff.nc.te <- smp.eff.nc[, smp.eff.test.ind]
+
+# build a PAM classifier
+pam.int <- pam.intcv(X = smp.eff.nc.tr,
+                     y = substr(colnames(smp.eff.nc.tr), 7, 7),
+                     kfold = 5, seed = 1)
+
+# predict with the PAM classifier
+pam.pred <- pam.predict(pam.intcv.model = pam.int, 
+                        pred.obj = smp.eff.nc.te, 
+                        pred.obj.group.id = substr(colnames(smp.eff.nc.te), 7, 7))
+
+pam.int$mc
+pam.pred$mc
+
+# build a LASSO classifier
+lasso.int <- lasso.intcv(X = smp.eff.nc.tr,
+                     y = substr(colnames(smp.eff.nc.tr), 7, 7),
+                     kfold = 5, seed = 1, alp = 1)
+
+# predict with the LASSO classifier
+lasso.pred <- lasso.predict(lasso.intcv.model = lasso.int, 
+                        pred.obj = smp.eff.nc.te, 
+                        pred.obj.group.id = substr(colnames(smp.eff.nc.te), 7, 7))
+
+lasso.int$mc
+lasso.pred$mc
+
+```
+
+## Simulation Studies
+
+Finally, the main functionality of `PRECISION` is to provide users with an efficient way to reproduce our simulation studies in molecular classification. Two wrapper functions are available to do so: one for the analysis with randomized data and one for the analysis with confounding handling. 
+
+### Analysis with randomized data
+
+The analysis with randomized data is based on `N` number of random training-and-test-set splits on the randomized data; `uni.handled.simulate()` is used. Users can control the signal level of the estimated sample effects being inputted as well as the normalization and classification methods being compared.
+
+```{r uni.handled.simulate, results = "hide", eval = FALSE}
+uni.handled.results <- uni.handled.simulate(myseed = 1, N = 3,
+                                            smp.eff = smp.eff.nc,
+                                            norm.list = c("NN", "QN"),
+                                            class.list = c("PAM", "LASSO"))
+
+```
+
+```{r uni.handled.tab, results = "asis"}
+knitr::kable(data.frame(uni.handled.results$error_store[2, ]), 
+             caption = "Analysis of randomized data")
+
+```
+
+### Analysis with confounding handling
+
+The analysis with confounding handling is based on `N` number of array-to-sample reassignments on the simulated data using `precision.simulate()`. Users can control the signal level of the estimated sample effects, the confounding level of the estimated array effects, array-to-sample study design, the normalization, the batch adjustment, and the classification methods.
+
+```{r precision.simulate, results = "hide", eval = FALSE}
+set.seed(101)
+group.id <- substr(colnames(smp.eff.nc), 7, 7)
+
+# randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples
+smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
+smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
+
+smp.eff.train.test.split =
+  list("tr" = smp.eff.train.ind,
+       "te" = smp.eff.test.ind)
+
+# non-randomly split array effect data into training and test set; technician effect as proxy
+ary.eff.train.test.split =
+  list("tr" = c(1:64, 129:192),
+       "te" = 65:128)
+
+smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
+smp.eff.nc.te <- smp.eff.nc[, smp.eff.test.ind]
+ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
+ary.eff.nc.te <- ary.eff.nc[, 65:128]
+
+# Simulation without batch adjustment
+precision.results <- precision.simulate(myseed = 1, N = 3,
+                          smp.eff.tr = smp.eff.nc.tr,    
+                          smp.eff.te = smp.eff.nc.te,
+                          ary.eff.tr = ary.eff.nc.tr,
+                          ary.eff.te = ary.eff.nc.te,
+                          group.id.tr = substr(colnames(smp.eff.nc.tr), 7, 7),
+                          group.id.te = substr(colnames(smp.eff.nc.te), 7, 7),
+                          design.list = c("PC-", "STR"),
+                          norm.list = c("NN", "QN"),
+                          class.list = c("PAM", "LASSO"),
+                          batch.id = list(1:40, 41:64, (129:160) - 64, (161:192) - 64))
+
+# Simulation with RUV-4 batch adjustment
+smp.eff.tr.ctrl <- smp.eff.ctrl[, smp.eff.train.test.split$tr]
+ary.eff.tr.ctrl <- ary.eff.ctrl[, ary.eff.train.test.split$tr]
+
+precision.ruv4.results <- precision.simulate(myseed = 1, N = 3,
+                              smp.eff.tr = smp.eff.nc.tr,    
+                              smp.eff.te = smp.eff.nc.te,
+                              ary.eff.tr = ary.eff.nc.tr,
+                              ary.eff.te = ary.eff.nc.te,
+                              group.id.tr = substr(colnames(smp.eff.nc.tr), 7, 7),
+                              group.id.te = substr(colnames(smp.eff.nc.te), 7, 7),
+                              design.list = c("PC-", "STR"),
+                              norm.list = c("NN", "QN"),
+                              class.list = c("PAM", "LASSO"),
+                              batch.id = list(1:40, 41:64, (129:160) - 64, (161:192) - 64), 
+                              iruv = TRUE,
+                              smp.eff.tr.ctrl = smp.eff.tr.ctrl, 
+                              ary.eff.tr.ctrl = ary.eff.tr.ctrl)
+
+```
+
+```{r precision.tab, results = "asis"}
+knitr::kable(data.frame(precision.results$error_store[2, "PC-"]), 
+             aligh = "l",
+             caption = "Analysis of simulated data in presence of confounding handling")
+
+knitr::kable(data.frame(precision.ruv4.results$error_store[2, "PC-"]), 
+             aligh = "l",
+             caption = "Analysis of simulated data in presence of confounding handling, adjusting batch effects with RUV-4")
+
+```
+
+## Extension
+
+Both `uni.handled.simulate()` and `precision.simulate()` allows user-defined function for normalization or classification method comparison purposes. 
+
+A user-defined normalization method function must allow two input parameters: `train` and `test` (`test` can be `NULL`). The user is required to provide a short name for the normalization method and use the short name (in lower case) when defining the output. For example, if the short name is "RN", the function must return a list of two outputs: `train.rn` and `test.rn` for both normalized training and normalized test.
+
+```{r norm.func.extend, eval = FALSE}
+# an example of user-defined normalization method function:
+"rand.norm" <- function(train, test = NULL){
+  stopifnot(nrow(train) == nrow(test))
+  
+  if(is.null(test)) {
+    test.frn <- NULL
+  } else{
+    train.rn <- apply(train, 2, sample)
+    dimnames(train.rn) <- dimnames(train)
+    
+    test.frn <- apply(test, 2, sample)
+    dimnames(test.frn) <- dimnames(test)
+  }
+  
+  return(list("train.rn" = train.rn,
+              "test.frn" = test.frn))
+}
+
+uni.handled.results.rn <- uni.handled.simulate(myseed = 1, N = 3,
+                                       smp.eff = smp.eff.nc,
+                                       norm.list = c("NN", "QN", "RN"),
+                                       class.list = c("PAM", "LASSO"), 
+                                       norm.funcs = "rand.norm")
+
+```
+
+```{r uni.handled.tab.rn, results = "asis"}
+knitr::kable(data.frame(uni.handled.results.rn$error_store[2, ]), 
+             caption = "Analysis of randomized data (with RN)")
+
+```
+
+For each user-defined classification method, the user must provide two functions: one for building model and one for predicting. The build function must allow input parameters `kfold`, `X`, `y`, `seed`, and must return a list of outputs at minimal including `mc`, `model` (naming must match). The predict function must allow three input parameters for the build model, object to be predicted, and group ID of the object to be predicted (note: order matters). Lastly, the predict function must return a list of outputs at minimal including `mc` for misclassification error rate (naming must match). It is not required but is highly recommended to return predicted probabilities and selected features for future uses.
+
+```{r class.func.extend, eval = FALSE}
+# example of user-defined classification method functions:
+"build.ridge" <- function(kfold = 5, X, y, seed, alp = 0){
+  ptm <- proc.time()
+  set.seed(seed)
+  
+  cv.fit <- glmnet::cv.glmnet(x = data.matrix(t(X)), y = factor(y),
+                              family = "binomial", type.measure = "class", alpha = alp, nfold = kfold)
+  mc <- cv.fit$cvm[which(cv.fit$lambda == cv.fit$lambda.1se)]
+  #best.lambda <- cv.fit$lambda.1se # can be extracted from cv.fit
+  coefs <- coef(cv.fit, s = "lambda.1se")
+  time <- proc.time() - ptm
+  return(list(mc=mc, time=time, model=cv.fit, cfs=coefs))
+}
+
+# Ridge has the same prediction function as LASSO
+
+uni.handled.results.ridge <- uni.handled.simulate(myseed = 1, N = 3,
+                                   smp.eff = smp.eff.nc,
+                                   norm.list = c("NN", "RN"),
+                                   class.list = c("LASSO", "Ridge"), 
+                                   norm.funcs = "rand.norm",
+                                   class.funcs = "build.ridge", 
+                                   pred.funcs = "lasso.predict")
+
+```
+
+```{r uni.handled.ridge.tab, results = "asis"}
+knitr::kable(data.frame(uni.handled.results.ridge$error_store[2, ]), 
+             caption = "Analysis of randomized data (with Ridge)")
+
+```
+
+## Other useful functions
+
+We list a handful of useful functions available in `PRECISION` in the next section.
+
+#### Differential expression analysis
+
+Simple per-marker comparison methods such as differential expression analysis can be particularly useful when making preliminary data analysis decision. Therefore, we provide `limma.pbset` to perform differential expression analysis on expression data.
+
+```{r dea, eval = FALSE}
+r.data.psl.nc <- r.data.psl[!rownames(r.data.psl) %in% ctrl.genes, ] # nc for non-control probes
+
+group.id <- substr(colnames(r.data.psl.nc), 7, 7)
+group.id.level <- levels(as.factor(group.id))
+limma.fit.r.data<- limma.pbset(data = r.data.psl.nc, 
+                               group.id = group.id,
+                               group.id.level = group.id.level)
+table(limma.fit.r.data$P.Value < 0.01, dnn = "DE genes")
+
+```
+
+```{r dea.tab, results = "asis"}
+tab <- data.frame(table(limma.fit.r.data$P.Value < 0.01))
+colnames(tab) <- c("DEA", "Count")
+knitr::kable(tab, rownames = NULL)
+
+```
+
+#### Classify gene type into biological, technical or others
+
+When comparing classifiers, we can use `classify.gene.type()` to classify the selected genes for a classifier, such as the number of false positive genes (selected, but are technical genes).
+
+```{r classify.gene.type, comment = ">", message = FALSE, eval = FALSE}
+# classify gene type
+gene.cat <- classify.gene.type(smp.eff = smp.eff.nc,
+                               ary.eff = ary.eff.nc,
+                               smp.eff.train.ind = smp.eff.train.ind,
+                               ary.eff.train.ind = ary.eff.train.ind,
+                               group.id = group.id.list,
+                               ary.to.smp.assign = ary.to.smp.assign)
+
+```
+
+#### Calculate confounding level between array effects and sample groups
+
+We used a measurement to quantify confounding level between array effects and sample group of interest[^7]. We used this measurement to cross-check our results based on confounding and balanced study designs.
+
+[^7]: Leek JT, Scharpf RB, Bravo HC, Simcha D, Langmead B, Johnson WE, Geman D, Baggerly K, Irizarry RA: Tackling the widespread and critical impact of batch effects in high-throughput data. Nature reviews Genetics 2010, 11(10):733-739.
+
+```{r calc.confounding.level, comment = ">", message = FALSE, eval = FALSE}
+# calculate confounding level 
+nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE)
+calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind], 
+                       group.id = substr(smp.eff.train.ind, 7, 7), 
+                       nbe.genes = nbe.genes)
+
+```
+
+#### Reduce signal
+
+It may be necessary to manipulate the level of signal (i.e., the mean group difference between sample group) in a molecular classification study, so that the ormalization effects or classification methods can be distinguishable. To manipulate the level of signal, `reduce.signal()` can be used.
+
+```{r reduce.signal, eval = FALSE}
+# reduced signal by half
+group.id <- substr(colnames(smp.eff.nc), 7, 7)
+redhalf.smp.eff.nc <- reduce.signal(smp.eff = smp.eff.nc,
+                            group.id = group.id,
+                            group.id.level = c("E", "V"),
+                            reduce.multiplier = 1/2)
+
+
+# extract differential expressed genes
+smp.eff.nc.psl <- med.sum.pbset(smp.eff.nc)
+s.e.limma.fit <- limma.pbset(data = smp.eff.nc.psl,
+                         group.id = group.id,
+                         group.id.level = c("E", "V"))
+de.ind <- s.e.limma.fit$P.Value < 0.01
+
+de.gene.name <- rownames(redhalf.smp.eff.nc)[which(de.ind)][2]
+nonde.gene.name <- rownames(redhalf.smp.eff.nc)[-which(de.ind)][2]
+
+smp.eff.nc.de <- smp.eff.nc[de.gene.name, ]
+redhalf.smp.eff.nc.de <- redhalf.smp.eff.nc[de.gene.name, ]
+
+smp.eff.nc.nonde <- smp.eff.nc[nonde.gene.name, ]
+redhalf.smp.eff.nc.nonde <- redhalf.smp.eff.nc[nonde.gene.name, ]
+
+```
+
+```{r reduce.signal.fig, echo = FALSE, fig.align = "hold", fig.width = 4, fig.height = 4}
+group.id <- substr(colnames(smp.eff.nc), 7, 7)
+
+# plot
+par(mfrow = c(2, 2), mar = c(2, 2, 2, 1))
+# for DE genes, the difference has been shrunken in half...
+boxplot(smp.eff.nc.de ~ group.id == "E", main = "DE")
+boxplot(redhalf.smp.eff.nc.de ~ group.id == "E", main = "DE")
+# for non-DE genes, the difference has not been changed
+boxplot(smp.eff.nc.nonde ~ group.id == "E", main = "Non-DE")
+boxplot(redhalf.smp.eff.nc.nonde ~ group.id == "E", main = "Non-DE")
+
+```
+
+#### Amplify array effects
+
+Again, it may be necessary to manipulate the confounding level of array effects in the simulation study in order to evaluate normalization or classification methods in the presence of array effect. We offer three amplification methods in `amplify.ary.eff()`: 
+
+1. location shift - per selected array, shifting all probe expressions up or down by a constant.
+
+2. scaling 1 - per selected array, expanding the variance of probes towards the array's inter-quartile in both directions; Probes outside inter-quartile range remain unchanged.
+
+3. scaling 2 - scaling all probe expressions in arrays by the power of constants that are different for each batch. In our training data, there are four batches.
+
+
+```{r amplify.ary.eff, fig.align = "hold", fig.width = 7, fig.height = 7}
+ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
+
+# shift
+ary.eff.nc.tr.shift <- amplify.ary.eff(ary.eff.tr = ary.eff.nc.tr,
+       amplify.slide.id = colnames(ary.eff.nc.tr)[1:64],
+       amplify.level = 2, type = "shift")
+
+# scale 1
+ary.eff.nc.tr.scale1 <- amplify.ary.eff(ary.eff.tr = ary.eff.nc.tr,
+       amplify.slide.id = colnames(ary.eff.nc.tr)[1:64],
+       amplify.level = 2, type = "scale1")
+
+# scale 2
+amplify.slide.id <- list(1:40, 41:64, (129:160) - 64, (161:192) - 64)
+for(i in 1:length(amplify.slide.id)) 
+  amplify.slide.id[[i]] <- colnames(ary.eff.nc.tr)[amplify.slide.id[[i]]]
+amplify.level <- c(1.2, 1.3, 1/3, 2/3)
+
+ary.eff.nc.tr.scale2 <- amplify.ary.eff(ary.eff.tr = ary.eff.nc.tr,
+       amplify.slide.id = amplify.slide.id,
+       amplify.level = amplify.level,
+       type = "scale2")
+
+par(mfrow = c(2, 2), mar = c(2, 2, 2, 1))
+rng <- range(ary.eff.nc.tr, ary.eff.nc.tr.shift, ary.eff.nc.tr.scale1, ary.eff.nc.tr.scale2)
+boxplot(ary.eff.nc.tr, main = "Original",
+        ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
+boxplot(ary.eff.nc.tr.shift, main = "Shift",
+        ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
+boxplot(ary.eff.nc.tr.scale1, main = "Scaling 1",
+        ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
+boxplot(ary.eff.nc.tr.scale2, main = "Scaling 2",
+        ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
+
+```

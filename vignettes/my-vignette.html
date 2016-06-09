@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Huei-Chung Huang" />
+
+<meta name="date" content="2016-06-09" />
+
+<title>PRECISION Vignette</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+</style>
+
+
+
+<link href="data:text/css,body%20%7B%0A%20%20background%2Dcolor%3A%20%23fff%3B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20max%2Dwidth%3A%20700px%3B%0A%20%20overflow%3A%20visible%3B%0A%20%20padding%2Dleft%3A%202em%3B%0A%20%20padding%2Dright%3A%202em%3B%0A%20%20font%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0A%20%20font%2Dsize%3A%2014px%3B%0A%20%20line%2Dheight%3A%201%2E35%3B%0A%7D%0A%0A%23header%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0A%0A%23TOC%20%7B%0A%20%20clear%3A%20both%3B%0A%20%20margin%3A%200%200%2010px%2010px%3B%0A%20%20padding%3A%204px%3B%0A%20%20width%3A%20400px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20border%2Dradius%3A%205px%3B%0A%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20font%2Dsize%3A%2013px%3B%0A%20%20line%2Dheight%3A%201%2E3%3B%0A%7D%0A%20%20%23TOC%20%2Etoctitle%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%20%20font%2Dsize%3A%2015px%3B%0A%20%20%20%20margin%2Dleft%3A%205px%3B%0A%20%20%7D%0A%0A%20%20%23TOC%20ul%20%7B%0A%20%20%20%20padding%2Dleft%3A%2040px%3B%0A%20%20%20%20margin%2Dleft%3A%20%2D1%2E5em%3B%0A%20%20%20%20margin%2Dtop%3A%205px%3B%0A%20%20%20%20margin%2Dbottom%3A%205px%3B%0A%20%20%7D%0A%20%20%23TOC%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dleft%3A%20%2D2em%3B%0A%20%20%7D%0A%20%20%23TOC%20li%20%7B%0A%20%20%20%20line%2Dheight%3A%2016px%3B%0A%20%20%7D%0A%0Atable%20%7B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dcolor%3A%20%23DDDDDD%3B%0A%20%20border%2Dstyle%3A%20outset%3B%0A%20%20border%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0A%20%20border%2Dwidth%3A%202px%3B%0A%20%20padding%3A%205px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%20%20line%2Dheight%3A%2018px%3B%0A%20%20padding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0A%20%20border%2Dleft%2Dstyle%3A%20none%3B%0A%20%20border%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Ap%20%7B%0A%20%20margin%3A%200%2E5em%200%3B%0A%7D%0A%0Ablockquote%20%7B%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20padding%3A%200%2E25em%200%2E75em%3B%0A%7D%0A%0Ahr%20%7B%0A%20%20border%2Dstyle%3A%20solid%3B%0A%20%20border%3A%20none%3B%0A%20%20border%2Dtop%3A%201px%20solid%20%23777%3B%0A%20%20margin%3A%2028px%200%3B%0A%7D%0A%0Adl%20%7B%0A%20%20margin%2Dleft%3A%200%3B%0A%7D%0A%20%20dl%20dd%20%7B%0A%20%20%20%20margin%2Dbottom%3A%2013px%3B%0A%20%20%20%20margin%2Dleft%3A%2013px%3B%0A%20%20%7D%0A%20%20dl%20dt%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%7D%0A%0Aul%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%7D%0A%20%20ul%20li%20%7B%0A%20%20%20%20list%2Dstyle%3A%20circle%20outside%3B%0A%20%20%7D%0A%20%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dbottom%3A%200%3B%0A%20%20%7D%0A%0Apre%2C%20code%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20color%3A%20%23333%3B%0A%20%20white%2Dspace%3A%20pre%2Dwrap%3B%20%20%20%20%2F%2A%20Wrap%20long%20lines%20%2A%2F%0A%7D%0Apre%20%7B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20margin%3A%205px%200px%2010px%200px%3B%0A%20%20padding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Acode%20%7B%0A%20%20font%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0A%20%20font%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0A%20%20padding%3A%202px%200px%3B%0A%7D%0A%0Adiv%2Efigure%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0A%20%20background%2Dcolor%3A%20%23FFFFFF%3B%0A%20%20padding%3A%202px%3B%0A%20%20border%3A%201px%20solid%20%23DDDDDD%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20margin%3A%200%205px%3B%0A%7D%0A%0Ah1%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%20%20font%2Dsize%3A%2035px%3B%0A%20%20line%2Dheight%3A%2040px%3B%0A%7D%0A%0Ah2%20%7B%0A%20%20border%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20padding%2Dbottom%3A%202px%3B%0A%20%20font%2Dsize%3A%20145%25%3B%0A%7D%0A%0Ah3%20%7B%0A%20%20border%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20font%2Dsize%3A%20120%25%3B%0A%7D%0A%0Ah4%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0A%20%20margin%2Dleft%3A%208px%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Ah5%2C%20h6%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23ccc%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Aa%20%7B%0A%20%20color%3A%20%230033dd%3B%0A%20%20text%2Ddecoration%3A%20none%3B%0A%7D%0A%20%20a%3Ahover%20%7B%0A%20%20%20%20color%3A%20%236666ff%3B%20%7D%0A%20%20a%3Avisited%20%7B%0A%20%20%20%20color%3A%20%23800080%3B%20%7D%0A%20%20a%3Avisited%3Ahover%20%7B%0A%20%20%20%20color%3A%20%23BB00BB%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%0A%2F%2A%20Class%20described%20in%20https%3A%2F%2Fbenjeffrey%2Ecom%2Fposts%2Fpandoc%2Dsyntax%2Dhighlighting%2Dcss%0A%20%20%20Colours%20from%20https%3A%2F%2Fgist%2Egithub%2Ecom%2Frobsimmons%2F1172277%20%2A%2F%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Keyword%20%2A%2F%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%2F%2A%20DataType%20%2A%2F%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%2F%2A%20DecVal%20%28decimal%20values%29%20%2A%2F%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20BaseN%20%2A%2F%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Float%20%2A%2F%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Char%20%2A%2F%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20String%20%2A%2F%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%2F%2A%20Comment%20%2A%2F%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%2F%2A%20OtherToken%20%2A%2F%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20AlertToken%20%2A%2F%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Function%20calls%20%2A%2F%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%2F%2A%20ErrorTok%20%2A%2F%0A%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">PRECISION Vignette</h1>
+<h4 class="author"><em>Huei-Chung Huang</em></h4>
+<h4 class="date"><em>2016-06-09</em></h4>
+
+
+
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p><code>PRECISION</code> is a package that allows users to conduct a simulation study for molecular classification, using our unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classifier building and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.</p>
+<p>This document familiarizes users with the data and the functions available in the package, but more importantly allows users to simulate datasets for a molecular classification study. It also walks through the process of extending our existing study to normalization and classification method comparison studies using user-defined functions.</p>
+<p>When use <code>PRECISION</code>, please cite the following papers:</p>
+<p>Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 <a href="http://clincancerres.aacrjournals.org/content/20/13/3371.long"><a href="http://clincancerres.aacrjournals.org/content/20/13/3371.long" class="uri">http://clincancerres.aacrjournals.org/content/20/13/3371.long</a></a></p>
+</div>
+<div id="load-precision" class="section level2">
+<h2>Load PRECISION</h2>
+<p>The first step is to install <code>PRECISION</code> from <code>CRAN</code> by typing the following command in R console:</p>
+<pre class="sourceCode r"><code class="sourceCode r">if(!<span class="kw">require</span>(PRECISION)) <span class="kw">install.packages</span>(<span class="st">&quot;PRECISION&quot;</span>)
+<span class="kw">library</span>(PRECISION)</code></pre>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>The unique pair of datasets are generated from the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples using blocking (by both array slide and row-column location on each slide). The second dataset was handled by two technicians in five batches. Its arrays were assigned in the order of sample collection without blocking to mimick typical practice. More details on the data can be found in Qin et al.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> The datasets are publically available on <code>GEO</code> <a href="http://">here</a>.</p>
+<p>This package includes two example datasets (probe level): randomized data <code>r.data.pl</code> and non-randomized data <code>non.r.data.pl</code>, both coming from the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels “E” or “V” indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;r.data.pl&quot;</span>)
+<span class="kw">data</span>(<span class="st">&quot;non.r.data.pl&quot;</span>)</code></pre>
+<table>
+<caption>Randomized Data</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">JB5011V</th>
+<th align="right">JB5143V</th>
+<th align="right">JB4870E</th>
+<th align="right">GL4660E</th>
+<th align="right">JB2851E</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.519917</td>
+<td align="right">8.321713</td>
+<td align="right">8.191844</td>
+<td align="right">8.375039</td>
+<td align="right">8.335499</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.471477</td>
+<td align="right">8.275102</td>
+<td align="right">8.036174</td>
+<td align="right">8.340760</td>
+<td align="right">8.357961</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.398691</td>
+<td align="right">8.436503</td>
+<td align="right">8.040785</td>
+<td align="right">8.349887</td>
+<td align="right">8.415496</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.327370</td>
+<td align="right">8.257273</td>
+<td align="right">7.898854</td>
+<td align="right">8.421778</td>
+<td align="right">8.338764</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.401192</td>
+<td align="right">8.226792</td>
+<td align="right">8.107632</td>
+<td align="right">8.339071</td>
+<td align="right">8.324442</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.401519</td>
+<td align="right">8.176700</td>
+<td align="right">8.051209</td>
+<td align="right">8.403755</td>
+<td align="right">8.299437</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.329522</td>
+<td align="right">8.187407</td>
+<td align="right">7.845490</td>
+<td align="right">8.193579</td>
+<td align="right">8.400681</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.332516</td>
+<td align="right">8.216577</td>
+<td align="right">7.982994</td>
+<td align="right">8.213104</td>
+<td align="right">8.285402</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.384835</td>
+<td align="right">8.222178</td>
+<td align="right">7.794064</td>
+<td align="right">8.415398</td>
+<td align="right">8.404548</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">8.413628</td>
+<td align="right">8.184655</td>
+<td align="right">7.996588</td>
+<td align="right">8.369525</td>
+<td align="right">8.353039</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00010683</td>
+<td align="right">9.400979</td>
+<td align="right">8.364961</td>
+<td align="right">9.752062</td>
+<td align="right">10.071179</td>
+<td align="right">10.754247</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00010683</td>
+<td align="right">9.307174</td>
+<td align="right">8.388857</td>
+<td align="right">9.766736</td>
+<td align="right">10.056472</td>
+<td align="right">10.626686</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00010683</td>
+<td align="right">9.313038</td>
+<td align="right">8.241623</td>
+<td align="right">9.789004</td>
+<td align="right">10.044453</td>
+<td align="right">10.625220</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00010683</td>
+<td align="right">9.332664</td>
+<td align="right">8.317951</td>
+<td align="right">9.715799</td>
+<td align="right">10.009034</td>
+<td align="right">10.725606</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00010683</td>
+<td align="right">9.352993</td>
+<td align="right">8.273548</td>
+<td align="right">9.727772</td>
+<td align="right">10.046701</td>
+<td align="right">10.677699</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Non-randomized Data</caption>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">JB1245E</th>
+<th align="right">JB1394E</th>
+<th align="right">JB1437E</th>
+<th align="right">JB1521E</th>
+<th align="right">JB1533E</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.720305</td>
+<td align="right">6.346619</td>
+<td align="right">6.529127</td>
+<td align="right">6.485281</td>
+<td align="right">6.718333</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.709331</td>
+<td align="right">6.218932</td>
+<td align="right">6.347330</td>
+<td align="right">6.453701</td>
+<td align="right">6.598850</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.841207</td>
+<td align="right">6.348728</td>
+<td align="right">6.299527</td>
+<td align="right">6.465275</td>
+<td align="right">6.842569</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.784711</td>
+<td align="right">6.441758</td>
+<td align="right">6.436216</td>
+<td align="right">6.480250</td>
+<td align="right">6.686183</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.826992</td>
+<td align="right">6.382785</td>
+<td align="right">6.477574</td>
+<td align="right">6.462627</td>
+<td align="right">6.673368</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.828173</td>
+<td align="right">6.403206</td>
+<td align="right">6.686142</td>
+<td align="right">6.329874</td>
+<td align="right">6.635306</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.807355</td>
+<td align="right">6.423866</td>
+<td align="right">6.320669</td>
+<td align="right">6.415789</td>
+<td align="right">6.632822</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.883516</td>
+<td align="right">6.415471</td>
+<td align="right">6.564289</td>
+<td align="right">6.468668</td>
+<td align="right">6.658536</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.660337</td>
+<td align="right">6.280884</td>
+<td align="right">6.321161</td>
+<td align="right">6.333774</td>
+<td align="right">6.601264</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00011991</td>
+<td align="right">6.810863</td>
+<td align="right">6.315355</td>
+<td align="right">6.590077</td>
+<td align="right">6.577932</td>
+<td align="right">6.633785</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00010683</td>
+<td align="right">7.339657</td>
+<td align="right">8.641086</td>
+<td align="right">7.407942</td>
+<td align="right">8.919174</td>
+<td align="right">8.654199</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00010683</td>
+<td align="right">7.420205</td>
+<td align="right">8.576085</td>
+<td align="right">7.299407</td>
+<td align="right">8.939800</td>
+<td align="right">8.559781</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00010683</td>
+<td align="right">7.360822</td>
+<td align="right">8.645573</td>
+<td align="right">7.404858</td>
+<td align="right">9.007665</td>
+<td align="right">8.635866</td>
+</tr>
+<tr class="even">
+<td align="left">A_25_P00010683</td>
+<td align="right">7.380392</td>
+<td align="right">8.604415</td>
+<td align="right">7.379566</td>
+<td align="right">8.945319</td>
+<td align="right">8.656340</td>
+</tr>
+<tr class="odd">
+<td align="left">A_25_P00010683</td>
+<td align="right">7.305606</td>
+<td align="right">8.564705</td>
+<td align="right">7.399361</td>
+<td align="right">8.937759</td>
+<td align="right">8.680870</td>
+</tr>
+</tbody>
+</table>
+<p>Originally, each probe has 10 to 40 replicates. We recommend truncating the number of replicates to a fixed number across probes to save data preprocessing time. We are safe to do so because we have previously observed that the variation among replicates for the same probe is small. Here, we provide <code>per.unipbset.truncate()</code> to truncate the number of replicates in data. In our simulation study, we used only the first 10 replicates for each unique probe.</p>
+<pre class="sourceCode r"><code class="sourceCode r">r.data.pl.p5 &lt;-<span class="st"> </span><span class="kw">per.unipbset.truncate</span>(<span class="dt">data =</span> r.data.pl,
+                                      <span class="dt">num.per.unipbset =</span> <span class="dv">5</span>)</code></pre>
+<p>In most of the analyses, only <strong>non-control probe</strong> data were used. An exception was when batch effects were adjusted by RUV-4 (exampled in a later section). The following code identifies and <strong>filters</strong> out the control probes from the data.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># negatively biological control probes</span>
+ctrl.genes &lt;-<span class="st"> </span><span class="kw">unique</span>(<span class="kw">rownames</span>(r.data.pl))[<span class="kw">grep</span>(<span class="st">&quot;NC&quot;</span>, <span class="kw">unique</span>(<span class="kw">rownames</span>(r.data.pl)))]
+
+r.data.pl.nc &lt;-<span class="st"> </span>r.data.pl[!<span class="kw">rownames</span>(r.data.pl) %in%<span class="st"> </span>ctrl.genes, ] <span class="co"># nc for non-control probes</span></code></pre>
+</div>
+<div id="data-simulation" class="section level2">
+<h2>Data Simulation</h2>
+<p>We used the randomized dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the randomized dataset and the other from the non-randomized dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with <code>estimate.smp.eff()</code> and <code>estimate.ary.eff()</code> as follows:</p>
+<pre class="sourceCode r"><code class="sourceCode r">smp.eff &lt;-<span class="st"> </span><span class="kw">estimate.smp.eff</span>(<span class="dt">r.data =</span> r.data.pl)
+
+ary.eff &lt;-<span class="st"> </span><span class="kw">estimate.ary.eff</span>(<span class="dt">r.data =</span> r.data.pl, 
+                             <span class="dt">non.r.data =</span> non.r.data.pl)
+
+smp.eff.nc &lt;-<span class="st"> </span>smp.eff[!<span class="kw">rownames</span>(smp.eff) %in%<span class="st"> </span>ctrl.genes, ]
+ary.eff.nc &lt;-<span class="st"> </span>ary.eff[!<span class="kw">rownames</span>(ary.eff) %in%<span class="st"> </span>ctrl.genes, ]</code></pre>
+<p>The 192 samples were <strong>randomly split</strong> in a 2:1 ratio into a training set and a test set, balanced by tumor type; the 192 arrays were <strong>non-randomly</strong> split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing) and a test set (n=64, the middle 64 arrays) – allowing the training set to have roughly an equal number of arrays done by the two technicians.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">101</span>)
+group.id &lt;-<span class="st"> </span><span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc), <span class="dv">7</span>, <span class="dv">7</span>)
+
+<span class="co"># randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples</span>
+smp.eff.train.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(smp.eff.nc)[<span class="kw">c</span>(<span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;E&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>), <span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;V&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>))] 
+smp.eff.test.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(smp.eff.nc)[!<span class="kw">colnames</span>(smp.eff.nc) %in%<span class="st"> </span>smp.eff.train.ind]
+
+<span class="co"># non-randomly split array effect data into training and test set; technician effect as proxy</span>
+ary.eff.train.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(ary.eff.nc)[<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">64</span>, <span class="dv">129</span>:<span class="dv">192</span>)]
+ary.eff.test.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(ary.eff.nc)[<span class="dv">65</span>:<span class="dv">128</span>]
+
+group.id.list &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;all&quot;</span> =<span class="st"> </span>group.id,
+                 <span class="st">&quot;tr&quot;</span> =<span class="st"> </span><span class="kw">substr</span>(smp.eff.train.ind, <span class="dv">7</span>, <span class="dv">7</span>),
+                 <span class="st">&quot;te&quot;</span> =<span class="st"> </span><span class="kw">substr</span>(smp.eff.test.ind, <span class="dv">7</span>, <span class="dv">7</span>))
+ary.to.smp.assign &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;all&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;E&quot;</span>, <span class="st">&quot;V&quot;</span>), <span class="dt">each =</span> <span class="dv">64</span>),
+                                    <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;V&quot;</span>, <span class="st">&quot;E&quot;</span>), <span class="dt">each =</span> <span class="dv">32</span>)),
+                          <span class="st">&quot;tr&quot;</span> =<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;E&quot;</span>, <span class="st">&quot;V&quot;</span>), <span class="dt">each =</span> <span class="dv">64</span>),
+                          <span class="st">&quot;te&quot;</span> =<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;V&quot;</span>, <span class="st">&quot;E&quot;</span>), <span class="dt">each =</span> <span class="dv">32</span>))</code></pre>
+<p>Next, for the training set, data were simulated through “virtual re-hybridization” by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the array effect for its assigned array. For the test set, we used the test data from the randomized dataset; no data simulation is needed. Three study design functions assign arrays to samples (<code>confounding.design()</code>, <code>stratification.design()</code>, <code>blocking.design()</code>) and <code>rehybridize()</code> is provided to sum biological effects to array effects, given array-to-sample assignments.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">101</span>)
+
+<span class="co"># Complete Confounding</span>
+cc.ind &lt;-<span class="st"> </span><span class="kw">confounding.design</span>(<span class="dt">seed =</span> <span class="dv">1</span>, <span class="dt">num.smp =</span> <span class="dv">128</span>, 
+                               <span class="dt">degree =</span> <span class="st">&quot;complete&quot;</span>, <span class="dt">rev.order =</span> <span class="ot">FALSE</span>)
+
+<span class="co"># Partial Confounding Reversed</span>
+pc.rev.ind &lt;-<span class="st"> </span><span class="kw">confounding.design</span>(<span class="dt">seed =</span> <span class="dv">1</span>, <span class="dt">num.smp =</span> <span class="dv">128</span>, 
+                               <span class="dt">degree =</span> <span class="st">&quot;partial&quot;</span>, <span class="dt">rev.order =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># Stratification</span>
+batch.id &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dv">1</span>:<span class="dv">40</span>, <span class="dv">41</span>:<span class="dv">64</span>, (<span class="dv">129</span>:<span class="dv">160</span>) -<span class="st"> </span><span class="dv">64</span>, (<span class="dv">161</span>:<span class="dv">192</span>) -<span class="st"> </span><span class="dv">64</span>)
+str.ind &lt;-<span class="st"> </span><span class="kw">stratification.design</span>(<span class="dt">seed =</span> <span class="dv">1</span>, <span class="dt">num.smp =</span> <span class="dv">128</span>,
+                                       <span class="dt">batch.id =</span> batch.id)
+
+<span class="co"># Blocking</span>
+blk.ind &lt;-<span class="st"> </span><span class="kw">blocking.design</span>(<span class="dt">seed =</span> <span class="dv">1</span>, <span class="dt">num.smp =</span> <span class="dv">128</span>)</code></pre>
+<p>Here is one of the possible array-to-sample-group splits for the study designs. Each stem is an array and the color of each stem represents which sample group the array is assigned to.</p>
+<p><img src="data:image/png;base64,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" /></p>
+<p>We also incorporated batch effect adjustment methods<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> into the rehybridization step. The adjustment can be turned on by specifying <code>icombat = TRUE</code>, <code>isva = TRUE</code> or <code>iruv = TRUE</code>, or else by default, no batch adjustment will be performed. Note that when RUV is selected, control-probe data must be supplied.</p>
+<pre class="sourceCode r"><code class="sourceCode r">assign.ind &lt;-<span class="st"> </span><span class="kw">confounding.design</span>(<span class="dt">seed =</span> <span class="dv">1</span>, <span class="dt">num.smp =</span> <span class="dv">192</span>, 
+                               <span class="dt">degree =</span> <span class="st">&quot;complete&quot;</span>, <span class="dt">rev.order =</span> <span class="ot">FALSE</span>)
+group.id &lt;-<span class="st"> </span><span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc), <span class="dv">7</span>, <span class="dv">7</span>)
+
+<span class="co"># rehybridize</span>
+sim.data.raw &lt;-<span class="st"> </span><span class="kw">rehybridize</span>(<span class="dt">smp.eff =</span> smp.eff.nc,
+                            <span class="dt">ary.eff =</span> ary.eff.nc,
+                            <span class="dt">group.id =</span> group.id,
+                            <span class="dt">ary.to.smp.assign =</span> assign.ind)
+
+<span class="co"># rehybridize + adjust batch effects with SVA</span>
+sim.data.sva &lt;-<span class="st"> </span><span class="kw">rehybridize</span>(<span class="dt">smp.eff =</span> smp.eff.nc,
+                            <span class="dt">ary.eff =</span> ary.eff.nc,
+                            <span class="dt">group.id =</span> group.id,
+                            <span class="dt">ary.to.smp.assign =</span> assign.ind, 
+                            <span class="dt">isva =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># rehybridize + adjust batch effects with RUV-4</span>
+smp.eff.ctrl &lt;-<span class="st"> </span>smp.eff[<span class="kw">rownames</span>(smp.eff) %in%<span class="st"> </span>ctrl.genes, ]
+ary.eff.ctrl &lt;-<span class="st"> </span>ary.eff[<span class="kw">rownames</span>(ary.eff) %in%<span class="st"> </span>ctrl.genes, ]
+
+sim.data.ruv &lt;-<span class="st"> </span><span class="kw">rehybridize</span>(<span class="dt">smp.eff =</span> smp.eff.nc,
+                            <span class="dt">ary.eff =</span> ary.eff.nc,
+                            <span class="dt">group.id =</span> group.id,
+                            <span class="dt">ary.to.smp.assign =</span> assign.ind, 
+                            <span class="dt">iruv =</span> <span class="ot">TRUE</span>,
+                            <span class="dt">smp.eff.ctrl =</span> smp.eff.ctrl,
+                            <span class="dt">ary.eff.ctrl =</span> ary.eff.ctrl)</code></pre>
+</div>
+<div id="data-preprocess" class="section level2">
+<h2>Data Preprocess</h2>
+<p>Data preprocessing in the study includes three steps:</p>
+<ol style="list-style-type: decimal">
+<li><p>log2 transformation. Logged-2 was performed at the step of generating data matrix.</p></li>
+<li><p>normalization for training data and frozen normalization for test data (that is, mapping the empirical distribution of each individual test-set sample to the “frozen” empirical distribution of the normalized training data).</p></li>
+<li><p>probe-replicate summarization using the median.</p></li>
+</ol>
+<p>We provide <code>med.norm()</code>, <code>quant.norm()</code>, and <code>vs.norm()</code> for median normalization, quantile normalization<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>, and variance stabilizing normalization<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>, respectively. When parameter <code>test</code> is not supplied, the functions only normalize on training data and return <code>NULL</code> on the frozen normalized test. Note: as number of probes increases, VSN can be computationally intensive.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">101</span>)
+group.id &lt;-<span class="st"> </span><span class="kw">substr</span>(<span class="kw">colnames</span>(sim.data.raw), <span class="dv">7</span>, <span class="dv">7</span>)
+
+<span class="co"># randomly split data into training and test set with equal number of endometrial and ovarian samples</span>
+train.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(smp.eff)[<span class="kw">c</span>(<span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;E&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>), <span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;V&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>))]
+
+train.dat &lt;-<span class="st"> </span>sim.data.raw[, train.ind]
+test.dat &lt;-<span class="st"> </span>sim.data.raw[, !<span class="kw">colnames</span>(sim.data.raw) %in%train.ind]
+
+
+<span class="co"># median normalize (normalize training data only)</span>
+data.mn &lt;-<span class="st"> </span><span class="kw">med.norm</span>(<span class="dt">train =</span> train.dat)
+
+<span class="co"># median normalize (normalize training data + frozen normaliz test data)</span>
+data.mn &lt;-<span class="st"> </span><span class="kw">med.norm</span>(<span class="dt">train =</span> train.dat, <span class="dt">test =</span> test.dat)
+
+<span class="co"># quantile normalize</span>
+data.qn &lt;-<span class="st"> </span><span class="kw">quant.norm</span>(<span class="dt">train =</span> train.dat, <span class="dt">test =</span> test.dat)
+
+<span class="co"># varaince stabilizing normalize</span>
+data.vsn &lt;-<span class="st"> </span><span class="kw">vs.norm</span>(<span class="dt">train =</span> train.dat, <span class="dt">test =</span> test.dat)</code></pre>
+<p>To summarize replicate level data to unique probe level, based on within-probe medians, <code>med.sum.pbset()</code> can be used:</p>
+<pre class="sourceCode r"><code class="sourceCode r">r.data.psl &lt;-<span class="st"> </span><span class="kw">med.sum.pbset</span>(<span class="dt">data =</span> r.data.pl, 
+                            <span class="dt">num.per.unipbset =</span> <span class="dv">10</span>)</code></pre>
+</div>
+<div id="classification" class="section level2">
+<h2>Classification</h2>
+<p>Regardless of classification methods, internal cross-validation should used to build a classifier and tune parameter(s) and external validation should be used to validate the performance. In our simulation study, we focused on reporting two classification methods: one non-parametric method, prediction analysis for microarrays (PAM)<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> and one parametric method, the least absolute shrinkage and selection operator (LASSO)<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>. Examples of model-building and predicting functions in <code>PRECISION</code> are <code>pam.intcv()</code> and <code>pam.predict()</code> for PAM and <code>lasso.intcv()</code> and <code>lasso.predict()</code> for LASSO.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">101</span>)
+<span class="co"># randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples</span>
+smp.eff.train.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(smp.eff.nc)[<span class="kw">c</span>(<span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;E&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>), <span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;V&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>))] 
+smp.eff.test.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(smp.eff.nc)[!<span class="kw">colnames</span>(smp.eff.nc) %in%<span class="st"> </span>smp.eff.train.ind]
+
+smp.eff.nc.tr &lt;-<span class="st"> </span>smp.eff.nc[, smp.eff.train.ind]
+smp.eff.nc.te &lt;-<span class="st"> </span>smp.eff.nc[, smp.eff.test.ind]
+
+<span class="co"># build a PAM classifier</span>
+pam.int &lt;-<span class="st"> </span><span class="kw">pam.intcv</span>(<span class="dt">X =</span> smp.eff.nc.tr,
+                     <span class="dt">y =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.tr), <span class="dv">7</span>, <span class="dv">7</span>),
+                     <span class="dt">kfold =</span> <span class="dv">5</span>, <span class="dt">seed =</span> <span class="dv">1</span>)
+
+<span class="co"># predict with the PAM classifier</span>
+pam.pred &lt;-<span class="st"> </span><span class="kw">pam.predict</span>(<span class="dt">pam.intcv.model =</span> pam.int, 
+                        <span class="dt">pred.obj =</span> smp.eff.nc.te, 
+                        <span class="dt">pred.obj.group.id =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.te), <span class="dv">7</span>, <span class="dv">7</span>))
+
+pam.int$mc
+pam.pred$mc
+
+<span class="co"># build a LASSO classifier</span>
+lasso.int &lt;-<span class="st"> </span><span class="kw">lasso.intcv</span>(<span class="dt">X =</span> smp.eff.nc.tr,
+                     <span class="dt">y =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.tr), <span class="dv">7</span>, <span class="dv">7</span>),
+                     <span class="dt">kfold =</span> <span class="dv">5</span>, <span class="dt">seed =</span> <span class="dv">1</span>, <span class="dt">alp =</span> <span class="dv">1</span>)
+
+<span class="co"># predict with the LASSO classifier</span>
+lasso.pred &lt;-<span class="st"> </span><span class="kw">lasso.predict</span>(<span class="dt">lasso.intcv.model =</span> lasso.int, 
+                        <span class="dt">pred.obj =</span> smp.eff.nc.te, 
+                        <span class="dt">pred.obj.group.id =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.te), <span class="dv">7</span>, <span class="dv">7</span>))
+
+lasso.int$mc
+lasso.pred$mc</code></pre>
+</div>
+<div id="simulation-studies" class="section level2">
+<h2>Simulation Studies</h2>
+<p>Finally, the main functionality of <code>PRECISION</code> is to provide users with an efficient way to reproduce our simulation studies in molecular classification. Two wrapper functions are available to do so: one for the analysis with randomized data and one for the analysis with confounding handling.</p>
+<div id="analysis-with-randomized-data" class="section level3">
+<h3>Analysis with randomized data</h3>
+<p>The analysis with randomized data is based on <code>N</code> number of random training-and-test-set splits on the randomized data; <code>uni.handled.simulate()</code> is used. Users can control the signal level of the estimated sample effects being inputted as well as the normalization and classification methods being compared.</p>
+<pre class="sourceCode r"><code class="sourceCode r">uni.handled.results &lt;-<span class="st"> </span><span class="kw">uni.handled.simulate</span>(<span class="dt">myseed =</span> <span class="dv">1</span>, <span class="dt">N =</span> <span class="dv">3</span>,
+                                            <span class="dt">smp.eff =</span> smp.eff.nc,
+                                            <span class="dt">norm.list =</span> <span class="kw">c</span>(<span class="st">&quot;NN&quot;</span>, <span class="st">&quot;QN&quot;</span>),
+                                            <span class="dt">class.list =</span> <span class="kw">c</span>(<span class="st">&quot;PAM&quot;</span>, <span class="st">&quot;LASSO&quot;</span>))</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(<span class="kw">data.frame</span>(uni.handled.results$error_store[<span class="dv">2</span>, ]), 
+             <span class="dt">caption =</span> <span class="st">&quot;Analysis of randomized data&quot;</span>)</code></pre>
+<table>
+<caption>Analysis of randomized data</caption>
+<thead>
+<tr class="header">
+<th align="right">PAM.NN</th>
+<th align="right">PAM.QN</th>
+<th align="right">LASSO.NN</th>
+<th align="right">LASSO.QN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.109375</td>
+<td align="right">0.156250</td>
+<td align="right">0.12500</td>
+<td align="right">0.140625</td>
+</tr>
+<tr class="even">
+<td align="right">0.109375</td>
+<td align="right">0.093750</td>
+<td align="right">0.06250</td>
+<td align="right">0.078125</td>
+</tr>
+<tr class="odd">
+<td align="right">0.093750</td>
+<td align="right">0.046875</td>
+<td align="right">0.09375</td>
+<td align="right">0.078125</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="analysis-with-confounding-handling" class="section level3">
+<h3>Analysis with confounding handling</h3>
+<p>The analysis with confounding handling is based on <code>N</code> number of array-to-sample reassignments on the simulated data using <code>precision.simulate()</code>. Users can control the signal level of the estimated sample effects, the confounding level of the estimated array effects, array-to-sample study design, the normalization, the batch adjustment, and the classification methods.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">101</span>)
+group.id &lt;-<span class="st"> </span><span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc), <span class="dv">7</span>, <span class="dv">7</span>)
+
+<span class="co"># randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples</span>
+smp.eff.train.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(smp.eff.nc)[<span class="kw">c</span>(<span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;E&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>), <span class="kw">sample</span>(<span class="kw">which</span>(group.id ==<span class="st"> &quot;V&quot;</span>), <span class="dt">size =</span> <span class="dv">64</span>))] 
+smp.eff.test.ind &lt;-<span class="st"> </span><span class="kw">colnames</span>(smp.eff.nc)[!<span class="kw">colnames</span>(smp.eff.nc) %in%<span class="st"> </span>smp.eff.train.ind]
+
+smp.eff.train.test.split =
+<span class="st">  </span><span class="kw">list</span>(<span class="st">&quot;tr&quot;</span> =<span class="st"> </span>smp.eff.train.ind,
+       <span class="st">&quot;te&quot;</span> =<span class="st"> </span>smp.eff.test.ind)
+
+<span class="co"># non-randomly split array effect data into training and test set; technician effect as proxy</span>
+ary.eff.train.test.split =
+<span class="st">  </span><span class="kw">list</span>(<span class="st">&quot;tr&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">64</span>, <span class="dv">129</span>:<span class="dv">192</span>),
+       <span class="st">&quot;te&quot;</span> =<span class="st"> </span><span class="dv">65</span>:<span class="dv">128</span>)
+
+smp.eff.nc.tr &lt;-<span class="st"> </span>smp.eff.nc[, smp.eff.train.ind]
+smp.eff.nc.te &lt;-<span class="st"> </span>smp.eff.nc[, smp.eff.test.ind]
+ary.eff.nc.tr &lt;-<span class="st"> </span>ary.eff.nc[, <span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">64</span>, <span class="dv">129</span>:<span class="dv">192</span>)]
+ary.eff.nc.te &lt;-<span class="st"> </span>ary.eff.nc[, <span class="dv">65</span>:<span class="dv">128</span>]
+
+<span class="co"># Simulation without batch adjustment</span>
+precision.results &lt;-<span class="st"> </span><span class="kw">precision.simulate</span>(<span class="dt">myseed =</span> <span class="dv">1</span>, <span class="dt">N =</span> <span class="dv">3</span>,
+                          <span class="dt">smp.eff.tr =</span> smp.eff.nc.tr,    
+                          <span class="dt">smp.eff.te =</span> smp.eff.nc.te,
+                          <span class="dt">ary.eff.tr =</span> ary.eff.nc.tr,
+                          <span class="dt">ary.eff.te =</span> ary.eff.nc.te,
+                          <span class="dt">group.id.tr =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.tr), <span class="dv">7</span>, <span class="dv">7</span>),
+                          <span class="dt">group.id.te =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.te), <span class="dv">7</span>, <span class="dv">7</span>),
+                          <span class="dt">design.list =</span> <span class="kw">c</span>(<span class="st">&quot;PC-&quot;</span>, <span class="st">&quot;STR&quot;</span>),
+                          <span class="dt">norm.list =</span> <span class="kw">c</span>(<span class="st">&quot;NN&quot;</span>, <span class="st">&quot;QN&quot;</span>),
+                          <span class="dt">class.list =</span> <span class="kw">c</span>(<span class="st">&quot;PAM&quot;</span>, <span class="st">&quot;LASSO&quot;</span>),
+                          <span class="dt">batch.id =</span> <span class="kw">list</span>(<span class="dv">1</span>:<span class="dv">40</span>, <span class="dv">41</span>:<span class="dv">64</span>, (<span class="dv">129</span>:<span class="dv">160</span>) -<span class="st"> </span><span class="dv">64</span>, (<span class="dv">161</span>:<span class="dv">192</span>) -<span class="st"> </span><span class="dv">64</span>))
+
+<span class="co"># Simulation with RUV-4 batch adjustment</span>
+smp.eff.tr.ctrl &lt;-<span class="st"> </span>smp.eff.ctrl[, smp.eff.train.test.split$tr]
+ary.eff.tr.ctrl &lt;-<span class="st"> </span>ary.eff.ctrl[, ary.eff.train.test.split$tr]
+
+precision.ruv4.results &lt;-<span class="st"> </span><span class="kw">precision.simulate</span>(<span class="dt">myseed =</span> <span class="dv">1</span>, <span class="dt">N =</span> <span class="dv">3</span>,
+                              <span class="dt">smp.eff.tr =</span> smp.eff.nc.tr,    
+                              <span class="dt">smp.eff.te =</span> smp.eff.nc.te,
+                              <span class="dt">ary.eff.tr =</span> ary.eff.nc.tr,
+                              <span class="dt">ary.eff.te =</span> ary.eff.nc.te,
+                              <span class="dt">group.id.tr =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.tr), <span class="dv">7</span>, <span class="dv">7</span>),
+                              <span class="dt">group.id.te =</span> <span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc.te), <span class="dv">7</span>, <span class="dv">7</span>),
+                              <span class="dt">design.list =</span> <span class="kw">c</span>(<span class="st">&quot;PC-&quot;</span>, <span class="st">&quot;STR&quot;</span>),
+                              <span class="dt">norm.list =</span> <span class="kw">c</span>(<span class="st">&quot;NN&quot;</span>, <span class="st">&quot;QN&quot;</span>),
+                              <span class="dt">class.list =</span> <span class="kw">c</span>(<span class="st">&quot;PAM&quot;</span>, <span class="st">&quot;LASSO&quot;</span>),
+                              <span class="dt">batch.id =</span> <span class="kw">list</span>(<span class="dv">1</span>:<span class="dv">40</span>, <span class="dv">41</span>:<span class="dv">64</span>, (<span class="dv">129</span>:<span class="dv">160</span>) -<span class="st"> </span><span class="dv">64</span>, (<span class="dv">161</span>:<span class="dv">192</span>) -<span class="st"> </span><span class="dv">64</span>), 
+                              <span class="dt">iruv =</span> <span class="ot">TRUE</span>,
+                              <span class="dt">smp.eff.tr.ctrl =</span> smp.eff.tr.ctrl, 
+                              <span class="dt">ary.eff.tr.ctrl =</span> ary.eff.tr.ctrl)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(<span class="kw">data.frame</span>(precision.results$error_store[<span class="dv">2</span>, <span class="st">&quot;PC-&quot;</span>]), 
+             <span class="dt">aligh =</span> <span class="st">&quot;l&quot;</span>,
+             <span class="dt">caption =</span> <span class="st">&quot;Analysis of simulated data in presence of confounding handling&quot;</span>)</code></pre>
+<table>
+<caption>Analysis of simulated data in presence of confounding handling</caption>
+<thead>
+<tr class="header">
+<th align="right">PAM.NN</th>
+<th align="right">PAM.QN</th>
+<th align="right">LASSO.NN</th>
+<th align="right">LASSO.QN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.203125</td>
+<td align="right">0.156250</td>
+<td align="right">0.078125</td>
+<td align="right">0.171875</td>
+</tr>
+<tr class="even">
+<td align="right">0.203125</td>
+<td align="right">0.125000</td>
+<td align="right">0.156250</td>
+<td align="right">0.187500</td>
+</tr>
+<tr class="odd">
+<td align="right">0.171875</td>
+<td align="right">0.140625</td>
+<td align="right">0.156250</td>
+<td align="right">0.171875</td>
+</tr>
+</tbody>
+</table>
+<pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(<span class="kw">data.frame</span>(precision.ruv4.results$error_store[<span class="dv">2</span>, <span class="st">&quot;PC-&quot;</span>]), 
+             <span class="dt">aligh =</span> <span class="st">&quot;l&quot;</span>,
+             <span class="dt">caption =</span> <span class="st">&quot;Analysis of simulated data in presence of confounding handling, adjusting batch effects with RUV-4&quot;</span>)</code></pre>
+<table>
+<caption>Analysis of simulated data in presence of confounding handling, adjusting batch effects with RUV-4</caption>
+<thead>
+<tr class="header">
+<th align="right">PAM.NN</th>
+<th align="right">PAM.QN</th>
+<th align="right">LASSO.NN</th>
+<th align="right">LASSO.QN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.375000</td>
+<td align="right">0.390625</td>
+<td align="right">0.437500</td>
+<td align="right">0.390625</td>
+</tr>
+<tr class="even">
+<td align="right">0.265625</td>
+<td align="right">0.125000</td>
+<td align="right">0.390625</td>
+<td align="right">0.265625</td>
+</tr>
+<tr class="odd">
+<td align="right">0.406250</td>
+<td align="right">0.406250</td>
+<td align="right">0.421875</td>
+<td align="right">0.375000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="extension" class="section level2">
+<h2>Extension</h2>
+<p>Both <code>uni.handled.simulate()</code> and <code>precision.simulate()</code> allows user-defined function for normalization or classification method comparison purposes.</p>
+<p>A user-defined normalization method function must allow two input parameters: <code>train</code> and <code>test</code> (<code>test</code> can be <code>NULL</code>). The user is required to provide a short name for the normalization method and use the short name (in lower case) when defining the output. For example, if the short name is “RN”, the function must return a list of two outputs: <code>train.rn</code> and <code>test.rn</code> for both normalized training and normalized test.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># an example of user-defined normalization method function:</span>
+<span class="st">&quot;rand.norm&quot;</span> &lt;-<span class="st"> </span>function(train, <span class="dt">test =</span> <span class="ot">NULL</span>){
+  <span class="kw">stopifnot</span>(<span class="kw">nrow</span>(train) ==<span class="st"> </span><span class="kw">nrow</span>(test))
+  
+  if(<span class="kw">is.null</span>(test)) {
+    test.frn &lt;-<span class="st"> </span><span class="ot">NULL</span>
+  } else{
+    train.rn &lt;-<span class="st"> </span><span class="kw">apply</span>(train, <span class="dv">2</span>, sample)
+    <span class="kw">dimnames</span>(train.rn) &lt;-<span class="st"> </span><span class="kw">dimnames</span>(train)
+    
+    test.frn &lt;-<span class="st"> </span><span class="kw">apply</span>(test, <span class="dv">2</span>, sample)
+    <span class="kw">dimnames</span>(test.frn) &lt;-<span class="st"> </span><span class="kw">dimnames</span>(test)
+  }
+  
+  <span class="kw">return</span>(<span class="kw">list</span>(<span class="st">&quot;train.rn&quot;</span> =<span class="st"> </span>train.rn,
+              <span class="st">&quot;test.frn&quot;</span> =<span class="st"> </span>test.frn))
+}
+
+uni.handled.results.rn &lt;-<span class="st"> </span><span class="kw">uni.handled.simulate</span>(<span class="dt">myseed =</span> <span class="dv">1</span>, <span class="dt">N =</span> <span class="dv">3</span>,
+                                       <span class="dt">smp.eff =</span> smp.eff.nc,
+                                       <span class="dt">norm.list =</span> <span class="kw">c</span>(<span class="st">&quot;NN&quot;</span>, <span class="st">&quot;QN&quot;</span>, <span class="st">&quot;RN&quot;</span>),
+                                       <span class="dt">class.list =</span> <span class="kw">c</span>(<span class="st">&quot;PAM&quot;</span>, <span class="st">&quot;LASSO&quot;</span>), 
+                                       <span class="dt">norm.funcs =</span> <span class="st">&quot;rand.norm&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(<span class="kw">data.frame</span>(uni.handled.results.rn$error_store[<span class="dv">2</span>, ]), 
+             <span class="dt">caption =</span> <span class="st">&quot;Analysis of randomized data (with RN)&quot;</span>)</code></pre>
+<table>
+<caption>Analysis of randomized data (with RN)</caption>
+<thead>
+<tr class="header">
+<th align="right">PAM.NN</th>
+<th align="right">PAM.QN</th>
+<th align="right">PAM.RN</th>
+<th align="right">LASSO.NN</th>
+<th align="right">LASSO.QN</th>
+<th align="right">LASSO.RN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.140625</td>
+<td align="right">0.203125</td>
+<td align="right">0.578125</td>
+<td align="right">0.12500</td>
+<td align="right">0.125000</td>
+<td align="right">0.500000</td>
+</tr>
+<tr class="even">
+<td align="right">0.109375</td>
+<td align="right">0.093750</td>
+<td align="right">0.593750</td>
+<td align="right">0.06250</td>
+<td align="right">0.078125</td>
+<td align="right">0.562500</td>
+</tr>
+<tr class="odd">
+<td align="right">0.093750</td>
+<td align="right">0.046875</td>
+<td align="right">0.531250</td>
+<td align="right">0.09375</td>
+<td align="right">0.078125</td>
+<td align="right">0.515625</td>
+</tr>
+</tbody>
+</table>
+<p>For each user-defined classification method, the user must provide two functions: one for building model and one for predicting. The build function must allow input parameters <code>kfold</code>, <code>X</code>, <code>y</code>, <code>seed</code>, and must return a list of outputs at minimal including <code>mc</code>, <code>model</code> (naming must match). The predict function must allow three input parameters for the build model, object to be predicted, and group ID of the object to be predicted (note: order matters). Lastly, the predict function must return a list of outputs at minimal including <code>mc</code> for misclassification error rate (naming must match). It is not required but is highly recommended to return predicted probabilities and selected features for future uses.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># example of user-defined classification method functions:</span>
+<span class="st">&quot;build.ridge&quot;</span> &lt;-<span class="st"> </span>function(<span class="dt">kfold =</span> <span class="dv">5</span>, X, y, seed, <span class="dt">alp =</span> <span class="dv">0</span>){
+  ptm &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
+  <span class="kw">set.seed</span>(seed)
+  
+  cv.fit &lt;-<span class="st"> </span>glmnet::<span class="kw">cv.glmnet</span>(<span class="dt">x =</span> <span class="kw">data.matrix</span>(<span class="kw">t</span>(X)), <span class="dt">y =</span> <span class="kw">factor</span>(y),
+                              <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="dt">type.measure =</span> <span class="st">&quot;class&quot;</span>, <span class="dt">alpha =</span> alp, <span class="dt">nfold =</span> kfold)
+  mc &lt;-<span class="st"> </span>cv.fit$cvm[<span class="kw">which</span>(cv.fit$lambda ==<span class="st"> </span>cv.fit$lambda.1se)]
+  <span class="co">#best.lambda &lt;- cv.fit$lambda.1se # can be extracted from cv.fit</span>
+  coefs &lt;-<span class="st"> </span><span class="kw">coef</span>(cv.fit, <span class="dt">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)
+  time &lt;-<span class="st"> </span><span class="kw">proc.time</span>() -<span class="st"> </span>ptm
+  <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">mc=</span>mc, <span class="dt">time=</span>time, <span class="dt">model=</span>cv.fit, <span class="dt">cfs=</span>coefs))
+}
+
+<span class="co"># Ridge has the same prediction function as LASSO</span>
+
+uni.handled.results.ridge &lt;-<span class="st"> </span><span class="kw">uni.handled.simulate</span>(<span class="dt">myseed =</span> <span class="dv">1</span>, <span class="dt">N =</span> <span class="dv">3</span>,
+                                   <span class="dt">smp.eff =</span> smp.eff.nc,
+                                   <span class="dt">norm.list =</span> <span class="kw">c</span>(<span class="st">&quot;NN&quot;</span>, <span class="st">&quot;RN&quot;</span>),
+                                   <span class="dt">class.list =</span> <span class="kw">c</span>(<span class="st">&quot;LASSO&quot;</span>, <span class="st">&quot;Ridge&quot;</span>), 
+                                   <span class="dt">norm.funcs =</span> <span class="st">&quot;rand.norm&quot;</span>,
+                                   <span class="dt">class.funcs =</span> <span class="st">&quot;build.ridge&quot;</span>, 
+                                   <span class="dt">pred.funcs =</span> <span class="st">&quot;lasso.predict&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(<span class="kw">data.frame</span>(uni.handled.results.ridge$error_store[<span class="dv">2</span>, ]), 
+             <span class="dt">caption =</span> <span class="st">&quot;Analysis of randomized data (with Ridge)&quot;</span>)</code></pre>
+<table>
+<caption>Analysis of randomized data (with Ridge)</caption>
+<thead>
+<tr class="header">
+<th align="right">LASSO.NN</th>
+<th align="right">LASSO.RN</th>
+<th align="right">Ridge.NN</th>
+<th align="right">Ridge.RN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.09375</td>
+<td align="right">0.468750</td>
+<td align="right">0.1250</td>
+<td align="right">0.484375</td>
+</tr>
+<tr class="even">
+<td align="right">0.06250</td>
+<td align="right">0.562500</td>
+<td align="right">0.1875</td>
+<td align="right">0.546875</td>
+</tr>
+<tr class="odd">
+<td align="right">0.09375</td>
+<td align="right">0.515625</td>
+<td align="right">0.1250</td>
+<td align="right">0.515625</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="other-useful-functions" class="section level2">
+<h2>Other useful functions</h2>
+<p>We list a handful of useful functions available in <code>PRECISION</code> in the next section.</p>
+<div id="differential-expression-analysis" class="section level4">
+<h4>Differential expression analysis</h4>
+<p>Simple per-marker comparison methods such as differential expression analysis can be particularly useful when making preliminary data analysis decision. Therefore, we provide <code>limma.pbset</code> to perform differential expression analysis on expression data.</p>
+<pre class="sourceCode r"><code class="sourceCode r">r.data.psl.nc &lt;-<span class="st"> </span>r.data.psl[!<span class="kw">rownames</span>(r.data.psl) %in%<span class="st"> </span>ctrl.genes, ] <span class="co"># nc for non-control probes</span>
+
+group.id &lt;-<span class="st"> </span><span class="kw">substr</span>(<span class="kw">colnames</span>(r.data.psl.nc), <span class="dv">7</span>, <span class="dv">7</span>)
+group.id.level &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(group.id))
+limma.fit.r.data&lt;-<span class="st"> </span><span class="kw">limma.pbset</span>(<span class="dt">data =</span> r.data.psl.nc, 
+                               <span class="dt">group.id =</span> group.id,
+                               <span class="dt">group.id.level =</span> group.id.level)
+<span class="kw">table</span>(limma.fit.r.data$P.Value &lt;<span class="st"> </span><span class="fl">0.01</span>, <span class="dt">dnn =</span> <span class="st">&quot;DE genes&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">tab &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">table</span>(limma.fit.r.data$P.Value &lt;<span class="st"> </span><span class="fl">0.01</span>))
+<span class="kw">colnames</span>(tab) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;DEA&quot;</span>, <span class="st">&quot;Count&quot;</span>)
+knitr::<span class="kw">kable</span>(tab, <span class="dt">rownames =</span> <span class="ot">NULL</span>)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">DEA</th>
+<th align="right">Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">FALSE</td>
+<td align="right">158</td>
+</tr>
+<tr class="even">
+<td align="left">TRUE</td>
+<td align="right">17</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="classify-gene-type-into-biological-technical-or-others" class="section level4">
+<h4>Classify gene type into biological, technical or others</h4>
+<p>When comparing classifiers, we can use <code>classify.gene.type()</code> to classify the selected genes for a classifier, such as the number of false positive genes (selected, but are technical genes).</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># classify gene type</span>
+gene.cat &lt;-<span class="st"> </span><span class="kw">classify.gene.type</span>(<span class="dt">smp.eff =</span> smp.eff.nc,
+                               <span class="dt">ary.eff =</span> ary.eff.nc,
+                               <span class="dt">smp.eff.train.ind =</span> smp.eff.train.ind,
+                               <span class="dt">ary.eff.train.ind =</span> ary.eff.train.ind,
+                               <span class="dt">group.id =</span> group.id.list,
+                               <span class="dt">ary.to.smp.assign =</span> ary.to.smp.assign)</code></pre>
+</div>
+<div id="calculate-confounding-level-between-array-effects-and-sample-groups" class="section level4">
+<h4>Calculate confounding level between array effects and sample groups</h4>
+<p>We used a measurement to quantify confounding level between array effects and sample group of interest<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>. We used this measurement to cross-check our results based on confounding and balanced study designs.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate confounding level </span>
+nbe.genes &lt;-<span class="st"> </span><span class="kw">ifelse</span>(gene.cat ==<span class="st"> </span>-<span class="dv">1</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)
+<span class="kw">calc.confounding.level</span>(<span class="dt">data =</span> smp.eff.nc[, smp.eff.train.ind], 
+                       <span class="dt">group.id =</span> <span class="kw">substr</span>(smp.eff.train.ind, <span class="dv">7</span>, <span class="dv">7</span>), 
+                       <span class="dt">nbe.genes =</span> nbe.genes)</code></pre>
+</div>
+<div id="reduce-signal" class="section level4">
+<h4>Reduce signal</h4>
+<p>It may be necessary to manipulate the level of signal (i.e., the mean group difference between sample group) in a molecular classification study, so that the ormalization effects or classification methods can be distinguishable. To manipulate the level of signal, <code>reduce.signal()</code> can be used.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># reduced signal by half</span>
+group.id &lt;-<span class="st"> </span><span class="kw">substr</span>(<span class="kw">colnames</span>(smp.eff.nc), <span class="dv">7</span>, <span class="dv">7</span>)
+redhalf.smp.eff.nc &lt;-<span class="st"> </span><span class="kw">reduce.signal</span>(<span class="dt">smp.eff =</span> smp.eff.nc,
+                            <span class="dt">group.id =</span> group.id,
+                            <span class="dt">group.id.level =</span> <span class="kw">c</span>(<span class="st">&quot;E&quot;</span>, <span class="st">&quot;V&quot;</span>),
+                            <span class="dt">reduce.multiplier =</span> <span class="dv">1</span>/<span class="dv">2</span>)
+
+
+<span class="co"># extract differential expressed genes</span>
+smp.eff.nc.psl &lt;-<span class="st"> </span><span class="kw">med.sum.pbset</span>(smp.eff.nc)
+s.e.limma.fit &lt;-<span class="st"> </span><span class="kw">limma.pbset</span>(<span class="dt">data =</span> smp.eff.nc.psl,
+                         <span class="dt">group.id =</span> group.id,
+                         <span class="dt">group.id.level =</span> <span class="kw">c</span>(<span class="st">&quot;E&quot;</span>, <span class="st">&quot;V&quot;</span>))
+de.ind &lt;-<span class="st"> </span>s.e.limma.fit$P.Value &lt;<span class="st"> </span><span class="fl">0.01</span>
+
+de.gene.name &lt;-<span class="st"> </span><span class="kw">rownames</span>(redhalf.smp.eff.nc)[<span class="kw">which</span>(de.ind)][<span class="dv">2</span>]
+nonde.gene.name &lt;-<span class="st"> </span><span class="kw">rownames</span>(redhalf.smp.eff.nc)[-<span class="kw">which</span>(de.ind)][<span class="dv">2</span>]
+
+smp.eff.nc.de &lt;-<span class="st"> </span>smp.eff.nc[de.gene.name, ]
+redhalf.smp.eff.nc.de &lt;-<span class="st"> </span>redhalf.smp.eff.nc[de.gene.name, ]
+
+smp.eff.nc.nonde &lt;-<span class="st"> </span>smp.eff.nc[nonde.gene.name, ]
+redhalf.smp.eff.nc.nonde &lt;-<span class="st"> </span>redhalf.smp.eff.nc[nonde.gene.name, ]</code></pre>
+<p><img src="data:image/png;base64,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" /></p>
+</div>
+<div id="amplify-array-effects" class="section level4">
+<h4>Amplify array effects</h4>
+<p>Again, it may be necessary to manipulate the confounding level of array effects in the simulation study in order to evaluate normalization or classification methods in the presence of array effect. We offer three amplification methods in <code>amplify.ary.eff()</code>:</p>
+<ol style="list-style-type: decimal">
+<li><p>location shift - per selected array, shifting all probe expressions up or down by a constant.</p></li>
+<li><p>scaling 1 - per selected array, expanding the variance of probes towards the array’s inter-quartile in both directions; Probes outside inter-quartile range remain unchanged.</p></li>
+<li><p>scaling 2 - scaling all probe expressions in arrays by the power of constants that are different for each batch. In our training data, there are four batches.</p></li>
+</ol>
+<pre class="sourceCode r"><code class="sourceCode r">ary.eff.nc.tr &lt;-<span class="st"> </span>ary.eff.nc[, <span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">64</span>, <span class="dv">129</span>:<span class="dv">192</span>)]
+
+<span class="co"># shift</span>
+ary.eff.nc.tr.shift &lt;-<span class="st"> </span><span class="kw">amplify.ary.eff</span>(<span class="dt">ary.eff.tr =</span> ary.eff.nc.tr,
+       <span class="dt">amplify.slide.id =</span> <span class="kw">colnames</span>(ary.eff.nc.tr)[<span class="dv">1</span>:<span class="dv">64</span>],
+       <span class="dt">amplify.level =</span> <span class="dv">2</span>, <span class="dt">type =</span> <span class="st">&quot;shift&quot;</span>)
+
+<span class="co"># scale 1</span>
+ary.eff.nc.tr.scale1 &lt;-<span class="st"> </span><span class="kw">amplify.ary.eff</span>(<span class="dt">ary.eff.tr =</span> ary.eff.nc.tr,
+       <span class="dt">amplify.slide.id =</span> <span class="kw">colnames</span>(ary.eff.nc.tr)[<span class="dv">1</span>:<span class="dv">64</span>],
+       <span class="dt">amplify.level =</span> <span class="dv">2</span>, <span class="dt">type =</span> <span class="st">&quot;scale1&quot;</span>)
+
+<span class="co"># scale 2</span>
+amplify.slide.id &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dv">1</span>:<span class="dv">40</span>, <span class="dv">41</span>:<span class="dv">64</span>, (<span class="dv">129</span>:<span class="dv">160</span>) -<span class="st"> </span><span class="dv">64</span>, (<span class="dv">161</span>:<span class="dv">192</span>) -<span class="st"> </span><span class="dv">64</span>)
+for(i in <span class="dv">1</span>:<span class="kw">length</span>(amplify.slide.id)) 
+  amplify.slide.id[[i]] &lt;-<span class="st"> </span><span class="kw">colnames</span>(ary.eff.nc.tr)[amplify.slide.id[[i]]]
+amplify.level &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1.2</span>, <span class="fl">1.3</span>, <span class="dv">1</span>/<span class="dv">3</span>, <span class="dv">2</span>/<span class="dv">3</span>)
+
+ary.eff.nc.tr.scale2 &lt;-<span class="st"> </span><span class="kw">amplify.ary.eff</span>(<span class="dt">ary.eff.tr =</span> ary.eff.nc.tr,
+       <span class="dt">amplify.slide.id =</span> amplify.slide.id,
+       <span class="dt">amplify.level =</span> amplify.level,
+       <span class="dt">type =</span> <span class="st">&quot;scale2&quot;</span>)
+
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>))
+rng &lt;-<span class="st"> </span><span class="kw">range</span>(ary.eff.nc.tr, ary.eff.nc.tr.shift, ary.eff.nc.tr.scale1, ary.eff.nc.tr.scale2)
+<span class="kw">boxplot</span>(ary.eff.nc.tr, <span class="dt">main =</span> <span class="st">&quot;Original&quot;</span>,
+        <span class="dt">ylim =</span> rng, <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.2</span>, <span class="dt">xaxt =</span> <span class="st">&quot;n&quot;</span>)
+<span class="kw">boxplot</span>(ary.eff.nc.tr.shift, <span class="dt">main =</span> <span class="st">&quot;Shift&quot;</span>,
+        <span class="dt">ylim =</span> rng, <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.2</span>, <span class="dt">xaxt =</span> <span class="st">&quot;n&quot;</span>)
+<span class="kw">boxplot</span>(ary.eff.nc.tr.scale1, <span class="dt">main =</span> <span class="st">&quot;Scaling 1&quot;</span>,
+        <span class="dt">ylim =</span> rng, <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.2</span>, <span class="dt">xaxt =</span> <span class="st">&quot;n&quot;</span>)
+<span class="kw">boxplot</span>(ary.eff.nc.tr.scale2, <span class="dt">main =</span> <span class="st">&quot;Scaling 2&quot;</span>,
+        <span class="dt">ylim =</span> rng, <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.2</span>, <span class="dt">xaxt =</span> <span class="st">&quot;n&quot;</span>)</code></pre>
+<p><img src="data:image/png;base64,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" /></p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 <a href="http://clincancerres.aacrjournals.org/content/20/13/3371.long">here</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>ComBat and sva: Leek JT, Johnson WE, Parker HS, Fertig EJ, Jaffe AE and Storey JD (2016). sva: Surrogate Variable Analysis. R package version 3.20.0. RUV: Johann Gagnon-Bartsch (2015). ruv: Detect and Remove Unwanted Variation using Negative Controls. R package version 0.9.6.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Bolstad BM, Irizarry RA, Astrand M, Speed TP: A comparison of normalization methods for high density oligonucleotide array data based on variance and bias. Bioinformatics 2003, 19(2):185-193. Bolstad BM: preprocessCore: A collection of pre-processing functions. R package version 1.34.0. 2016.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Huber W, von Heydebreck A, Sultmann H, Poustka A, Vingron M: Variance stabilization applied to microarray data calibration and to the quantification of differential expression. Bioinformatics 2002, 18 Suppl 1(suppl 1):S96-104.<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Tibshirani R, Hastie T, Narasimhan B, Chu G: Diagnosis of multiple cancer types by shrunken centroids of gene expression. Proceedings of the National Academy of Sciences of the United States of America 2002, 99(10):6567-6572. Hastie T, R., Narasimhan B, Chu G: pamr: Pam: prediction analysis for microarrays; 2014.<a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>Tibshirani R: Regression shrinkage and selection via the Lasso. J Roy Stat Soc B Met 1996, 58(1):267-288. Friedman J, Hastie T, Tibshirani R: Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw 2010, 33(1):1-22.<a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>Leek JT, Scharpf RB, Bravo HC, Simcha D, Langmead B, Johnson WE, Geman D, Baggerly K, Irizarry RA: Tackling the widespread and critical impact of batch effects in high-throughput data. Nature reviews Genetics 2010, 11(10):733-739.<a href="#fnref7">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

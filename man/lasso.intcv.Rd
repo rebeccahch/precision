@@ -7,21 +7,28 @@
 lasso.intcv(kfold = 5, X, y, seed, alp = 1)
 }
 \arguments{
-\item{kfold}{number of folds; default is 5.}
+\item{kfold}{number of folds. By default, \code{kfold = 5}.}
 
-\item{X}{expression dataset to be trained, rows as probes, columns as samples.}
+\item{X}{expression dataset to be trained. This dataset must have rows as probes and columns as samples.}
 
-\item{y}{sample group corresponding to the dataset to be trained; should have the equal length as the number of samples as X.}
+\item{y}{a vector of sample group of each sample for the dataset to be trained.
+It must have an equal length to the number of samples in \code{X}.}
 
-\item{seed}{specifies seed for random assignment using set.seed().}
+\item{seed}{an integer used to initialize a pseudorandom number generator.}
 
-\item{alp}{alpha, the penalty type from 0 to 1; default alp = 1 for LASSO; alp = 0 for a ridge classifier.}
+\item{alp}{alpha, the penalty type. It can be any numeric value from 0 to 1.
+By default, \code{alp = 1} which is for LASSO. \code{alp = 0} is for ridge and
+any value in between is for elastic net.}
 }
 \value{
-a LASSO classifier
+a list of 4 elements:
+\item{mc}{an internal misclassification error rate}
+\item{time}{the processing time of performing internal validation with LASSO}
+\item{model}{a LASSO classifier, resulted from \code{cv.fit}}
+\item{cfs}{estimated coefficients for the final classifier}
 }
 \description{
-Builds a LASSO classifier using internal cross validation, with a 5-fold cross validation as default.
+Build a LASSO classifier using internal cross validation to choose the turning parameter, with a 5-fold cross validation as default.
 }
 \examples{
 set.seed(101)
@@ -37,6 +44,12 @@ smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
 lasso.int <- lasso.intcv(X = smp.eff.nc.tr,
                          y = substr(colnames(smp.eff.nc.tr), 7, 7),
                          kfold = 5, seed = 1, alp = 1)
+
+}
+\references{
+Friedman, J., Hastie, T. and Tibshirani, R. (2008) Regularization Paths for Generalized Linear Mod- els via Coordinate Descent,
+http://www.stanford.edu/~hastie/Papers/glmnet.pdf
+Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010
 }
 \keyword{classification}
 

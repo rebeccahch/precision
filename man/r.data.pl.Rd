@@ -3,13 +3,16 @@
 \docType{data}
 \name{r.data.pl}
 \alias{r.data.pl}
-\title{The randomized (benchmark) probe-level dataset, 10 probes for each unique probe}
-\format{A data matrix with 1810 rows (probes) and 192 columns (samples), column names ending with E/V are endometrial/ovarian samples.}
+\title{The uniformly-handled (benchmark) probe-level dataset, 10 probes for each unique probe}
+\format{A data matrix with 1810 rows (probes) and 192 columns (samples).
+Its column names ending with "E" or "V" indicate whether a sample belongs to endometrial or ovarian tumor sample.}
 \usage{
 r.data.pl
 }
 \description{
-The randomized probe-level dataset, non-control-probe-removed, 10 probes for each unique probe, no background adjusted and after logged 2.
+The uniforly-handled probe-level dataset, with non-control-probe removed,
+10 probes per each unique probe, no background adjustment.
+The expressions are on a log-2 scale.
 }
 \keyword{example.data}
 

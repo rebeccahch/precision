@@ -1,17 +1,22 @@
-#' @title The randomized (benchmark) probe-level dataset, 10 probes for each unique probe
+#' @title The uniformly-handled (benchmark) probe-level dataset, 10 probes for each unique probe
 #'
-#' @description The randomized probe-level dataset, non-control-probe-removed, 10 probes for each unique probe, no background adjusted and after logged 2.
+#' @description The uniforly-handled probe-level dataset, with non-control-probe removed,
+#' 10 probes per each unique probe, no background adjustment.
+#' The expressions are on a log-2 scale.
 #'
-#' @format A data matrix with 1810 rows (probes) and 192 columns (samples), column names ending with E/V are endometrial/ovarian samples.
+#' @format A data matrix with 1810 rows (probes) and 192 columns (samples).
+#' Its column names ending with "E" or "V" indicate whether a sample belongs to endometrial or ovarian tumor sample.
 #' @keywords example.data
 
 "r.data.pl"
 
-#' @title The non-randomized (test) probe-level dataset, 10 probes for each unique probe
+#' @title The non-uniformly-handled (test) probe-level dataset, 10 probes for each unique probe
 #'
-#' @description The non-randomized probe-level dataset, non-control-probe-removed, 10 probes for each unique probe, no background adjusted and after logged 2.
+#' @description The non-uniformly-handled probe-level dataset, with non-control-probe removed,
+#' 10 probes per each unique probe, no background adjustment. The expressions are on a log-2 scale.
 #'
-#' @format A data matrix with 1810 rows (probes) and 192 columns (samples), column names ending with E/V are endometrial/ovarian samples.
+#' @format A data matrix with 1810 rows (probes) and 192 columns (samples).
+#' Its column names ending with "E" or "V" indicate whether a sample belongs to endometrial or ovarian tumor sample.
 #' @keywords example.data
 
 "non.r.data.pl"

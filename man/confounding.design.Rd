@@ -7,19 +7,30 @@
 confounding.design(seed, num.smp, degree = "complete", rev.order = FALSE)
 }
 \arguments{
-\item{seed}{specifies seed for random assignment using set.seed().}
+\item{seed}{an integer used to initialize a pseudorandom number generator.}
 
-\item{num.smp}{number of samples.}
+\item{num.smp}{number of arrays.}
 
-\item{degree}{level of confounding; has to be either "complete" or "partial" for either "complete confounding" or "partial confounding" design; default is "complete".}
+\item{degree}{level of confounding. It must be either "complete" or "partial"
+for "complete confounding" or "partial confounding" design.
+By default, \code{degree = "complete"}.}
 
-\item{rev.order}{FALSE indicating no reverse order, first half arrays to group 1 (endometrial), second half arrays to group 2 (ovarian); default is FALSE.}
+\item{rev.order}{whether the array-to-sample-group assignment should be flipped.
+Originally the first half arrays are designated to be assigned to group 1 (endometrial sample group)
+and the second half to group 2 (ovarian sample group).
+If the array-to-sample-group assignment is flipped (rev.order = TRUE),
+the first half of the array IDs will be swapped with the second half of the array IDs.
+By default, \code{rev.order = FALSE}.}
 }
 \value{
-array-to-sample assignment, first half for group 1 (endometrial), second half for group 2 (ovarian)
+a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
+As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
 }
 \description{
-Assigns arrays to samples with confounding design.
+Assign arrays to samples with confounding design, intentionally assigning arrays to sample groups in the order of array collection.
+Since the non-uniformly-handled data had the earlier arrays processed by one technician and the later arrays processed by another,
+assigning the earlier arrays to one sample group and the later arrays to another
+results in confounding handling effects with the sample groups.
 }
 \examples{
 cc.ind <- confounding.design(seed = 1, num.smp = 128,

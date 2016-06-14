@@ -7,22 +7,30 @@
 med.sum.pbset(data, pbset.id = NULL, num.per.unipbset = 10)
 }
 \arguments{
-\item{data}{expression data to be summarized, rows as probes, columns as samples; rownames as probe names;
-only accept data matrix with a fixed number of probes per unique probe-set. If the data is already on the probe-set level, no manipulation will be done.}
+\item{data}{expression dataset to be summarized.
+The dataset must have rows as probes and columns as samples.
+It must be a data matrix with the same number of probes per unique probe-set.
+If it is already on the probe-set level, no manipulation will be done.}
 
-\item{pbset.id}{unique probe-set name, if not specified then use the unique probe name of the data.}
+\item{pbset.id}{a vector of unique probe-set names.
+If it is not specified, then by default it is set to be the unique probe names of the data.}
 
-\item{num.per.unipbset}{number of probes for each unique probe-set; default is 10.}
+\item{num.per.unipbset}{number of probes for each unique probe-set.
+By default, \code{num.per.unipbset = 10}.}
 }
 \value{
 probe-set median summarized data
 }
 \description{
-Summarizes probe-set using median of each unique probe, only taking in data matrix with a fixed number of probes per unique probe-set.
+Summarize probe-set using median of each unique probe and
+only takes in data matrix with the same number of probes per unique probe-set.
 }
 \examples{
+\dontrun{
 r.data.psl <- med.sum.pbset(data = r.data.pl,
                             num.per.unipbset = 10)
+}
+
 }
 \keyword{preprocess}
 

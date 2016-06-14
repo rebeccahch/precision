@@ -2,21 +2,23 @@
 % Please edit documentation in R/estimate.smp.eff.R
 \name{estimate.smp.eff}
 \alias{estimate.smp.eff}
-\title{Estimated Sample Effect}
+\title{Estimated Sample Effects}
 \usage{
 estimate.smp.eff(r.data)
 }
 \arguments{
-\item{r.data}{randomized expression dataset, rows as probes, columns as samples.}
+\item{r.data}{the uniformly-handled expression dataset.
+The dataset must have rows as probes and columns as samples.}
 }
 \value{
-an estimation of the sample effect
+an estimation of the sample effects
 }
 \description{
-Estimates sample effect from the expressions of the randomized data
+Estimate sample effects from the expressions of the uniformly-handled data.
 }
 \examples{
 smp.eff <- estimate.smp.eff(r.data = r.data.pl)
+
 }
 \keyword{data.setup}
 

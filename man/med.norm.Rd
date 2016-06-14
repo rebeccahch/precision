@@ -2,20 +2,29 @@
 % Please edit documentation in R/med.norm.R
 \name{med.norm}
 \alias{med.norm}
-\title{Median nomalization}
+\title{Median normalization}
 \usage{
 med.norm(train, test = NULL)
 }
 \arguments{
-\item{train}{training data to be median normalized, rows as probes, columns as samples.}
+\item{train}{training dataset to be median normalized.
+The dataset must have rows as probes and columns as samples.}
 
-\item{test}{test data to be frozen median normalized, rows as probes with equal number of rows as the training set, columns as samples.}
+\item{test}{test dataset to be frozen median normalized.
+The dataset must have rows as probes and columns as samples.
+The number of rows must equal to the number of rows in the training set.
+By default, the test set is not specified (\code{test = NULL}) and
+no frozen normalization will be performed.}
 }
 \value{
-a list of two datasets, the normalized training set and the frozen normalied test set
+a list of two datasets:
+\item{train.mn}{the normalized training set}
+\item{test.fmn}{the frozen normalized test set, if test set is specified}
 }
 \description{
-Normalizes training dataset so that each array shares a same median, stores the median from the training dataset as the reference to frozen median normalize test dataset.
+Normalize training dataset so that each array shares
+a same median and store the median from the training dataset
+as the reference to frozen median normalize test dataset.
 }
 \examples{
 set.seed(101)

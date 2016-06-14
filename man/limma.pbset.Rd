@@ -7,31 +7,48 @@
 limma.pbset(data, group.id, group.id.level = c("E", "V"), pbset.id = NULL)
 }
 \arguments{
-\item{data}{expression dataset to be differentially expression analyzed, rows as unique probe-sets, columns as samples.}
+\item{data}{expression dataset to be analyzed.
+The dataset must have rows as unique probe-sets and columns as samples.}
 
-\item{group.id}{sample group label; must be a 2-level non-numeric factor vector.}
+\item{group.id}{a vector of sample-group labels for each sample of the dataset.
+It must be a 2-level non-numeric factor vector.}
 
-\item{group.id.level}{sample group label level, the first one being the reference level; default = c("E", "V") in our studies when comparing endometrial to ovarian samples.}
+\item{group.id.level}{a vector of sample-group label level.
+It must have two and only two elements and the first element is the reference.
+By default, \code{group.id.level = c("E", "V")}.
+That is in our study, we compare endometrial tumor samples to
+ovarian tumor samples, with endometrial as our reference.}
 
-\item{pbset.id}{unique probe-set name; default is NULL, the rownames of the dataset.}
+\item{pbset.id}{a vector of unique probe-set names.
+By default, \code{pbset.id = NULL} for it to be the row names of the dataset.}
 }
 \value{
-differential expression anlysis results, group means, group standard deviations
+a data frame with differential expression analysis results,
+group means and group standard deviations, for each unique probe-set.
 }
 \description{
-Performs two-group differential expression analysis using "limma".
+Perform two-group differential expression analysis using "limma".
 }
 \examples{
 r.data.psl <- med.sum.pbset(data = r.data.pl,
                             num.per.unipbset = 10)
 ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+
 r.data.psl.nc <- r.data.psl[!rownames(r.data.psl) \%in\% ctrl.genes, ]
+
 group.id <- substr(colnames(r.data.psl.nc), 7, 7)
 group.id.level <- levels(as.factor(group.id))
+
 limma.fit.r.data<- limma.pbset(data = r.data.psl.nc,
                                group.id = group.id,
                                group.id.level = group.id.level)
                                table(limma.fit.r.data$P.Value < 0.01, dnn = "DE genes")
+
+}
+\references{
+Ritchie ME, Phipson B, Wu D, Hu Y, Law CW, Shi W and Smyth GK (2015).
+"limma powers differential expression analyses for RNA-sequencing and microarray studies."
+Nucleic Acids Research, 43(7), pp. e47.
 }
 \keyword{DEA}
 

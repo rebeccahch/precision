@@ -1,12 +1,14 @@
-#' Classification analysis of uniformly-handled data
+#' Probe-level data truncation to a fixed number of probes per unique probe-set
 #'
-#' Performs classification analysis on the uniformly-handled data by reassigning samples to training and test set in Qin et al. (see reference).
+#' Truncate probe-level dataset so that it has a fixed number of probes per unique probe-set.
+#' We are safe to do so if the variation among replicates for the same probe is small.
 #'
-#' @references http://clincancerres.aacrjournals.org/content/20/13/3371.long
-#' @param data expression data, rows as probes, columns as samples.
-#' @param pbset.id unique probe-set name; default is NULL, the rownames of the dataset.
-#' @param num.per.unipbset number of probes for each unique probe-set; default is 10.
-#' @return benchmark analysis results with list of models built and internal and external misclassification error stored, also a list of assignment stored
+#' @param data probe-level expression dataset. The dataset must have rows as probes and columns as samples.
+#' @param pbset.id a vector of unique probe-set names.
+#' By default, \code{pbset.id = NULL} for it to be the row names of the dataset.
+#' @param num.per.unipbset number of probes for each unique probe-set to be truncated to.
+#' By default, \code{num.per.unipbset = 10}.
+#' @return truncated probe-level data
 #' @keywords data.setup
 #' @export
 #' @examples

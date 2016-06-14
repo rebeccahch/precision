@@ -7,15 +7,16 @@
 blocking.design(seed, num.smp)
 }
 \arguments{
-\item{seed}{specifies seed for random assignment using set.seed().}
+\item{seed}{an integer used to initialize a pseudorandom number generator.}
 
-\item{num.smp}{number of samples.}
+\item{num.smp}{number of arrays. It must be a multiple of 8.}
 }
 \value{
-array-to-sample assignment, first half for group 1 (endometrial), second half for group 2 (ovarian)
+a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
+As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
 }
 \description{
-Assigns arrays to samples with blocking design.
+Assign arrays to samples with blocking by (8-plex Agilent) array slide.
 }
 \examples{
 blocking.design(seed = 1, num.smp = 128)

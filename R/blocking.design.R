@@ -1,10 +1,12 @@
 #' Blocking Design
 #'
-#' Assigns arrays to samples with blocking design.
+#' Assign arrays to samples with blocking by (8-plex Agilent) array slide.
 #'
-#' @param seed specifies seed for random assignment using set.seed().
-#' @param num.smp number of samples.
-#' @return array-to-sample assignment, first half for group 1 (endometrial), second half for group 2 (ovarian)
+#' @param seed an integer used to initialize a pseudorandom number generator.
+#' @param num.smp number of arrays. It must be a multiple of 8.
+#' @return a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
+#  (first half of the samples belong to group 1 and second half to group 2).
+#' As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
 #' @export
 #' @keywords study.design
 #' @examples
@@ -12,7 +14,8 @@
 #'
 
 "blocking.design" <- function(seed, num.smp){
-
+  stopifnot(is.numeric(seed))
+  stopifnot(is.numeric(num.smp))
   stopifnot(num.smp %% 8 == 0)
 
   set.seed(seed)

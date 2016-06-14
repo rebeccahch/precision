@@ -1,11 +1,20 @@
 #' Prediction with least absolute shrinkage and selection operator classifier
 #'
-#' Predicts from a least absolute shrinkage and selection operator fit.
+#' Predict from a least absolute shrinkage and selection operator fit.
 #'
-#' @param lasso.intcv.model a LASSO classifier built with lasso.intcv().
-#' @param pred.obj expression dataset to have its sample group predicted, rows as probes, columns as samples; should have equal number of probes as the data trained.
-#' @param pred.obj.group.id sample group corresponding to the dataset to be predicted; should have equal length as the number of samples as pred.obj.
-#' @return predicted object, predicted error and predicted features
+#' @references Friedman, J., Hastie, T. and Tibshirani, R. (2008)
+#' Regularization Paths for Generalized Linear Mod- els via Coordinate Descent,
+#' http://www.stanford.edu/~hastie/Papers/glmnet.pdf Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010
+#' @param lasso.intcv.model a LASSO classifier built with \code{lasso.intcv()}.
+#' @param pred.obj expression dataset to have its sample group predicted.
+#' The dataset must have rows as probes and columns as samples.
+#' It must have an equal number of probes as the dataset being trained.
+#' @param pred.obj.group.id a vector of sample-group labels for each sample of the dataset to be predicted.
+#' It must have an equal length to the number of samples as \code{pred.obj}.
+#' @return a list of 3 elements:
+#' \item{pred}{predicted sample group for each sample}
+#' \item{mc}{a predicted misclassification error rate (external validation)}
+#' \item{prob}{predicted probability for each sample}
 #' @export
 #' @import glmnet
 #' @keywords classification
@@ -19,6 +28,7 @@
 #' smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64),
 #'                                           sample(which(group.id == "V"), size = 64))]
 #' smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
+#'
 #' smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
 #' smp.eff.nc.te <- smp.eff.nc[, smp.eff.test.ind]
 #'
@@ -31,6 +41,7 @@
 #'                             pred.obj.group.id = substr(colnames(smp.eff.nc.te), 7, 7))
 #' lasso.int$mc
 #' lasso.pred$mc
+#'
 
 "lasso.predict" <- function(lasso.intcv.model, pred.obj, pred.obj.group.id){
   pred <- predict(lasso.intcv.model$model, newx = t(pred.obj),
@@ -38,7 +49,7 @@
                   type = "class")
 
   mc <- tabulate.ext.err.func(pred, pred.obj.group.id)
-  feature <- predict(lasso.intcv.model$model, newx = t(pred.obj),
+  prob <- predict(lasso.intcv.model$model, newx = t(pred.obj),
                      s = lasso.intcv.model$model$lambda.1se)
-  return(list(pred=pred, mc=mc, feature=feature))
+  return(list(pred=pred, mc=mc, prob=prob))
 }

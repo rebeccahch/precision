@@ -1,35 +1,72 @@
 #' Classification analysis of uniformly-handled data
 #'
-#' Performs classification analysis on the uniformly-handled data by reassigning samples to training and test set in Qin et al. (see reference).
+#' Perform classification analysis on the uniformly-handled data by re-assigning samples to training and test set.
+#' More details can be found in Qin et al. (see reference).
 #'
 #' @references http://clincancerres.aacrjournals.org/content/20/13/3371.long
-#' @param myseed specifies seed for random assignment using set.seed().
+#' @details The analysis for the uniformly-handled dataset consists of the following main steps:
+#'
+#' (1) randomly split the data into a training set and a test set, balanced by sample group of interest
+#'
+#' (2) preprocess the training data and the test data
+#'
+#' (3) build a classifier using the preprocessed training data
+#'
+#' (4) assess the mislcassification error rate of the classifier using the preprocessed test data
+#'
+#' This analysis is repeated for \code{N} random splits of training set and test set.
+#'
+#' Data preprocessing in (2) includes three steps: log2 transformation, normalization for training data
+#' and frozen normalization for test data,
+#' and probe-set summarization using median. Normalization methods are specified in \code{norm.list}.
+#'
+#' Classifier building in (3) includes choosing the tuning parameter for each method using five-fold cross-validation and
+#' measuring classifier accuarcy using the misclassification error rate.
+#' Classification methods are specified in \code{class.list}
+#'
+#' The error rate is evaluated by both external validation of test data and cross-validation of training data.
+#' For user-defined normalization method or classification method, please refer to the vignette.
+#'
+#' @param seed an integer used to initialize a pseudorandom number generator.
 #' @param N number of simulation runs.
-#' @param smp.eff sample effect data, rows as probes, columns as samples.
-#' @param norm.list a list of strings for normalization methods compared in the simulation study;
-#' built-in normalization methods includes "NN", "QN", "MN", "VSN" for "No Normalization", "Quantile Normalization", "Median Normalization", "Variance Stablizing Normalization";
-#' user can provide a list of normalization methods given the functions are supplied (also see norm.funcs).
-#' @param class.list a list of strings for classification methods compared in the simulation study;
-#' built-in classification methods are "PAM" and "LASSO" for "prediction analysis for microarrays" and "least absolute shrinkage and selection operator";
-#' user can provide a list of classification methods given the correponding model-building and predicting functions are supplied (also see class.funcs and pred.funcs).
-#' @param norm.funcs a list of strings for names of user-defined normalization method functions, in the order of norm.list excluding any built-in normalization methods.
-#' @param class.funcs a list of strings for names of user-defined classification model-building functions, in the order of class.list excluding any built-in classification methods.
-#' @param pred.funcs a list of strings for names of user-defined classification predicting functions, in the order of class.list excluding any built-in classification methods.
-#' @return benchmark analysis results with list of models built and internal and external misclassification error stored, also a list of assignment stored
+#' @param smp.eff the estimated sample effect dataset. This dataset must have rows as probes and columns as samples.
+#' @param norm.list a list of strings for normalization methods to be compared in the simulation study.
+#' The built-in normalization methods includes "NN", "QN", "MN", "VSN" for "No Normalization", "Quantile Normalization",
+#' "Median Normalization", "Variance Stabilizing Normalization".
+#' User can provide a list of normalization methods given the functions are supplied (also see \code{norm.funcs}).
+#' @param class.list a list of strings for classification methods to be compared in the simulation study.
+#' The built-in classification methods are "PAM" and "LASSO" for "prediction analysis for microarrays"
+#' and "least absolute shrinkage and selection operator".
+#' User can provide a list of classification methods given the correponding model-building
+#' and predicting functions are supplied (also see \code{class.funcs} and \code{pred.funcs}).
+#' @param norm.funcs a list of strings for names of user-defined normalization method functions, in the order of \code{norm.list},
+#' excluding any built-in normalization methods.
+#' @param class.funcs a list of strings for names of user-defined classification model-building functions, in the order of \code{class.list},
+#' excluding any built-in classification methods.
+#' @param pred.funcs a list of strings for names of user-defined classification predicting functions, in the order of \code{class.list},
+#' excluding any built-in classification methods.
+#' @return benchmark analysis results -- a list of training-and-test-set splits, fitted models,
+#' and misclassification error rates across simulation runs:
+#' \item{assign_store}{random training-and-test-set splits}
+#' \item{model_store}{models for each combination of normalization methods and classification methods}
+#' \item{error_store}{internal and external misclassification error rates for each combination of normalization methods and classification methods}
 #' @keywords simulation
 #' @export
 #' @examples
 #' \dontrun{
 #' smp.eff <- estimate.smp.eff(r.data = r.data.pl)
+#'
 #' ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+#'
 #' smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
-#' uni.handled.results <- uni.handled.simulate(myseed = 1, N = 3,
+#'
+#' uni.handled.results <- uni.handled.simulate(seed = 1, N = 3,
 #'                                             smp.eff = smp.eff.nc,
 #'                                             norm.list = c("NN", "QN"),
 #'                                             class.list = c("PAM", "LASSO"))
 #' }
 
-"uni.handled.simulate" <- function(myseed, N, smp.eff,
+"uni.handled.simulate" <- function(seed, N, smp.eff,
                                    norm.list = c("NN", "QN"),
                                    class.list = c("PAM", "LASSO"),
                                    norm.funcs = NULL,
@@ -56,7 +93,7 @@
 
 
   for(k in 1:N){ # each of the N simulation
-    cat(k, "round seed used:", myseed + k, "\n")
+    cat(k, "round seed used:", seed + k, "\n")
     cat("- setup simulated data \n")
 
     #** split training and test **#
@@ -107,7 +144,7 @@
                                  " <- ", class.func,
                                  "(kfold = 5, X = train.", norm.met2,
                                  ".fin, y = group.id.tr, seed = ",
-                                 myseed + k, ")")))
+                                 seed + k, ")")))
         # store model
         eval(parse(text = paste0("model_store['model', ][[1]][['", cc, ".",
                                  toupper(norm.met2), "']][[k]] <- list(",

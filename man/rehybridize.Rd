@@ -2,61 +2,83 @@
 % Please edit documentation in R/rehybridize.R
 \name{rehybridize}
 \alias{rehybridize}
-\title{Rehybridization with an array-to-sample assignment}
+\title{Virtual rehybridization with an array-to-sample assignment}
 \usage{
 rehybridize(smp.eff, ary.eff, group.id, group.id.level = c("E", "V"),
   ary.to.smp.assign, icombat = FALSE, isva = FALSE, iruv = FALSE,
   smp.eff.ctrl = NULL, ary.eff.ctrl = NULL)
 }
 \arguments{
-\item{smp.eff}{sample effect data, rows as probes, columns as samples.}
+\item{smp.eff}{the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.}
 
-\item{ary.eff}{array effect data, rows as probes, columns as samples; must have same dimensions and same probe name as sample effect data.}
+\item{ary.eff}{the estimated array effect dataset. The dataset must have rows as probes and columns as samples.
+It must have the same dimensions and the same probe names as the estimated sample effect dataset.}
 
-\item{group.id}{sample group label; must be a 2-level non-numeric factor vector.}
+\item{group.id}{a vector of sample-group labels for each sample of the estimated sample effect dataset.
+It must be a 2-level non-numeric factor vector.}
 
-\item{group.id.level}{sample group label level, the first one being the reference level; default = c("E", "V") in our studies when comparing endometrial to ovarian samples.}
+\item{group.id.level}{a vector of sample-group label level. It must have two and only two elements and
+the first element is the reference.
+By default, \code{group.id.level = c("E", "V")}. That is in our study, we compare endometrial tumor samples to
+ovarian tumor samples, with endometrial as our reference.}
 
-\item{ary.to.smp.assign}{array-to-sample assignment, equal length as number of samples of sample effect data; first half of the vector assigning to endometrial, second half to ovarian.}
+\item{ary.to.smp.assign}{a vector of indices that assign arrays to samples (see details in \code{blocking.design},
+\code{confounding.design} or \code{stratification.design}). It must have an equal length to the number of samples
+in the estimated sample effect dataset.
+The first half arrays in the vector have to be assigned to the sample group 1 and the second half to sample group 2.}
 
-\item{icombat}{indicator for combat adjustment; default is not to adjust, icombat = FALSE.}
+\item{icombat}{an indicator for combat adjustment. By default, \code{icombat = FALSE} for no ComBat adjustment.}
 
-\item{isva}{indicator for sva adjustment; default is not to adjust, isva = FALSE.}
+\item{isva}{an indicator for sva adjustment. By default, \code{isva = FALSE} for no sva adjustment.}
 
-\item{iruv}{indicator for RUV-4 adjustment; default is not to adjust, iruv = FALSE.}
+\item{iruv}{an indicator for RUV-4 adjustment. By default, \code{iruv = FALSE} for no RUV-4 adjustment.}
 
-\item{smp.eff.ctrl}{negative-control gene sample effect data if iruv = TRUE.}
+\item{smp.eff.ctrl}{the negative-control probe sample effect data if \code{iruv = TRUE}.
+This dataset must have rows as probes and columns as samples.
+It also must have the same number of samples and the same sample names as \code{smp.eff}.}
 
-\item{ary.eff.ctrl}{negative-control gene array effect data if iruv = TRUE}
+\item{ary.eff.ctrl}{the negative-control probe array effect data if \code{iruv = TRUE}.
+It also must have the same dimensions and the same probe names as \code{smp.eff.ctrl}.}
 }
 \value{
 simulated data, after batch adjustment if specified
 }
 \description{
-Creates simulated dataset through rehybridization with a specified array-to-sample assignment.
+Create simulated dataset through "virtual rehybridization" for a given array-to-sample assignment.
 }
 \examples{
 \dontrun{
 smp.eff <- estimate.smp.eff(r.data = r.data.pl)
 ary.eff <- estimate.ary.eff(r.data = r.data.pl,
                              non.r.data = non.r.data.pl)
+
 ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+
 smp.eff.nc <- smp.eff[!rownames(smp.eff) \%in\% ctrl.genes, ]
 ary.eff.nc <- ary.eff[!rownames(ary.eff) \%in\% ctrl.genes, ]
+
 assign.ind <- confounding.design(seed = 1, num.smp = 192,
 degree = "complete", rev.order = FALSE)
+
 group.id <- substr(colnames(smp.eff.nc), 7, 7)
+
+# no batch effect adjustment (default)
 sim.data.raw <- rehybridize(smp.eff = smp.eff.nc,
                             ary.eff = ary.eff.nc,
                             group.id = group.id,
                             ary.to.smp.assign = assign.ind)
+
+# batch effect adjusting with sva
 sim.data.sva <- rehybridize(smp.eff = smp.eff.nc,
                             ary.eff = ary.eff.nc,
                             group.id = group.id,
                             ary.to.smp.assign = assign.ind,
                             isva = TRUE)
+
+# batch effect adjusting with RUV-4
 smp.eff.ctrl <- smp.eff[rownames(smp.eff) \%in\% ctrl.genes, ]
 ary.eff.ctrl <- ary.eff[rownames(ary.eff) \%in\% ctrl.genes, ]
+
 sim.data.ruv <- rehybridize(smp.eff = smp.eff.nc,
                             ary.eff = ary.eff.nc,
                             group.id = group.id,

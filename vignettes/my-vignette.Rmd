@@ -42,7 +42,7 @@ The unique pair of datasets are generated from the same set of 96 endometrial an
 
 [^1]: Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [here](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
-This package includes two example datasets (probe level): randomized data `r.data.pl` and non-randomized data `non.r.data.pl`, both coming from the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
+This package includes two example datasets (probe level): uniformly-handled data `r.data.pl` and non-uniformly-handled data `non.r.data.pl`, both coming from the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
 
 ```{r load.data, eval = FALSE}
 data("r.data.pl")
@@ -51,9 +51,9 @@ data("non.r.data.pl")
 ```
 
 ```{r data.tab, results = "asis", echo = FALSE}
-knitr::kable(r.data.pl[1:15, 1:5], caption = "Randomized Data")
+knitr::kable(r.data.pl[1:15, 1:5], caption = "Uniformly-handled Data")
 
-knitr::kable(non.r.data.pl[1:15, 1:5], caption = "Non-randomized Data")
+knitr::kable(non.r.data.pl[1:15, 1:5], caption = "Non-uniformly-handled Data")
 
 ```
 
@@ -75,7 +75,7 @@ r.data.pl.nc <- r.data.pl[!rownames(r.data.pl) %in% ctrl.genes, ] # nc for non-c
 
 ## Data Simulation
 
-We used the randomized dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the randomized dataset and the other from the non-randomized dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
+We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the non-uniformly-handled dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
 
 ```{r est.eff, results = "hide", message = FALSE}
 smp.eff <- estimate.smp.eff(r.data = r.data.pl)
@@ -112,7 +112,7 @@ ary.to.smp.assign <- list("all" = c(rep(c("E", "V"), each = 64),
 
 ```
 
-Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the array effect for its assigned array. For the test set, we used the test data from the randomized dataset; no data simulation is needed. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`) and `rehybridize()` is provided to sum biological effects to array effects, given array-to-sample assignments. 
+Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the array effect for its assigned array. For the test set, we used the test data from the uniformly-handled dataset; no data simulation is needed. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`) and `rehybridize()` is provided to sum biological effects to array effects, given array-to-sample assignments. 
 
 ```{r study.design}
 set.seed(101)
@@ -297,14 +297,14 @@ lasso.pred$mc
 
 ## Simulation Studies
 
-Finally, the main functionality of `PRECISION` is to provide users with an efficient way to reproduce our simulation studies in molecular classification. Two wrapper functions are available to do so: one for the analysis with randomized data and one for the analysis with confounding handling. 
+Finally, the main functionality of `PRECISION` is to provide users with an efficient way to reproduce our simulation studies in molecular classification. Two wrapper functions are available to do so: one for the analysis with uniformly-handled data and one for the analysis with confounding handling. 
 
-### Analysis with randomized data
+### Analysis with uniformly-handled data
 
-The analysis with randomized data is based on `N` number of random training-and-test-set splits on the randomized data; `uni.handled.simulate()` is used. Users can control the signal level of the estimated sample effects being inputted as well as the normalization and classification methods being compared.
+The analysis with uniformly-handled data is based on `N` number of random training-and-test-set splits on the uniformly-handled data; `uni.handled.simulate()` is used. Users can control the signal level of the estimated sample effects being inputted as well as the normalization and classification methods being compared.
 
 ```{r uni.handled.simulate, results = "hide", eval = FALSE}
-uni.handled.results <- uni.handled.simulate(myseed = 1, N = 3,
+uni.handled.results <- uni.handled.simulate(seed = 1, N = 3,
                                             smp.eff = smp.eff.nc,
                                             norm.list = c("NN", "QN"),
                                             class.list = c("PAM", "LASSO"))
@@ -313,7 +313,7 @@ uni.handled.results <- uni.handled.simulate(myseed = 1, N = 3,
 
 ```{r uni.handled.tab, results = "asis"}
 knitr::kable(data.frame(uni.handled.results$error_store[2, ]), 
-             caption = "Analysis of randomized data")
+             caption = "Analysis of uniformly-handled data")
 
 ```
 
@@ -344,7 +344,7 @@ ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
 ary.eff.nc.te <- ary.eff.nc[, 65:128]
 
 # Simulation without batch adjustment
-precision.results <- precision.simulate(myseed = 1, N = 3,
+precision.results <- precision.simulate(seed = 1, N = 3,
                           smp.eff.tr = smp.eff.nc.tr,    
                           smp.eff.te = smp.eff.nc.te,
                           ary.eff.tr = ary.eff.nc.tr,
@@ -360,7 +360,7 @@ precision.results <- precision.simulate(myseed = 1, N = 3,
 smp.eff.tr.ctrl <- smp.eff.ctrl[, smp.eff.train.test.split$tr]
 ary.eff.tr.ctrl <- ary.eff.ctrl[, ary.eff.train.test.split$tr]
 
-precision.ruv4.results <- precision.simulate(myseed = 1, N = 3,
+precision.ruv4.results <- precision.simulate(seed = 1, N = 3,
                               smp.eff.tr = smp.eff.nc.tr,    
                               smp.eff.te = smp.eff.nc.te,
                               ary.eff.tr = ary.eff.nc.tr,
@@ -413,7 +413,7 @@ A user-defined normalization method function must allow two input parameters: `t
               "test.frn" = test.frn))
 }
 
-uni.handled.results.rn <- uni.handled.simulate(myseed = 1, N = 3,
+uni.handled.results.rn <- uni.handled.simulate(seed = 1, N = 3,
                                        smp.eff = smp.eff.nc,
                                        norm.list = c("NN", "QN", "RN"),
                                        class.list = c("PAM", "LASSO"), 
@@ -423,7 +423,7 @@ uni.handled.results.rn <- uni.handled.simulate(myseed = 1, N = 3,
 
 ```{r uni.handled.tab.rn, results = "asis"}
 knitr::kable(data.frame(uni.handled.results.rn$error_store[2, ]), 
-             caption = "Analysis of randomized data (with RN)")
+             caption = "Analysis of uniformly-handled data (with RN)")
 
 ```
 
@@ -446,7 +446,7 @@ For each user-defined classification method, the user must provide two functions
 
 # Ridge has the same prediction function as LASSO
 
-uni.handled.results.ridge <- uni.handled.simulate(myseed = 1, N = 3,
+uni.handled.results.ridge <- uni.handled.simulate(seed = 1, N = 3,
                                    smp.eff = smp.eff.nc,
                                    norm.list = c("NN", "RN"),
                                    class.list = c("LASSO", "Ridge"), 
@@ -458,7 +458,7 @@ uni.handled.results.ridge <- uni.handled.simulate(myseed = 1, N = 3,
 
 ```{r uni.handled.ridge.tab, results = "asis"}
 knitr::kable(data.frame(uni.handled.results.ridge$error_store[2, ]), 
-             caption = "Analysis of randomized data (with Ridge)")
+             caption = "Analysis of uniformly-handled data (with Ridge)")
 
 ```
 
@@ -570,7 +570,7 @@ Again, it may be necessary to manipulate the confounding level of array effects 
 
 1. location shift - per selected array, shifting all probe expressions up or down by a constant.
 
-2. scaling 1 - per selected array, expanding the variance of probes towards the array's inter-quartile in both directions; Probes outside inter-quartile range remain unchanged.
+2. scaling 1 - per selected array, expanding the variance of probes towards the array's inter-quartiles; probes that are outside of the inter-quartile range remain unchanged.
 
 3. scaling 2 - scaling all probe expressions in arrays by the power of constants that are different for each batch. In our training data, there are four batches.
 
@@ -579,28 +579,29 @@ Again, it may be necessary to manipulate the confounding level of array effects 
 ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
 
 # shift
-ary.eff.nc.tr.shift <- amplify.ary.eff(ary.eff.tr = ary.eff.nc.tr,
-       amplify.slide.id = colnames(ary.eff.nc.tr)[1:64],
+ary.eff.nc.tr.shift <- amplify.ary.eff(ary.eff = ary.eff.nc.tr,
+       amplify.ary.id = colnames(ary.eff.nc.tr)[1:64],
        amplify.level = 2, type = "shift")
 
 # scale 1
-ary.eff.nc.tr.scale1 <- amplify.ary.eff(ary.eff.tr = ary.eff.nc.tr,
-       amplify.slide.id = colnames(ary.eff.nc.tr)[1:64],
+ary.eff.nc.tr.scale1 <- amplify.ary.eff(ary.eff = ary.eff.nc.tr,
+       amplify.ary.id = colnames(ary.eff.nc.tr)[1:64],
        amplify.level = 2, type = "scale1")
 
 # scale 2
-amplify.slide.id <- list(1:40, 41:64, (129:160) - 64, (161:192) - 64)
-for(i in 1:length(amplify.slide.id)) 
-  amplify.slide.id[[i]] <- colnames(ary.eff.nc.tr)[amplify.slide.id[[i]]]
+amplify.ary.id <- list(1:40, 41:64, (129:160) - 64, (161:192) - 64)
+for(i in 1:length(amplify.ary.id)) 
+  amplify.ary.id[[i]] <- colnames(ary.eff.nc.tr)[amplify.ary.id[[i]]]
 amplify.level <- c(1.2, 1.3, 1/3, 2/3)
 
-ary.eff.nc.tr.scale2 <- amplify.ary.eff(ary.eff.tr = ary.eff.nc.tr,
-       amplify.slide.id = amplify.slide.id,
+ary.eff.nc.tr.scale2 <- amplify.ary.eff(ary.eff = ary.eff.nc.tr,
+       amplify.ary.id = amplify.ary.id,
        amplify.level = amplify.level,
        type = "scale2")
 
 par(mfrow = c(2, 2), mar = c(2, 2, 2, 1))
-rng <- range(ary.eff.nc.tr, ary.eff.nc.tr.shift, ary.eff.nc.tr.scale1, ary.eff.nc.tr.scale2)
+rng <- range(ary.eff.nc.tr, ary.eff.nc.tr.shift, 
+             ary.eff.nc.tr.scale1, ary.eff.nc.tr.scale2)
 boxplot(ary.eff.nc.tr, main = "Original",
         ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
 boxplot(ary.eff.nc.tr.shift, main = "Shift",

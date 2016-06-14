@@ -2,23 +2,28 @@
 % Please edit documentation in R/estimate.ary.eff.R
 \name{estimate.ary.eff}
 \alias{estimate.ary.eff}
-\title{Estimated array effect}
+\title{Estimated array effects}
 \usage{
 estimate.ary.eff(r.data, non.r.data)
 }
 \arguments{
-\item{r.data}{randomized expression dataset, rows as probes, columns as samples.}
+\item{r.data}{the uniformly-handled expression dataset.
+The dataset must have rows as probes and columns as samples.}
 
-\item{non.r.data}{non-randomized expression dataset, rows as probes, columns as samples; must have same dimensions and same probe name as randomized data.}
+\item{non.r.data}{the non-uniformly-handled expression dataset.
+The dataset must have rows as probes and columns as samples and the same dimensions and
+the same probe names as the uniformly-handled dataset.}
 }
 \value{
-an estimation of the array effect
+an estimation of the array effects
 }
 \description{
-Estimates array effect from taking the differences between the expressions of the non-randomized and the randomized data, matched by samples
+Estimate array effects from taking the differences between the expressions of the non-uniformly-handled and
+the uniformly-handled data, matched by samples.
 }
 \examples{
 ary.eff <- estimate.ary.eff(r.data = r.data.pl, non.r.data = non.r.data.pl)
+
 }
 \keyword{data.setup}
 

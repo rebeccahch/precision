@@ -7,25 +7,35 @@
 pam.intcv(X, y, vt.k = NULL, n.k = 30, kfold = 5, folds = NULL, seed)
 }
 \arguments{
-\item{X}{expression dataset to be trained, rows as probes, columns as samples.}
+\item{X}{expression dataset to be trained.
+This dataset must have rows as probes and columns as samples.}
 
-\item{y}{sample group corresponding to the data to be trained; must have the equal length as the number of samples as X.}
+\item{y}{a vector of sample group of each sample for the dataset to be trained.
+It must have an equal length to the number of samples in \code{X}.}
 
-\item{vt.k}{custom-specified threshold list; default is NULL predetermined by the PAM package.}
+\item{vt.k}{custom-specified threshold list.
+By default, \code{vt.k = NULL} and
+30 values will be predetermined by the pamr package.}
 
-\item{n.k}{number of threshold values desired; default is 30.}
+\item{n.k}{number of threshold values desired. By default, \code{n.k = 30}.}
 
-\item{kfold}{number of folds for cross validation; default is 5}
+\item{kfold}{number of folds. By default, kfold = 5.}
 
-\item{folds}{prespecifies samples to folds; default is NULL for no prespecification.}
+\item{folds}{pre-specifies samples to each fold.
+By default, \code{folds = NULL} for no pre-specification.}
 
-\item{seed}{specifies seed for random assignment using set.seed().}
+\item{seed}{an integer used to initialize a pseudorandom number generator.}
 }
 \value{
-a PAM classifier
+a list of 4 elements:
+\item{mc}{an internal misclassification error rate}
+\item{time}{processing time of performing internal validation with PAM}
+\item{model}{a PAM classifier, resulted from \code{pamr.train}}
+\item{cfs}{estimated coefficients for the final classifier}
 }
 \description{
-Builds a PAM classifier using internal cross validation, with 5-fold cross validation as the default.
+Build a PAM classifier using internal cross validation to choose
+the tuning parameter, with 5-fold cross validation as the default.
 }
 \examples{
 set.seed(101)
@@ -41,6 +51,12 @@ smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
 pam.int <- pam.intcv(X = smp.eff.nc.tr,
                      y = substr(colnames(smp.eff.nc.tr), 7, 7),
                      kfold = 5, seed = 1)
+
+}
+\references{
+T. Hastie, R. Tibshirani, Balasubramanian Narasimhan and Gil Chu (2014).
+pamr: Pam: prediction analysis for microarrays. R package version 1.55.
+https://CRAN.R-project.org/package=pamr
 }
 \keyword{classification}
 

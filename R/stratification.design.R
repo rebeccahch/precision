@@ -1,11 +1,18 @@
 #' Stratification Design
 #'
-#' Assigns arrays to samples with stratification design.
+#' Assign arrays to samples with stratification,
+#' a study design assigning arrays in each batch to each sample group proportionally.
 #'
-#' @param seed specifies seed for random assignment using set.seed().
-#' @param num.smp number of samples.
-#' @param batch.id sample group ID for the estimated sample effect data.
-#' @return array-to-sample assignment, first half for group 1 (endometrial), second half for group 2 (ovarian)
+#' @param seed an integer used to initialize a pseudorandom number generator.
+#' @param num.smp number of arrays.
+#' @param batch.id a list of array indices grouped by batches when data were profiled.
+#' The length of the list must be equal to the number of batches in the data;
+#' the number of array indices must be the same as the number of samples.
+#' @return a vector of array IDs in the order of assigning to samples that are
+#' assumed to be sorted by sample group of interest
+#  (first half of the samples belong to group 1 and second half to group 2).
+#' As a result, the first half of the array IDs are assigned to group 1
+#' and the second half of the array IDs are assigned to group 2.
 #' @export
 #' @keywords study.design
 #' @examples

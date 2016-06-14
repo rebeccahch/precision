@@ -8,44 +8,65 @@ classify.gene.type(smp.eff, ary.eff, smp.eff.train.ind, ary.eff.train.ind,
   group.id, ary.to.smp.assign)
 }
 \arguments{
-\item{smp.eff}{estimated sample effect data, rows as probes, columns as samples; can only take in either probe-level data with 10 probe per unique probe or probe-set-level data.}
+\item{smp.eff}{the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
+It can only be either probe-level with a fixed number of probe per unique probe or probe-set-level.}
 
-\item{ary.eff}{estimated array effect data, rows as probes, columns as samples; must have same dimensions and same probe name as sample effect data; can only take in either probe-level data with 10 probe per unique probe or probe-set-level data; must be the same dimensions as the estimated sample effect data.}
+\item{ary.eff}{the estimated array effect dataset. The dataset must have rows as probes and columns as samples.
+It must have the same dimensions and the same probe names as the estimated sample effect dataset.
+It can only be either probe-level with a fixed number of probe per unique probe or probe-set-level.}
 
-\item{smp.eff.train.ind}{training set index for samples from the estimated sample effect data.}
+\item{smp.eff.train.ind}{a vector of sample IDs for the estimated sample effects that are assigned to the training set.}
 
-\item{ary.eff.train.ind}{training set index for arrays from the estimaed array effect data.}
+\item{ary.eff.train.ind}{a vector of array IDs for the estimated array effects that are assigned to the training set.}
 
-\item{group.id}{sample group ID for the estimated sample effect data.}
+\item{group.id}{a vector of sample-group labels for each sample of the estimated sample effect data.}
 
-\item{ary.to.smp.assign}{array-to-sample assignment for the arrays of the estimated array effect data.}
+\item{ary.to.smp.assign}{a vector of indices that assign arrays to samples (see details in \code{blocking.design},
+\code{confounding.design} or \code{stratification.design}). It must have an equal length to the number of samples
+in the estimated sample effect dataset.
+The first half arrays in the vector have to be assigned to the sample group 1 and the second half to sample group 2.}
 }
 \value{
-gene category vector, -1 for technical, 0 for other, 1 for biological genes
+a vector of gene type for each gene: -1 for technical, 0 for other, 1 for biological genes
 }
 \description{
-Classifies genes into technical, biological or other based on the differential expression analysis results of the estimated sample and array effect data.
+Classify genes into technical, biological or other based on the differential expression analysis results of the estimated sample and array effect data.
+}
+\details{
+Based on differential expression analysis, biological genes are defined as genes with \code{p-value < 0.01} on
+all three of the overall, the training set and the test set of the sample effect data.
+Technical genes are defined as genes with \code{p-value < 0.01} on
+the training set of the array effect data but with \code{p-value > 0.01} on all of the following:
+the test set of the array effect data, and the overall, the training set and the test set of the sample effect data.
 }
 \examples{
 \dontrun{
 smp.eff <- estimate.smp.eff(r.data = r.data.pl)
 ary.eff <- estimate.ary.eff(r.data = r.data.pl,
                             non.r.data = non.r.data.pl)
+
 ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+
 smp.eff.nc <- smp.eff[!rownames(smp.eff) \%in\% ctrl.genes, ]
 ary.eff.nc <- ary.eff[!rownames(ary.eff) \%in\% ctrl.genes, ]
+
 group.id <- substr(colnames(smp.eff.nc), 7, 7)
+
 smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64),
 sample(which(group.id == "V"), size = 64))]
 smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) \%in\% smp.eff.train.ind]
+
 ary.eff.train.ind <- colnames(ary.eff.nc)[c(1:64, 129:192)]
+
 group.id.list <- list("all" = group.id,
                       "tr" = substr(smp.eff.train.ind, 7, 7),
                       "te" = substr(smp.eff.test.ind, 7, 7))
+
 ary.to.smp.assign <- list("all" = c(rep(c("E", "V"), each = 64),
                           rep(c("V", "E"), each = 32)),
                           "tr" = rep(c("E", "V"), each = 64),
                           "te" = rep(c("V", "E"), each = 32))
+
 gene.cat <- classify.gene.type(smp.eff = smp.eff.nc,
                                ary.eff = ary.eff.nc,
                                smp.eff.train.ind = smp.eff.train.ind,

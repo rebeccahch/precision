@@ -1,15 +1,20 @@
-#' Estimated array effect
+#' Estimated array effects
 #'
-#' Estimates array effect from taking the differences between the expressions of the non-randomized and the randomized data, matched by samples
+#' Estimate array effects from taking the differences between the expressions of the non-uniformly-handled and
+#' the uniformly-handled data, matched by samples.
 #'
-#' @param r.data randomized expression dataset, rows as probes, columns as samples.
-#' @param non.r.data non-randomized expression dataset, rows as probes, columns as samples; must have same dimensions and same probe name as randomized data.
-#' @return an estimation of the array effect
+#' @param r.data the uniformly-handled expression dataset.
+#' The dataset must have rows as probes and columns as samples.
+#' @param non.r.data the non-uniformly-handled expression dataset.
+#' The dataset must have rows as probes and columns as samples and the same dimensions and
+#' the same probe names as the uniformly-handled dataset.
+#' @return an estimation of the array effects
 #' @keywords data.setup
 #' @importFrom stats median
 #' @export
 #' @examples
 #' ary.eff <- estimate.ary.eff(r.data = r.data.pl, non.r.data = non.r.data.pl)
+#'
 
 
 "estimate.ary.eff" <- function(r.data, non.r.data){

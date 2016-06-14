@@ -4,7 +4,7 @@
 \alias{precision.simulate}
 \title{Classification analysis of simulation study}
 \usage{
-precision.simulate(myseed, N, smp.eff.tr, smp.eff.te, ary.eff.tr, ary.eff.te,
+precision.simulate(seed, N, smp.eff.tr, smp.eff.te, ary.eff.tr, ary.eff.te,
   group.id.tr, group.id.te, design.list = c("CC+", "CC-", "PC+", "PC-"),
   norm.list = c("NN", "QN"), class.list = c("PAM", "LASSO"),
   batch.id = NULL, icombat = FALSE, isva = FALSE, iruv = FALSE,
@@ -12,58 +12,119 @@ precision.simulate(myseed, N, smp.eff.tr, smp.eff.te, ary.eff.tr, ary.eff.te,
   class.funcs = NULL, pred.funcs = NULL)
 }
 \arguments{
-\item{myseed}{specifies seed for random assignment using set.seed().}
+\item{seed}{an integer used to initialize a pseudorandom number generator.}
 
 \item{N}{number of simulation runs.}
 
-\item{smp.eff.tr}{sample effect training data, rows as probes, columns as samples.}
+\item{smp.eff.tr}{the training set of the estimated sample effects. This dataset must have rows as probes and columns as samples.}
 
-\item{smp.eff.te}{sample effect test data, rows as probes, columns as samples; must have same number of probes and probe names as sample effect training data.}
+\item{smp.eff.te}{the test set of the estimated sample effects. This dataset must have rows as probes and columns as samples.
+It must have the same number of probes and the same probe names as the training set of the estimated sample effects.}
 
-\item{ary.eff.tr}{array effect training data, rows as probes, columns as samples; must have same dimensions and same probe name as sample effect training data.}
+\item{ary.eff.tr}{the training set of the estimated array effects. This dataset must have rows as probes and columns as samples.
+It must have the same dimensions and the same probe names as the training set of the estimated sample effects.}
 
-\item{ary.eff.te}{array effect test data, rows as probes, columns as samples; must have same dimensions and same probe name as array effect test data.}
+\item{ary.eff.te}{the test set of the estimated array effects. This dataset must have rows as probes, columns as samples.
+It must have the same dimensions and the same probe names as the training set of the estimated array effects.}
 
-\item{group.id.tr}{sample group ID of the sample effect training data; has to be "E" and "V".}
+\item{group.id.tr}{a vector of sample-group labels for each sample of the training set of the estimated sample effects.
+It must be a 2-level non-numeric factor vector.}
 
-\item{group.id.te}{sample group ID of the sample effect test data; has to be "E" and "V".}
+\item{group.id.te}{a vector of sample-group labels for each sample of the test set of the estimated sample effects.
+It must be a 2-level non-numeric factor vector.}
 
-\item{design.list}{a list of strings for study designs compared in the simulation study;
-built-in designs are "CC+", "CC-", "PC+", "PC-", "BLK", and "STR" for "Complete Confounding 1", "Complete Confounding 2", "Partial Confounding 1", "Partial Confounding 2", "Blocking", "Stratification" in Qin et al.}
+\item{design.list}{a list of strings for study designs to be compared in the simulation study.
+The built-in designs are "CC+", "CC-", "PC+", "PC-", "BLK", and "STR" for "Complete Confounding 1", "Complete Confounding 2",
+"Partial Confounding 1", "Partial Confounding 2", "Blocking", and "Stratification" in Qin et al.}
 
-\item{norm.list}{a list of strings for normalization methods compared in the simulation study;
-build-in available normalization methods are "NN", "QN", "MN", "VSN" for "No Normalization", "Quantile Normalization", "Median Normalization", "Variance Stablizing Normalization";
-user can provide a list of normalization methods given the functions are supplied (also see norm.funcs).}
+\item{norm.list}{a list of strings for normalization methods to be compared in the simulation study.
+The build-in available normalization methods are "NN", "QN", "MN", "VSN" for "No Normalization", "Quantile Normalization",
+"Median Normalization", "Variance Stabilizing Normalization".
+User can provide a list of normalization methods given the functions are supplied (also see norm.funcs).}
 
-\item{class.list}{a list of strings for classification methods compared in the simulation study;
-built-in classification methods are "PAM" and "LASSO" for "prediction analysis for microarrays" and "least absolute shrinkage and selection operator";
-user can provide a list of classification methods given the correponding model-building and predicting functions are supplied (also see class.funcs and pred.funcs).}
+\item{class.list}{a list of strings for classification methods to be compared in the simulation study.
+The built-in classification methods are "PAM" and "LASSO" for "prediction analysis for microarrays" and
+"least absolute shrinkage and selection operator".
+User can provide a list of classification methods given the correponding model-building and
+predicting functions are supplied (also see \code{class.funcs} and \code{pred.funcs}).}
 
-\item{batch.id}{a list of batch id by the number of batches when stratification study design is specified; default is NULL.}
+\item{batch.id}{a list of array indices grouped by batches when data were profiled.
+The length of the list must be equal to the number of batches in the data;
+the number of array indices must be the same as the number of samples.
+This is required if stratification study design is specified in \code{design.list}; otherwise \code{batch.id = NULL}.}
 
-\item{icombat}{indicator for combat adjustment; default is not to adjust (icombat = FALSE).}
+\item{icombat}{an indicator for combat adjustment. By default, \code{icombat = FALSE} for no ComBat adjustment.}
 
-\item{isva}{indicator for sva adjustment; default is not to adjust (isva = FALSE).}
+\item{isva}{an indicator for sva adjustment. By default, \code{isva = FALSE} for no sva adjustment.}
 
-\item{iruv}{indicator for RUV-4 adjustment; default is not to adjust (iruv = FALSE).}
+\item{iruv}{an indicator for RUV-4 adjustment. By default, \code{iruv = FALSE} for no RUV-4 adjustment.}
 
-\item{smp.eff.tr.ctrl}{negative-control gene sample effect data if iruv = TRUE, rows as probes, columns as samples;
-must have same number of probes and probe names as non-control gene sample effect training data.}
+\item{smp.eff.tr.ctrl}{the training set of the negative-control probe sample effect data if \code{iruv = TRUE}.
+This dataset must have rows as probes and columns as samples.
+It also must have the same number of samples and the same sample names as \code{smp.eff.tr}.}
 
-\item{ary.eff.tr.ctrl}{negative-control gene array effect data if iruv = TRUE, rows as probes, columns as samples;
-must have same number of probes and probe names as non-control gene array effect training data.}
+\item{ary.eff.tr.ctrl}{the training set of the negative-control probe array effect data if \code{iruv = TRUE}.
+This dataset must have rows as probes and columns as samples.
+It also must have the same dimensions and the same probe names as \code{smp.eff.tr.ctrl}.}
 
-\item{norm.funcs}{a list of strings for names of user-defined normalization method functions, in the order of norm.list excluding any built-in normalization methods.}
+\item{norm.funcs}{a list of strings for names of user-defined normalization method functions, in the order of \code{norm.list},
+excluding any built-in normalization methods.}
 
-\item{class.funcs}{a list of strings for names of user-defined classification model-building functions, in the order of class.list excluding any built-in classification methods.}
+\item{class.funcs}{a list of strings for names of user-defined classification model-building functions, in the order of \code{class.list},
+excluding any built-in classification methods.}
 
-\item{pred.funcs}{a list of strings for names of user-defined classification predicting functions, in the order of class.list excluding any built-in classification methods.}
+\item{pred.funcs}{a list of strings for names of user-defined classification predicting functions, in the order of \code{class.list},
+excluding any built-in classification methods.}
 }
 \value{
-simulated results with list of models built and internal and external misclassification error stored, also a list of assignment stored
+simulation study results -- a list of array-to-sample assignments, fitted models,
+and misclassification error rates across simulation runs:
+\item{assign_store}{array-to-sample assignments for each study design}
+\item{model_store}{models for each combination of study designs, normalization methods, and classification methods}
+\item{error_store}{internal and external misclassification error rates for each combination of study designs,
+normalization methods, and classification methods}
 }
 \description{
-Performs simulation study in Qin et al. (see reference).
+Perform the simulation study in Qin et al. (see reference).
+}
+\details{
+The classification anlaysis of simulation study consists of the following main steps:
+
+First, \code{precision.simulate} requires the training and test sets for both estimated sample effects and estimated array effects.
+The effects can be simulated as follows (using \code{estimate.smp.eff} and \code{estimate.ary.eff}).
+The uniformly-handled dataset are used to approximate the biological effect for each sample,
+and the difference between the two arrays (one from the uniformly-handled dataset and
+the other from the non-uniformly-handled dataset, subtracting the former from the latter)
+for the same sample are used to approximate the handling effect for each array in the non-uniformly-handled dataset.
+
+The samples are randomly split into a training set and a test set, balanced by tumor type (in Qin et al., training-to-test ratio is 2:1).
+The arrays were then non-randomly split to a training set and a test set (in Qin et al., training set n = 128 -- the first 64 and last 64 arrays
+in the order of array processing; test set n = 64 -- the middle 64 arrays).
+This setup allows different pairings of arrays and samples by various different training-and-test-set splits.
+Furthermore, biological signal strength and confounding level of the handling effects can be modified
+(using \code{reduce.signal} and \code{amplify.ary.eff}).
+
+Second, for the training set, data are simulated through "virtual re-hybridization" (using \code{rehybridize})
+by first assigning arrays to sample groups using a confounding design or a balanced design, and
+then summing the biological effect for a sample and the handling effect for its assigned array.
+Rehybridization allows us to examine the use of various array-assignment schemes, specified in \code{design.list}.
+
+Third, the analysis for each simulated dataset follows the same steps as described
+for the analysis of the uniformly-handled data (also see documentation on \code{uni.handled.siumate}):
+
+(1) data preprocessing (normalization methods are specified in \code{norm.list} and
+batch effects can be adjusted specified with \code{icombat}, \code{isva} and \code{iruv})
+
+(2) classifier training (classification methods are specified in \code{class.list})
+
+(3) classification error estimation using both cross-validation and external validation
+
+The only difference is that here external validation is based on the test data from the uniformly-handled dataset
+and served as the gold standard for the misclassification error estimation.
+
+For a given split of samples to training set versus test set,
+\code{N} datasets will be simulated and analyzed for each array-assignment scheme.
+For user-defined normalization method or classification method, please refer to the vignette.
 }
 \examples{
 \dontrun{
@@ -99,7 +160,7 @@ ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
 ary.eff.nc.te <- ary.eff.nc[, 65:128]
 
 # Simulation without batch adjustment
-precision.results <- precision.simulate(myseed = 1, N = 3,
+precision.results <- precision.simulate(seed = 1, N = 3,
                                         smp.eff.tr = smp.eff.nc.tr,
                                         smp.eff.te = smp.eff.nc.te,
                                         ary.eff.tr = ary.eff.nc.tr,
@@ -121,7 +182,7 @@ ary.eff.ctrl <- ary.eff[rownames(ary.eff) \%in\% ctrl.genes, ]
 smp.eff.tr.ctrl <- smp.eff.ctrl[, smp.eff.train.test.split$tr]
 ary.eff.tr.ctrl <- ary.eff.ctrl[, ary.eff.train.test.split$tr]
 
-precision.ruv4.results <- precision.simulate(myseed = 1, N = 3,
+precision.ruv4.results <- precision.simulate(seed = 1, N = 3,
                                              smp.eff.tr = smp.eff.nc.tr,
                                              smp.eff.te = smp.eff.nc.te,
                                              ary.eff.tr = ary.eff.nc.tr,

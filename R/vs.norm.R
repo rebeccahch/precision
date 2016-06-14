@@ -1,10 +1,18 @@
-#' Variance stabalizing nomalization
+#' Variance stabilizing normalization
 #'
-#' Normalizes training dataset with vsn, stores the fitted vsn model from the training dataset as the reference to frozen variance stabalizng normalize test dataset.
-#' @references Wolfgang Huber, Anja von Heydebreck, Holger Sueltmann, Annemarie Poustka and Martin Vingron. Variance Stabilization Applied to Microarray Data Calibration and to the Quantification of Differential Expression. Bioinformatics 18, S96-S104 (2002).
-#' @param train training data to be variance stabalizing normalized, rows as probes, columns as samples.
-#' @param test test data to be frozen variance stabalizing normalized, rows as probes with equal number of rows as the training set, columns as samples.
-#' @return a list of two datasets, the normalized training set and the frozen normalied test set
+#' Normalize training dataset with vsn and
+#' store the fitted vsn model from the training dataset as the reference to frozen variance stabilizing normalize test dataset.
+#'
+#' @references Wolfgang Huber, Anja von Heydebreck, Holger Sueltmann, Annemarie Poustka and Martin Vingron.
+#' Variance Stabilization Applied to Microarray Data Calibration and to the Quantification of Differential Expression.
+#' Bioinformatics 18, S96-S104 (2002).
+#' @param train training dataset to be variance stabilizing normalized. The dataset must have rows as probes and columns as samples.
+#' @param test test dataset to be frozen variance stabilizing normalized. The dataset must have rows as probes and columns as samples.
+#' The number of rows must equal to the number of rows in the training set.
+#' By default, the test set is not specified (\code{test = NULL}) and no frozen normalization will be performed.
+#' @return a list of two datasets:
+#' \item{train.mn}{the normalized training set}
+#' \item{test.fmn}{the frozen normalized test set, if test set is specified}
 #' @export
 #' @keywords preprocess
 #' @import vsn

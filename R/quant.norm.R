@@ -1,10 +1,21 @@
-#' Quantile nomalization
+#' Quantile normalization
 #'
-#' Normalizes training dataset with quantile normalization, stores the quantiles from the training dataset as the references to frozen quantile normalize test dataset.
-#' @references Bolstad, B. M., Irizarry R. A., Astrand, M, and Speed, T. P. (2003) A Comparison of Normalization Methods for High Density Oligonucleotide Array Data Based on Bias and Variance. Bioinformatics 19(2) ,pp 185-193. http://bmbolstad.com/misc/normalize/normalize.html
-#' @param train training data to be quantile normalized, rows as probes, columns as samples.
-#' @param test test data to be frozen quantile normalized, rows as probes with equal number of rows as the training set, columns as samples.
-#' @return a list of two datasets, the normalized training set and the frozen normalied test set
+#' Normalize training dataset with quantile normalization and
+#' store the quantiles from the training dataset as the references to frozen quantile normalize test dataset.
+#'
+#' @references Bolstad, B. M., Irizarry R. A., Astrand, M, and Speed, T. P. (2003)
+#' A Comparison of Normalization Methods for High Density Oligonucleotide Array Data Based on Bias and Variance.
+#' Bioinformatics 19(2) , pp 185-193.
+#' http://bmbolstad.com/misc/normalize/normalize.html
+#' @param train training dataset to be quantile normalized.
+#' The dataset must have rows as probes and columns as samples.
+#' @param test test dataset to be frozen quantile normalized.
+#' The dataset must have rows as probes and columns as samples.
+#' The number of rows must equal to the number of rows in the training set.
+#' By default, the test set is not specified (\code{test = NULL}) and no frozen normalization will be performed.
+#' @return a list of two datasets:
+#' \item{train.mn}{the normalized training set}
+#' \item{test.fmn}{the frozen normalized test set, if test set is specified}
 #' @export
 #' @keywords preprocess
 #' @import preprocessCore

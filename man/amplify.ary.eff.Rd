@@ -20,8 +20,8 @@ A vector of multipliers must be supplied if type = "scale2" and it must have an 
 \item{type}{a choice of amplification type, either "shift", "scale1" or "scale2" for either location shift
 or scale change. By default \code{type = "shift"}.
 Location shift moves the entire specified arrays up or down by a constant.
-Scale change 1 re-scales the expressions towards the array's inter-quartiles;
-probes that are outside of the inter-quartile range remain unchanged.
+Scale change 1 within each array, re-scales expressions that are in inter-quartiles towards the first and the third quartiles;
+expressions that are outside of the inter-quartile range remain unchanged.
 Scale change 2 re-scales the expressions by the power of constants that are specified by the user for each batch.}
 }
 \value{

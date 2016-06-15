@@ -9,11 +9,11 @@ classify.gene.type(smp.eff, ary.eff, smp.eff.train.ind, ary.eff.train.ind,
 }
 \arguments{
 \item{smp.eff}{the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
-It can only be either probe-level with a fixed number of probe per unique probe or probe-set-level.}
+It can only be either probe-level with a fixed number of probes per unique probe or probe-set-level.}
 
 \item{ary.eff}{the estimated array effect dataset. The dataset must have rows as probes and columns as samples.
 It must have the same dimensions and the same probe names as the estimated sample effect dataset.
-It can only be either probe-level with a fixed number of probe per unique probe or probe-set-level.}
+It can only be either probe-level with a fixed number of probes per unique probe or probe-set-level.}
 
 \item{smp.eff.train.ind}{a vector of sample IDs for the estimated sample effects that are assigned to the training set.}
 

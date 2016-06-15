@@ -8,10 +8,10 @@
 #' the training set of the array effect data but with \code{p-value > 0.01} on all of the following:
 #' the test set of the array effect data, and the overall, the training set and the test set of the sample effect data.
 #' @param smp.eff the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
-#' It can only be either probe-level with a fixed number of probe per unique probe or probe-set-level.
+#' It can only be either probe-level with a fixed number of probes per unique probe or probe-set-level.
 #' @param ary.eff the estimated array effect dataset. The dataset must have rows as probes and columns as samples.
 #' It must have the same dimensions and the same probe names as the estimated sample effect dataset.
-#' It can only be either probe-level with a fixed number of probe per unique probe or probe-set-level.
+#' It can only be either probe-level with a fixed number of probes per unique probe or probe-set-level.
 #' @param smp.eff.train.ind a vector of sample IDs for the estimated sample effects that are assigned to the training set.
 #' @param ary.eff.train.ind a vector of array IDs for the estimated array effects that are assigned to the training set.
 #' @param ary.to.smp.assign a vector of indices that assign arrays to samples (see details in \code{blocking.design},

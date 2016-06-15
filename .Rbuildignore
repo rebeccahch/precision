@@ -5,3 +5,5 @@
 ^README\.Rmd$
 ^README-.*\.png$
 ^README\.html$
+^hide\.R$
+^setup\.R$

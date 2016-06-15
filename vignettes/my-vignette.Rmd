@@ -11,9 +11,9 @@ vignette: >
 
 ### Introduction
 
-`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using our unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classifier building and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
+`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using a unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classification error estimation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
 
-This document familiarizes users with the data and the functions available in the package, but more importantly allows users to simulate datasets for a molecular classification study. It also walks through the process of extending our existing study to normalization and classification method comparison studies using user-defined functions.
+This document familiarizes users with the data and the functions available in the package. More importantly, it also allows users to explore further on the topic using various methods for normalization and classification method comparison studies.
 
 ```{r prestore.obj, echo = FALSE, error = FALSE, warning = FALSE, results = "hide"}
 # load pre-stored R objects for the vignette.
@@ -26,6 +26,8 @@ When use `PRECISION`, please cite the following papers:
 Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
 
+XXXXX
+
 ## Load PRECISION
 
 The first step is to install `PRECISION` from `CRAN` by typing the following command in R console:
@@ -36,13 +38,13 @@ library(PRECISION)
 
 ```
 
-## Data
+## Empirial Data Collection
 
-The unique pair of datasets are generated from the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples using blocking (by both array slide and row-column location on each slide). The second dataset was handled by two technicians in five batches. Its arrays were assigned in the order of sample collection without blocking to mimick typical practice. More details on the data can be found in Qin et al.[^1] The datasets are publically available on `GEO` [here](http://).
+A unique pair of datasets was generated for the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples with blocking and randomization (by array slide). The second dataset was handled by two technicians in multiple batches and its arrays were assigned in the order of sample collection without blocking or randomization. to mimick typical practice. More details on the data collection can be found in Qin et al.[^1] The datasets are publicly available on `GEO` [here](http://www.ncbi.nlm.nih.gov/geo/).
 
 [^1]: Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [here](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
-This package includes two example datasets (probe level): uniformly-handled data `r.data.pl` and non-uniformly-handled data `non.r.data.pl`, both coming from the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
+This package includes two example datasets (probe level): uniformly-handled data `r.data.pl` and non-uniformly-handled data `non.r.data.pl`, which were the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
 
 ```{r load.data, eval = FALSE}
 data("r.data.pl")
@@ -64,16 +66,16 @@ r.data.pl.p5 <- per.unipbset.truncate(data = r.data.pl,
                                       num.per.unipbset = 5)
 ```
 
-In most of the analyses, only **non-control probe** data were used. An exception was when batch effects were adjusted by RUV-4 (exampled in a later section). The following code identifies and **filters** out the control probes from the data.
+Agilent includes control probes, but in most of the analyses, only **non-control probe** data were used. An exception was when batch effects were adjusted by RUV-4 (exampled in a later section). The following code identifies and **filters** out the control probes from the data.
 
 ```{r ctrl.genes}
-# negatively biological control probes
+# negative control probes
 ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
 
 r.data.pl.nc <- r.data.pl[!rownames(r.data.pl) %in% ctrl.genes, ] # nc for non-control probes
 ```
 
-## Data Simulation
+## Simulated Data Generation 
 
 We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the non-uniformly-handled dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
 
@@ -88,7 +90,7 @@ ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
 
 ```
 
-The 192 samples were **randomly split** in a 2:1 ratio into a training set and a test set, balanced by tumor type; the 192 arrays were **non-randomly** split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing) and a test set (n=64, the middle 64 arrays) -- allowing the training set to have roughly an equal number of arrays done by the two technicians.
+The 192 samples were **randomly split** in a 2:1 ratio into a training set and a test set, balanced by tumor type; the 192 arrays were **non-randomly** split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing) and a test set (n=64, the middle 64 arrays). This array split is intentional because the first 80 arrays were profiled by one technician and the rest by another technician.
 
 ```{r data.split, comment = ">", message = FALSE, eval = FALSE}
 set.seed(101)
@@ -98,7 +100,7 @@ group.id <- substr(colnames(smp.eff.nc), 7, 7)
 smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
 smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
 
-# non-randomly split array effect data into training and test set; technician effect as proxy
+# non-randomly split array effect data into training and test set
 ary.eff.train.ind <- colnames(ary.eff.nc)[c(1:64, 129:192)]
 ary.eff.test.ind <- colnames(ary.eff.nc)[65:128]
 
@@ -112,7 +114,7 @@ ary.to.smp.assign <- list("all" = c(rep(c("E", "V"), each = 64),
 
 ```
 
-Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the array effect for its assigned array. For the test set, we used the test data from the uniformly-handled dataset; no data simulation is needed. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`) and `rehybridize()` is provided to sum biological effects to array effects, given array-to-sample assignments. 
+Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the array effect for its assigned array. For the test set, we used the test data from the uniformly-handled dataset. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`). And, `rehybridize()` is provided to sum biological effects to array effects, following array-to-sample assignments. 
 
 ```{r study.design}
 set.seed(101)
@@ -135,7 +137,7 @@ blk.ind <- blocking.design(seed = 1, num.smp = 128)
 
 ```
 
-Here is one of the possible array-to-sample-group splits for the study designs. Each stem is an array and the color of each stem represents which sample group the array is assigned to.
+Here is one of the possible array-to-sample-group splits for the study designs. Each stem is an array and the color of each bar represents which sample group the array is assigned to.
 
 ```{r study.design.fig, fig.align = "hold", fig.height = 4, fig.width = 6, echo = FALSE}
 par(mar = c(1, 1, 1, 1))
@@ -162,31 +164,25 @@ text(x = 64.5, y = 0.75, labels = "Blocking")
 
 ```
 
-We also incorporated batch effect adjustment methods[^2] into the rehybridization step. The adjustment can be turned on by specifying `icombat = TRUE`, `isva = TRUE` or `iruv = TRUE`, or else by default, no batch adjustment will be performed. Note that when RUV is selected, control-probe data must be supplied. 
-
-[^2]: ComBat and sva: Leek JT, Johnson WE, Parker HS, Fertig EJ, Jaffe AE and Storey JD (2016). sva: Surrogate Variable Analysis. R package version 3.20.0. 
-RUV: Johann Gagnon-Bartsch (2015). ruv: Detect and Remove Unwanted Variation using Negative Controls. R package version 0.9.6.
-
-
 ```{r rehybridize, eval = FALSE}
 assign.ind <- confounding.design(seed = 1, num.smp = 192, 
                                degree = "complete", rev.order = FALSE)
 group.id <- substr(colnames(smp.eff.nc), 7, 7)
 
-# rehybridize
+# re-hybridize
 sim.data.raw <- rehybridize(smp.eff = smp.eff.nc,
                             ary.eff = ary.eff.nc,
                             group.id = group.id,
                             ary.to.smp.assign = assign.ind)
 
-# rehybridize + adjust batch effects with SVA
+# re-hybridize + correct batch effects with SVA
 sim.data.sva <- rehybridize(smp.eff = smp.eff.nc,
                             ary.eff = ary.eff.nc,
                             group.id = group.id,
                             ary.to.smp.assign = assign.ind, 
                             isva = TRUE)
 
-# rehybridize + adjust batch effects with RUV-4
+# re-hybridize + correct batch effects with RUV-4
 smp.eff.ctrl <- smp.eff[rownames(smp.eff) %in% ctrl.genes, ]
 ary.eff.ctrl <- ary.eff[rownames(ary.eff) %in% ctrl.genes, ]
 
@@ -200,7 +196,12 @@ sim.data.ruv <- rehybridize(smp.eff = smp.eff.nc,
 
 ```
 
-## Data Preprocess 
+Batch effect correction[^2] is available in the re-hybridization step. The adjustment can be turned on by specifying `icombat = TRUE`, `isva = TRUE` or `iruv = TRUE`, or else by default, no batch adjustment will be performed. Note that when RUV is selected, control-probe data must be supplied. 
+
+[^2]: ComBat and sva: Leek JT, Johnson WE, Parker HS, Fertig EJ, Jaffe AE and Storey JD (2016). sva: Surrogate Variable Analysis. R package version 3.20.0. 
+RUV: Johann Gagnon-Bartsch (2015). ruv: Detect and Remove Unwanted Variation using Negative Controls. R package version 0.9.6.
+
+## Data Preprocessing
 
 Data preprocessing in the study includes three steps: 
 
@@ -248,7 +249,7 @@ r.data.psl <- med.sum.pbset(data = r.data.pl,
                             num.per.unipbset = 10)
 ```
 
-## Classification 
+## Classification and Error Estimation
 
 Regardless of classification methods, internal cross-validation should used to build a classifier and tune parameter(s) and external validation should be used to validate the performance. In our simulation study, we focused on reporting two classification methods: one non-parametric method, prediction analysis for microarrays (PAM)[^5] and one parametric method, the least absolute shrinkage and selection operator (LASSO)[^6]. Examples of model-building and predicting functions in `PRECISION` are `pam.intcv()` and `pam.predict()` for PAM and `lasso.intcv()` and `lasso.predict()` for LASSO.
 
@@ -295,7 +296,7 @@ lasso.pred$mc
 
 ```
 
-## Simulation Studies
+## Wrapper Functions for Conducting Simulation
 
 Finally, the main functionality of `PRECISION` is to provide users with an efficient way to reproduce our simulation studies in molecular classification. Two wrapper functions are available to do so: one for the analysis with uniformly-handled data and one for the analysis with confounding handling. 
 
@@ -388,7 +389,7 @@ knitr::kable(data.frame(precision.ruv4.results$error_store[2, "PC-"]),
 
 ```
 
-## Extension
+## Additional Simulation Scenarios
 
 Both `uni.handled.simulate()` and `precision.simulate()` allows user-defined function for normalization or classification method comparison purposes. 
 
@@ -462,13 +463,9 @@ knitr::kable(data.frame(uni.handled.results.ridge$error_store[2, ]),
 
 ```
 
-## Other useful functions
-
-We list a handful of useful functions available in `PRECISION` in the next section.
-
 #### Differential expression analysis
 
-Simple per-marker comparison methods such as differential expression analysis can be particularly useful when making preliminary data analysis decision. Therefore, we provide `limma.pbset` to perform differential expression analysis on expression data.
+Simple per-marker comparison methods such as differential expression analysis can be particularly useful when making preliminary data analysis decision. For instance, when reducing biological signal, we first identified differentially expressed markers and then shrunk sample group differences of each of the markers. Therefore, we provide `limma.pbset` to perform differential expression analysis.
 
 ```{r dea, eval = FALSE}
 r.data.psl.nc <- r.data.psl[!rownames(r.data.psl) %in% ctrl.genes, ] # nc for non-control probes
@@ -489,39 +486,9 @@ knitr::kable(tab, rownames = NULL)
 
 ```
 
-#### Classify gene type into biological, technical or others
-
-When comparing classifiers, we can use `classify.gene.type()` to classify the selected genes for a classifier, such as the number of false positive genes (selected, but are technical genes).
-
-```{r classify.gene.type, comment = ">", message = FALSE, eval = FALSE}
-# classify gene type
-gene.cat <- classify.gene.type(smp.eff = smp.eff.nc,
-                               ary.eff = ary.eff.nc,
-                               smp.eff.train.ind = smp.eff.train.ind,
-                               ary.eff.train.ind = ary.eff.train.ind,
-                               group.id = group.id.list,
-                               ary.to.smp.assign = ary.to.smp.assign)
-
-```
-
-#### Calculate confounding level between array effects and sample groups
-
-We used a measurement to quantify confounding level between array effects and sample group of interest[^7]. We used this measurement to cross-check our results based on confounding and balanced study designs.
-
-[^7]: Leek JT, Scharpf RB, Bravo HC, Simcha D, Langmead B, Johnson WE, Geman D, Baggerly K, Irizarry RA: Tackling the widespread and critical impact of batch effects in high-throughput data. Nature reviews Genetics 2010, 11(10):733-739.
-
-```{r calc.confounding.level, comment = ">", message = FALSE, eval = FALSE}
-# calculate confounding level 
-nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE)
-calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind], 
-                       group.id = substr(smp.eff.train.ind, 7, 7), 
-                       nbe.genes = nbe.genes)
-
-```
-
 #### Reduce signal
 
-It may be necessary to manipulate the level of signal (i.e., the mean group difference between sample group) in a molecular classification study, so that the ormalization effects or classification methods can be distinguishable. To manipulate the level of signal, `reduce.signal()` can be used.
+It may be necessary to manipulate the level of signal (i.e., the mean group difference between sample group) in a molecular classification study, so that the normalization effects or classification methods can be distinguishable. To manipulate the level of signal, `reduce.signal()` can be used.
 
 ```{r reduce.signal, eval = FALSE}
 # reduced signal by half
@@ -570,7 +537,7 @@ Again, it may be necessary to manipulate the confounding level of array effects 
 
 1. location shift - per selected array, shifting all probe expressions up or down by a constant.
 
-2. scaling 1 - per selected array, expanding the variance of probes towards the array's inter-quartiles; probes that are outside of the inter-quartile range remain unchanged.
+2. scaling 1 - per selected array, expanding the variance of probes towards the array's inter-quartiles; probes that are outside of inter-quartiles remain unchanged.
 
 3. scaling 2 - scaling all probe expressions in arrays by the power of constants that are different for each batch. In our training data, there are four batches.
 
@@ -612,3 +579,19 @@ boxplot(ary.eff.nc.tr.scale2, main = "Scaling 2",
         ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
 
 ```
+
+### Calculate confounding level between array effects and sample groups
+
+We used a measurement to quantify confounding level between array effects and sample group of interest[^7]. We used this measurement to cross-check our results based on confounding and balanced study designs.
+
+[^7]: Leek JT, Scharpf RB, Bravo HC, Simcha D, Langmead B, Johnson WE, Geman D, Baggerly K, Irizarry RA: Tackling the widespread and critical impact of batch effects in high-throughput data. Nature reviews Genetics 2010, 11(10):733-739.
+
+```{r calc.confounding.level, comment = ">", message = FALSE, eval = FALSE}
+# calculate confounding level 
+nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE)
+calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind], 
+                       group.id = substr(smp.eff.train.ind, 7, 7), 
+                       nbe.genes = nbe.genes)
+
+```
+

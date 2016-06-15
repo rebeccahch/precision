@@ -3,16 +3,23 @@
 \docType{data}
 \name{r.data.pl}
 \alias{r.data.pl}
-\title{The uniformly-handled (benchmark) probe-level dataset, 10 probes for each unique probe}
-\format{A data matrix with 1810 rows (probes) and 192 columns (samples).
-Its column names ending with "E" or "V" indicate whether a sample belongs to endometrial or ovarian tumor sample.}
+\title{The uniformly-handled probe-level dataset,
+10 probes for each unique probe}
+\format{A data matrix with 1810 rows (probes) and 192 columns (samples).}
 \usage{
 r.data.pl
 }
 \description{
-The uniforly-handled probe-level dataset, with non-control-probe removed,
-10 probes per each unique probe, no background adjustment.
-The expressions are on a log-2 scale.
+A five percent random subset of the uniforly-handled (benchmark)
+probe-level dataset, 10 probes per each unique probe.
+The expressions are on a log2 scale without background adjustmnet.
+This dataset consists of 181 unique probes, of which
+6 are negatively biological control probes from Agilent array platform:
+"NC2_00079215", "NC1_00000215", "NC1_00000197", "NC2_00122731",
+"NC2_00092197", and "NC2_00106057".
+The sample IDs (the column names) ending with "E" or "V" are used to indicate
+whether a sample is endometrial or ovarian tumor sample. There are
+96 endometrial and 96 ovarian tumor samples.
 }
 \keyword{example.data}
 

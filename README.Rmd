@@ -1,6 +1,6 @@
 # PRECISION: PaiREd miCrorna sImulation on Study desIgn for mOlecular classificatioN 
 
-`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using our unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classifier building and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
+`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using an unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classifier building and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
 
 To load the package currently available on `GitHub`, type the following command in R console:
 

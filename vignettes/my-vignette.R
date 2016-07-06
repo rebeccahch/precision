@@ -24,7 +24,7 @@ knitr::kable(non.r.data.pl[1:15, 1:5], caption = "Non-uniformly-handled Data")
 #                                        num.per.unipbset = 5)
 
 ## ----ctrl.genes----------------------------------------------------------
-# negatively biological control probes
+# negative control probes
 ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
 
 r.data.pl.nc <- r.data.pl[!rownames(r.data.pl) %in% ctrl.genes, ] # nc for non-control probes
@@ -47,7 +47,7 @@ ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
 #  smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))]
 #  smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
 #  
-#  # non-randomly split array effect data into training and test set; technician effect as proxy
+#  # non-randomly split array effect data into training and test set
 #  ary.eff.train.ind <- colnames(ary.eff.nc)[c(1:64, 129:192)]
 #  ary.eff.test.ind <- colnames(ary.eff.nc)[65:128]
 #  
@@ -109,20 +109,20 @@ text(x = 64.5, y = 0.75, labels = "Blocking")
 #                                 degree = "complete", rev.order = FALSE)
 #  group.id <- substr(colnames(smp.eff.nc), 7, 7)
 #  
-#  # rehybridize
+#  # re-hybridize
 #  sim.data.raw <- rehybridize(smp.eff = smp.eff.nc,
 #                              ary.eff = ary.eff.nc,
 #                              group.id = group.id,
 #                              ary.to.smp.assign = assign.ind)
 #  
-#  # rehybridize + adjust batch effects with SVA
+#  # re-hybridize + correct batch effects with SVA
 #  sim.data.sva <- rehybridize(smp.eff = smp.eff.nc,
 #                              ary.eff = ary.eff.nc,
 #                              group.id = group.id,
 #                              ary.to.smp.assign = assign.ind,
 #                              isva = TRUE)
 #  
-#  # rehybridize + adjust batch effects with RUV-4
+#  # re-hybridize + correct batch effects with RUV-4
 #  smp.eff.ctrl <- smp.eff[rownames(smp.eff) %in% ctrl.genes, ]
 #  ary.eff.ctrl <- ary.eff[rownames(ary.eff) %in% ctrl.genes, ]
 #  
@@ -355,24 +355,6 @@ colnames(tab) <- c("DEA", "Count")
 knitr::kable(tab, rownames = NULL)
 
 
-## ----classify.gene.type, comment = ">", message = FALSE, eval = FALSE----
-#  # classify gene type
-#  gene.cat <- classify.gene.type(smp.eff = smp.eff.nc,
-#                                 ary.eff = ary.eff.nc,
-#                                 smp.eff.train.ind = smp.eff.train.ind,
-#                                 ary.eff.train.ind = ary.eff.train.ind,
-#                                 group.id = group.id.list,
-#                                 ary.to.smp.assign = ary.to.smp.assign)
-#  
-
-## ----calc.confounding.level, comment = ">", message = FALSE, eval = FALSE----
-#  # calculate confounding level
-#  nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE)
-#  calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind],
-#                         group.id = substr(smp.eff.train.ind, 7, 7),
-#                         nbe.genes = nbe.genes)
-#  
-
 ## ----reduce.signal, eval = FALSE-----------------------------------------
 #  # reduced signal by half
 #  group.id <- substr(colnames(smp.eff.nc), 7, 7)
@@ -448,4 +430,12 @@ boxplot(ary.eff.nc.tr.scale1, main = "Scaling 1",
 boxplot(ary.eff.nc.tr.scale2, main = "Scaling 2",
         ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
 
+
+## ----calc.confounding.level, comment = ">", message = FALSE, eval = FALSE----
+#  # calculate confounding level
+#  nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE)
+#  calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind],
+#                         group.id = substr(smp.eff.train.ind, 7, 7),
+#                         nbe.genes = nbe.genes)
+#  
 

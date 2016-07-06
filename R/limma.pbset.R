@@ -48,7 +48,7 @@
 
   if(is.null(pbset.id)) pbset.id <- rownames(data)
 
-  limma.level <- factor(group.id,levels = group.id.level)
+  limma.level <- factor(group.id, levels = group.id.level)
   design.mat <- model.matrix(~0 + limma.level)
   colnames(design.mat) <- group.id.level
   cont.mat <- limma::makeContrasts(contrasts = paste0(group.id.level[2], "-", group.id.level[1]),

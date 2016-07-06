@@ -3,7 +3,6 @@
 export(amplify.ary.eff)
 export(blocking.design)
 export(calc.confounding.level)
-export(classify.gene.type)
 export(confounding.design)
 export(estimate.ary.eff)
 export(estimate.smp.eff)

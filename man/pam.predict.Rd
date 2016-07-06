@@ -28,8 +28,8 @@ Predict from a nearest shrunken centroid fit.
 }
 \examples{
 set.seed(101)
-smp.eff <- estimate.smp.eff(r.data = r.data.pl)
-ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
+ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 smp.eff.nc <- smp.eff[!rownames(smp.eff) \%in\% ctrl.genes, ]
 group.id <- substr(colnames(smp.eff.nc), 7, 7)
 

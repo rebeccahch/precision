@@ -48,11 +48,11 @@ Create simulated dataset through "virtual rehybridization" for a given array-to-
 }
 \examples{
 \dontrun{
-smp.eff <- estimate.smp.eff(r.data = r.data.pl)
-ary.eff <- estimate.ary.eff(r.data = r.data.pl,
-                             non.r.data = non.r.data.pl)
+smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
+ary.eff <- estimate.ary.eff(uhdata = uhdata.pl,
+                             nuhdata = nuhdata.pl)
 
-ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
 smp.eff.nc <- smp.eff[!rownames(smp.eff) \%in\% ctrl.genes, ]
 ary.eff.nc <- ary.eff[!rownames(ary.eff) \%in\% ctrl.genes, ]

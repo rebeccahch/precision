@@ -23,19 +23,20 @@
 #' @importFrom stats model.matrix sd
 #' @export
 #' @examples
-#' r.data.psl <- med.sum.pbset(data = r.data.pl,
+#' uhdata.psl <- med.sum.pbset(data = uhdata.pl,
 #'                             num.per.unipbset = 10)
-#' ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+#' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 #'
-#' r.data.psl.nc <- r.data.psl[!rownames(r.data.psl) %in% ctrl.genes, ]
+#' uhdata.psl.nc <- uhdata.psl[!rownames(uhdata.psl) %in% ctrl.genes, ]
 #'
-#' group.id <- substr(colnames(r.data.psl.nc), 7, 7)
+#' group.id <- substr(colnames(uhdata.psl.nc), 7, 7)
 #' group.id.level <- levels(as.factor(group.id))
 #'
-#' limma.fit.r.data<- limma.pbset(data = r.data.psl.nc,
+#' limma.fit.uhdata<- limma.pbset(data = uhdata.psl.nc,
 #'                                group.id = group.id,
 #'                                group.id.level = group.id.level)
-#'                                table(limma.fit.r.data$P.Value < 0.01, dnn = "DE genes")
+#'                                table(limma.fit.uhdata$P.Value < 0.01,
+#'                                dnn = "DE genes")
 #'
 
 "limma.pbset" <- function(data, group.id,

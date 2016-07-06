@@ -1,7 +1,7 @@
 #' @title The uniformly-handled probe-level dataset,
 #' 10 probes for each unique probe
 #'
-#' @description A five percent random subset of the uniforly-handled (benchmark)
+#' @description A five percent random subset of the uniformly-handled
 #' probe-level dataset, 10 probes per each unique probe.
 #' The expressions are on a log2 scale without background adjustmnet.
 #' This dataset consists of 181 unique probes, of which
@@ -14,12 +14,12 @@
 #' @format A data matrix with 1810 rows (probes) and 192 columns (samples).
 #' @keywords example.data
 
-"r.data.pl"
+"uhdata.pl"
 
 #' @title The non-uniformly-handled probe-level dataset,
 #' 10 probes for each unique probe
 #'
-#' @description A five percent random subset of the non-uniforly-handled (test)
+#' @description A five percent random subset of the non-uniformly-handled
 #' probe-level dataset, 10 probes per each unique probe.
 #' The expressions are on a log2 scale without background adjustmnet.
 #' This dataset consists of 181 unique probes, of which
@@ -32,5 +32,5 @@
 #' @format A data matrix with 1810 rows (probes) and 192 columns (samples).
 #' @keywords example.data
 
-"non.r.data.pl"
+"nuhdata.pl"
 

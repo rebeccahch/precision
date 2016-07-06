@@ -23,7 +23,7 @@ Truncate probe-level dataset so that it has a fixed number of probes per unique 
 We are safe to do so if the variation among replicates for the same probe is small.
 }
 \examples{
-r.data.pl.p5 <- per.unipbset.truncate(data = r.data.pl,
+uhdata.pl.p5 <- per.unipbset.truncate(data = uhdata.pl,
 num.per.unipbset = 5)
 }
 \keyword{data.setup}

@@ -44,25 +44,25 @@ A unique pair of datasets was generated for the same set of 96 endometrial and 9
 
 [^1]: Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [here](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
-This package includes two example datasets (probe level): uniformly-handled data `r.data.pl` and non-uniformly-handled data `non.r.data.pl`, which were the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
+This package includes two example datasets (probe level): uniformly-handled data `uhdata.pl` and non-uniformly-handled data `nuhdata.pl`, which were the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
 
 ```{r load.data, eval = FALSE}
-data("r.data.pl")
-data("non.r.data.pl")
+data("uhdata.pl")
+data("nuhdata.pl")
 
 ```
 
 ```{r data.tab, results = "asis", echo = FALSE}
-knitr::kable(r.data.pl[1:15, 1:5], caption = "Uniformly-handled Data")
+knitr::kable(uhdata.pl[1:15, 1:5], caption = "Uniformly-handled Data")
 
-knitr::kable(non.r.data.pl[1:15, 1:5], caption = "Non-uniformly-handled Data")
+knitr::kable(nuhdata.pl[1:15, 1:5], caption = "Non-uniformly-handled Data")
 
 ```
 
 Originally, each probe has 10 to 40 replicates. We recommend truncating the number of replicates to a fixed number across probes to save data preprocessing time. We are safe to do so because we have previously observed that the variation among replicates for the same probe is small. Here, we provide `per.unipbset.truncate()` to truncate the number of replicates in data. In our simulation study, we used only the first 10 replicates for each unique probe.
 
 ```{r per.unipbset.truncate, eval = FALSE}
-r.data.pl.p5 <- per.unipbset.truncate(data = r.data.pl,
+uhdata.pl.p5 <- per.unipbset.truncate(data = uhdata.pl,
                                       num.per.unipbset = 5)
 ```
 
@@ -70,9 +70,9 @@ Agilent includes control probes, but in most of the analyses, only **non-control
 
 ```{r ctrl.genes}
 # negative control probes
-ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
-r.data.pl.nc <- r.data.pl[!rownames(r.data.pl) %in% ctrl.genes, ] # nc for non-control probes
+uhdata.pl.nc <- uhdata.pl[!rownames(uhdata.pl) %in% ctrl.genes, ] # nc for non-control probes
 ```
 
 ## Simulated Data Generation 
@@ -80,10 +80,10 @@ r.data.pl.nc <- r.data.pl[!rownames(r.data.pl) %in% ctrl.genes, ] # nc for non-c
 We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the non-uniformly-handled dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
 
 ```{r est.eff, results = "hide", message = FALSE}
-smp.eff <- estimate.smp.eff(r.data = r.data.pl)
+smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
 
-ary.eff <- estimate.ary.eff(r.data = r.data.pl, 
-                             non.r.data = non.r.data.pl)
+ary.eff <- estimate.ary.eff(uhdata = uhdata.pl, 
+                             nuhdata = nuhdata.pl)
 
 smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
 ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
@@ -245,7 +245,7 @@ data.vsn <- vs.norm(train = train.dat, test = test.dat)
 To summarize replicate level data to unique probe level, based on within-probe medians, `med.sum.pbset()` can be used:
 
 ```{r med.sum.pbset, eval = FALSE}
-r.data.psl <- med.sum.pbset(data = r.data.pl, 
+uhdata.psl <- med.sum.pbset(data = uhdata.pl, 
                             num.per.unipbset = 10)
 ```
 
@@ -468,19 +468,19 @@ knitr::kable(data.frame(uni.handled.results.ridge$error_store[2, ]),
 Simple per-marker comparison methods such as differential expression analysis can be particularly useful when making preliminary data analysis decision. For instance, when reducing biological signal, we first identified differentially expressed markers and then shrunk sample group differences of each of the markers. Therefore, we provide `limma.pbset` to perform differential expression analysis.
 
 ```{r dea, eval = FALSE}
-r.data.psl.nc <- r.data.psl[!rownames(r.data.psl) %in% ctrl.genes, ] # nc for non-control probes
+uhdata.psl.nc <- uhdata.psl[!rownames(uhdata.psl) %in% ctrl.genes, ] # nc for non-control probes
 
-group.id <- substr(colnames(r.data.psl.nc), 7, 7)
+group.id <- substr(colnames(uhdata.psl.nc), 7, 7)
 group.id.level <- levels(as.factor(group.id))
-limma.fit.r.data<- limma.pbset(data = r.data.psl.nc, 
+limma.fit.uhdata<- limma.pbset(data = uhdata.psl.nc, 
                                group.id = group.id,
                                group.id.level = group.id.level)
-table(limma.fit.r.data$P.Value < 0.01, dnn = "DE genes")
+table(limma.fit.uhdata$P.Value < 0.01, dnn = "DE genes")
 
 ```
 
 ```{r dea.tab, results = "asis"}
-tab <- data.frame(table(limma.fit.r.data$P.Value < 0.01))
+tab <- data.frame(table(limma.fit.uhdata$P.Value < 0.01))
 colnames(tab) <- c("DEA", "Count")
 knitr::kable(tab, rownames = NULL)
 

@@ -3,9 +3,9 @@
 #' Estimate array effects from taking the differences between the expressions of the non-uniformly-handled and
 #' the uniformly-handled data, matched by samples.
 #'
-#' @param r.data the uniformly-handled expression dataset.
+#' @param uhdata the uniformly-handled expression dataset.
 #' The dataset must have rows as probes and columns as samples.
-#' @param non.r.data the non-uniformly-handled expression dataset.
+#' @param nuhdata the non-uniformly-handled expression dataset.
 #' The dataset must have rows as probes and columns as samples and the same dimensions and
 #' the same probe names as the uniformly-handled dataset.
 #' @return an estimation of the array effects
@@ -13,14 +13,14 @@
 #' @importFrom stats median
 #' @export
 #' @examples
-#' ary.eff <- estimate.ary.eff(r.data = r.data.pl, non.r.data = non.r.data.pl)
+#' ary.eff <- estimate.ary.eff(uhdata = uhdata.pl, nuhdata = nuhdata.pl)
 #'
 
 
-"estimate.ary.eff" <- function(r.data, non.r.data){
+"estimate.ary.eff" <- function(uhdata, nuhdata){
 
-  stopifnot(rownames(r.data) == rownames(non.r.data))
-  stopifnot(dim(r.data) == dim(non.r.data))
+  stopifnot(rownames(uhdata) == rownames(nuhdata))
+  stopifnot(dim(uhdata) == dim(nuhdata))
 
   ## the list of 7 box 3 arrays and 2 bad arrays that require removal + median imputation
   ## from the rest of the arrays in the same slide
@@ -29,13 +29,13 @@
                "GL3793V.b3","JB4933E","JB4952V")
 
   temp.ary.eff <- NULL
-  for(i in 1:ncol(non.r.data)){
-    temp.name <- substr(colnames(non.r.data)[i], 1, 7)
-    b.data <- r.data[, colnames(r.data) == temp.name]
-    temp.diff <- non.r.data[, i] - b.data
+  for(i in 1:ncol(nuhdata)){
+    temp.name <- substr(colnames(nuhdata)[i], 1, 7)
+    temp.data <- uhdata[, colnames(uhdata) == temp.name]
+    temp.diff <- nuhdata[, i] - temp.data
     temp.ary.eff <- cbind(temp.ary.eff, temp.diff)
   }
-  colnames(temp.ary.eff) <- colnames(non.r.data)[1:ncol(non.r.data)]
+  colnames(temp.ary.eff) <- colnames(nuhdata)[1:ncol(nuhdata)]
 
   ary.eff <- NULL
   for(i in 1:24){
@@ -55,7 +55,7 @@
   }
 
   colnames(ary.eff) <- paste(substr(colnames(temp.ary.eff), 1, 7),
-                             seq(1, ncol(non.r.data)), sep = ".")
+                             seq(1, ncol(nuhdata)), sep = ".")
 
   return(ary.eff)
 }

@@ -4,13 +4,13 @@
 \alias{estimate.ary.eff}
 \title{Estimated array effects}
 \usage{
-estimate.ary.eff(r.data, non.r.data)
+estimate.ary.eff(uhdata, nuhdata)
 }
 \arguments{
-\item{r.data}{the uniformly-handled expression dataset.
+\item{uhdata}{the uniformly-handled expression dataset.
 The dataset must have rows as probes and columns as samples.}
 
-\item{non.r.data}{the non-uniformly-handled expression dataset.
+\item{nuhdata}{the non-uniformly-handled expression dataset.
 The dataset must have rows as probes and columns as samples and the same dimensions and
 the same probe names as the uniformly-handled dataset.}
 }
@@ -22,7 +22,7 @@ Estimate array effects from taking the differences between the expressions of th
 the uniformly-handled data, matched by samples.
 }
 \examples{
-ary.eff <- estimate.ary.eff(r.data = r.data.pl, non.r.data = non.r.data.pl)
+ary.eff <- estimate.ary.eff(uhdata = uhdata.pl, nuhdata = nuhdata.pl)
 
 }
 \keyword{data.setup}

@@ -27,7 +27,7 @@ only takes in data matrix with the same number of probes per unique probe-set.
 }
 \examples{
 \dontrun{
-r.data.psl <- med.sum.pbset(data = r.data.pl,
+uhdata.psl <- med.sum.pbset(data = uhdata.pl,
                             num.per.unipbset = 10)
 }
 

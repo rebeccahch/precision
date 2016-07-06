@@ -21,11 +21,11 @@
 #' @import preprocessCore
 #' @examples
 #' set.seed(101)
-#' group.id <- substr(colnames(non.r.data.pl), 7, 7)
-#' train.ind <- colnames(non.r.data.pl)[c(sample(which(group.id == "E"), size = 64),
+#' group.id <- substr(colnames(nuhdata.pl), 7, 7)
+#' train.ind <- colnames(nuhdata.pl)[c(sample(which(group.id == "E"), size = 64),
 #'                                sample(which(group.id == "V"), size = 64))]
-#' train.dat <- non.r.data.pl[, train.ind]
-#' test.dat <- non.r.data.pl[, !colnames(non.r.data.pl) %in%train.ind]
+#' train.dat <- nuhdata.pl[, train.ind]
+#' test.dat <- nuhdata.pl[, !colnames(nuhdata.pl) %in% train.ind]
 #' data.qn <- quant.norm(train = train.dat)
 #' str(data.qn)
 #' data.qn <- quant.norm(train = train.dat, test = test.dat)

@@ -17,7 +17,7 @@
 #' @keywords preprocess
 #' @examples
 #' \dontrun{
-#' r.data.psl <- med.sum.pbset(data = r.data.pl,
+#' uhdata.psl <- med.sum.pbset(data = uhdata.pl,
 #'                             num.per.unipbset = 10)
 #' }
 #'

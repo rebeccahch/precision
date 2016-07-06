@@ -4,10 +4,10 @@
 \alias{estimate.smp.eff}
 \title{Estimated Sample Effects}
 \usage{
-estimate.smp.eff(r.data)
+estimate.smp.eff(uhdata)
 }
 \arguments{
-\item{r.data}{the uniformly-handled expression dataset.
+\item{uhdata}{the uniformly-handled expression dataset.
 The dataset must have rows as probes and columns as samples.}
 }
 \value{
@@ -17,7 +17,7 @@ an estimation of the sample effects
 Estimate sample effects from the expressions of the uniformly-handled data.
 }
 \examples{
-smp.eff <- estimate.smp.eff(r.data = r.data.pl)
+smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
 
 }
 \keyword{data.setup}

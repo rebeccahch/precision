@@ -12,7 +12,7 @@
 #' @keywords data.setup
 #' @export
 #' @examples
-#' r.data.pl.p5 <- per.unipbset.truncate(data = r.data.pl,
+#' uhdata.pl.p5 <- per.unipbset.truncate(data = uhdata.pl,
 #' num.per.unipbset = 5)
 
 "per.unipbset.truncate" <- function(data, pbset.id = NULL,

@@ -38,7 +38,7 @@ library(PRECISION)
 
 ```
 
-## Empirial Data Collection
+## Empirical Data Collection
 
 A unique pair of datasets was generated for the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples with blocking and randomization (by array slide). The second dataset was handled by two technicians in multiple batches and its arrays were assigned in the order of sample collection without blocking or randomization. to mimick typical practice. More details on the data collection can be found in Qin et al.[^1] The datasets are publicly available on `GEO` [here](http://www.ncbi.nlm.nih.gov/geo/).
 

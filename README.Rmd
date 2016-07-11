@@ -16,4 +16,7 @@ When using `PRECISION`, please cite the following:
 
 Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
+A Cautionary Note on using Cross-validation for Molecular Classification. Qin LX, Huang HC, Begg CB.
+
+
 An introduction to `PRECISION` can be found in the vignette [here](https://github.com/rebeccahch/precision/tree/master/vignettes).

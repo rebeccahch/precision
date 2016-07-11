@@ -9,31 +9,31 @@ library(PRECISION)
 
 
 ## ----load.data, eval = FALSE---------------------------------------------
-#  data("r.data.pl")
-#  data("non.r.data.pl")
+#  data("uhdata.pl")
+#  data("nuhdata.pl")
 #  
 
 ## ----data.tab, results = "asis", echo = FALSE----------------------------
-knitr::kable(r.data.pl[1:15, 1:5], caption = "Uniformly-handled Data")
+knitr::kable(uhdata.pl[1:15, 1:5], caption = "Uniformly-handled Data")
 
-knitr::kable(non.r.data.pl[1:15, 1:5], caption = "Non-uniformly-handled Data")
+knitr::kable(nuhdata.pl[1:15, 1:5], caption = "Non-uniformly-handled Data")
 
 
 ## ----per.unipbset.truncate, eval = FALSE---------------------------------
-#  r.data.pl.p5 <- per.unipbset.truncate(data = r.data.pl,
+#  uhdata.pl.p5 <- per.unipbset.truncate(data = uhdata.pl,
 #                                        num.per.unipbset = 5)
 
 ## ----ctrl.genes----------------------------------------------------------
 # negative control probes
-ctrl.genes <- unique(rownames(r.data.pl))[grep("NC", unique(rownames(r.data.pl)))]
+ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
-r.data.pl.nc <- r.data.pl[!rownames(r.data.pl) %in% ctrl.genes, ] # nc for non-control probes
+uhdata.pl.nc <- uhdata.pl[!rownames(uhdata.pl) %in% ctrl.genes, ] # nc for non-control probes
 
 ## ----est.eff, results = "hide", message = FALSE--------------------------
-smp.eff <- estimate.smp.eff(r.data = r.data.pl)
+smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
 
-ary.eff <- estimate.ary.eff(r.data = r.data.pl, 
-                             non.r.data = non.r.data.pl)
+ary.eff <- estimate.ary.eff(uhdata = uhdata.pl, 
+                             nuhdata = nuhdata.pl)
 
 smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
 ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
@@ -160,7 +160,7 @@ text(x = 64.5, y = 0.75, labels = "Blocking")
 #  
 
 ## ----med.sum.pbset, eval = FALSE-----------------------------------------
-#  r.data.psl <- med.sum.pbset(data = r.data.pl,
+#  uhdata.psl <- med.sum.pbset(data = uhdata.pl,
 #                              num.per.unipbset = 10)
 
 ## ----classification, eval = FALSE----------------------------------------
@@ -339,18 +339,18 @@ knitr::kable(data.frame(uni.handled.results.ridge$error_store[2, ]),
 
 
 ## ----dea, eval = FALSE---------------------------------------------------
-#  r.data.psl.nc <- r.data.psl[!rownames(r.data.psl) %in% ctrl.genes, ] # nc for non-control probes
+#  uhdata.psl.nc <- uhdata.psl[!rownames(uhdata.psl) %in% ctrl.genes, ] # nc for non-control probes
 #  
-#  group.id <- substr(colnames(r.data.psl.nc), 7, 7)
+#  group.id <- substr(colnames(uhdata.psl.nc), 7, 7)
 #  group.id.level <- levels(as.factor(group.id))
-#  limma.fit.r.data<- limma.pbset(data = r.data.psl.nc,
+#  limma.fit.uhdata<- limma.pbset(data = uhdata.psl.nc,
 #                                 group.id = group.id,
 #                                 group.id.level = group.id.level)
-#  table(limma.fit.r.data$P.Value < 0.01, dnn = "DE genes")
+#  table(limma.fit.uhdata$P.Value < 0.01, dnn = "DE genes")
 #  
 
 ## ----dea.tab, results = "asis"-------------------------------------------
-tab <- data.frame(table(limma.fit.r.data$P.Value < 0.01))
+tab <- data.frame(table(limma.fit.uhdata$P.Value < 0.01))
 colnames(tab) <- c("DEA", "Count")
 knitr::kable(tab, rownames = NULL)
 

@@ -26,7 +26,7 @@ When use `PRECISION`, please cite the following papers:
 Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
 
-XXXXX
+Qin LX, Huang HC, Begg CB. Cautionary Note on Cross Validation in Molecular Classification.
 
 ## Load PRECISION
 
@@ -40,7 +40,7 @@ library(PRECISION)
 
 ## Empirical Data Collection
 
-A unique pair of datasets was generated for the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples with blocking and randomization (by array slide). The second dataset was handled by two technicians in multiple batches and its arrays were assigned in the order of sample collection without blocking or randomization. to mimick typical practice. More details on the data collection can be found in Qin et al.[^1] The datasets are publicly available on `GEO` [here](http://www.ncbi.nlm.nih.gov/geo/).
+A unique pair of datasets was generated for the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples with blocking and randomization (by array slide). The second dataset was handled by two technicians in multiple batches and its arrays were assigned in the order of sample collection without blocking or randomization to mimic typical practice. More details on the data collection can be found in Qin et al.[^1] The datasets are publicly available on `GEO` [here](http://www.ncbi.nlm.nih.gov/geo/).
 
 [^1]: Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [here](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
@@ -90,7 +90,7 @@ ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
 
 ```
 
-The 192 samples were **randomly split** in a 2:1 ratio into a training set and a test set, balanced by tumor type; the 192 arrays were **non-randomly** split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing) and a test set (n=64, the middle 64 arrays). This array split is intentional because the first 80 arrays were profiled by one technician and the rest by another technician.
+The 192 samples were **randomly split** in a 2:1 ratio into a training set and a test set, balanced by tumor type; the 192 arrays were **non-randomly** split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing) and a test set (n=64, the middle 64 arrays). This array split is intentional because the first 80 arrays were profiled by one technician and the rest by the other technician.
 
 ```{r data.split, comment = ">", message = FALSE, eval = FALSE}
 set.seed(101)
@@ -251,7 +251,7 @@ uhdata.psl <- med.sum.pbset(data = uhdata.pl,
 
 ## Classification and Error Estimation
 
-Regardless of classification methods, internal cross-validation should used to build a classifier and tune parameter(s) and external validation should be used to validate the performance. In our simulation study, we focused on reporting two classification methods: one non-parametric method, prediction analysis for microarrays (PAM)[^5] and one parametric method, the least absolute shrinkage and selection operator (LASSO)[^6]. Examples of model-building and predicting functions in `PRECISION` are `pam.intcv()` and `pam.predict()` for PAM and `lasso.intcv()` and `lasso.predict()` for LASSO.
+Regardless of classification methods, internal cross-validation should be used to build a classifier and tune parameter(s) and external validation should be used to validate the performance. In our simulation study, we reported results of two classification methods: one non-parametric method, prediction analysis for microarrays (PAM)[^5] and one parametric method, the least absolute shrinkage and selection operator (LASSO)[^6]. Examples of model-building and predicting functions in `PRECISION` are `pam.intcv()` and `pam.predict()` for PAM and `lasso.intcv()` and `lasso.predict()` for LASSO.
 
 [^5]: Tibshirani R, Hastie T, Narasimhan B, Chu G: Diagnosis of multiple cancer types by shrunken centroids of gene expression. Proceedings of the National Academy of Sciences of the United States of America 2002, 99(10):6567-6572.
 Hastie T, R., Narasimhan B, Chu G: pamr: Pam: prediction analysis for microarrays; 2014.

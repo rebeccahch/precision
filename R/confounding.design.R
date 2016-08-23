@@ -8,7 +8,7 @@
 #' @param seed an integer used to initialize a pseudorandom number generator.
 #' @param num.smp number of arrays.
 #' @param degree level of confounding. It must be either "complete" or "partial"
-#' for "complete confounding" or "partial confounding" design.
+#' for complete confounding design or partial confounding design, correspondingly.
 #' By default, \code{degree = "complete"}.
 #' @param rev.order whether the array-to-sample-group assignment should be flipped.
 #' Originally the first half arrays are designated to be assigned to group 1 (endometrial sample group)
@@ -16,8 +16,7 @@
 #' If the array-to-sample-group assignment is flipped (rev.order = TRUE),
 #' the first half of the array IDs will be swapped with the second half of the array IDs.
 #' By default, \code{rev.order = FALSE}.
-#' @return a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
-#  (first half of the samples belong to group 1 and second half to group 2).
+#' @return a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest.
 #' As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
 #' @keywords study.design
 #' @export

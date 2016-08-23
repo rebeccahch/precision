@@ -11,4 +11,7 @@
 #' smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
 #'
 
-"estimate.smp.eff" <- function(uhdata) return(uhdata)
+"estimate.smp.eff" <- function(uhdata) {
+    smp.eff <- uhdata
+    return(smp.eff)
+  }

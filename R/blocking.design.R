@@ -1,28 +1,31 @@
 #' Blocking Design
 #'
-#' Assign arrays to samples with blocking by (8-plex Agilent) array slide.
+#' Assign arrays to samples with blocking by array slide.
+#' For example Agilent comes with the 8-plex design.
+#' That is the number of arrays in an array slide = 8.
 #'
 #' @param seed an integer used to initialize a pseudorandom number generator.
-#' @param num.smp number of arrays. It must be a multiple of 8.
+#' @param num.per.slide number of arrays per array slide. It must be a multiple of 2. By default, \code{num.per.slide = 8}.
+#' @param num.smp number of arrays. It must be a multiple of the \code{num.per.slide}.
 #' @return a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
 #  (first half of the samples belong to group 1 and second half to group 2).
 #' As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
 #' @export
 #' @keywords study.design
 #' @examples
-#' blocking.design(seed = 1, num.smp = 128)
+#' blocking.design(seed = 1, num.per.slide = 8, num.smp = 128)
 #'
 
-"blocking.design" <- function(seed, num.smp){
+"blocking.design" <- function(seed, num.per.slide = 8, num.smp){
   stopifnot(is.numeric(seed))
   stopifnot(is.numeric(num.smp))
-  stopifnot(num.smp %% 8 == 0)
+  stopifnot(num.smp %% num.per.slide == 0)
 
   set.seed(seed)
   g1.sample <- g2.sample <- NULL
-  for(j in 1:(num.smp/8)){
-    sample.number <- ((j-1)*8+1):(j*8)
-    g1 <- sample(sample.number, size = 4)
+  for(j in 1:(num.smp/num.per.slide)){
+    sample.number <- ((j - 1)*num.per.slide + 1):(j*num.per.slide)
+    g1 <- sample(sample.number, size = num.per.slide/2)
     g2 <- sample.number[!sample.number %in% g1]
     g1.sample <- c(g1.sample, g1)
     g2.sample <- c(g2.sample, g2)

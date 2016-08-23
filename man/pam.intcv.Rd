@@ -19,7 +19,7 @@ By default, \code{vt.k = NULL} and
 
 \item{n.k}{number of threshold values desired. By default, \code{n.k = 30}.}
 
-\item{kfold}{number of folds. By default, kfold = 5.}
+\item{kfold}{number of folds. By default, \code{kfold = 5}.}
 
 \item{folds}{pre-specifies samples to each fold.
 By default, \code{folds = NULL} for no pre-specification.}

@@ -3,3 +3,5 @@
 .RData
 setup.R
 hide.R
+precision.simulate.test.R
+precision.simulate2.R

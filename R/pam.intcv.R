@@ -14,7 +14,7 @@
 #' By default, \code{vt.k = NULL} and
 #' 30 values will be predetermined by the pamr package.
 #' @param n.k number of threshold values desired. By default, \code{n.k = 30}.
-#' @param kfold number of folds. By default, kfold = 5.
+#' @param kfold number of folds. By default, \code{kfold = 5}.
 #' @param folds pre-specifies samples to each fold.
 #' By default, \code{folds = NULL} for no pre-specification.
 #' @param seed an integer used to initialize a pseudorandom number generator.

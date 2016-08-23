@@ -5,12 +5,13 @@
 #' @param ary.eff the estimated array effect dataset to be modified. The dataset must have rows as probes and columns as samples.
 #' @param amplify.ary.id the array IDs specified to have its array effect amplified.
 #' If \code{type = "shift"} or \code{type = "scale1"}, a vector of array IDs must be supplied.
-#' If \code{type = "scale2"}, a list of vectors of array IDs must be supplied.
+#' If \code{type = "scale2"}, a list of vectors of array IDs must be supplied;
+#' each element in the list must be a vector of array IDs.
 #' @param amplify.level a multiplier specified to amplify array effect by.
 #' A numeric multiplier must be supplied if \code{type = "shift"} or \code{type = "scale1"}.
 #' A vector of multipliers must be supplied if type = "scale2" and it must have an equal length to the \code{amplify.ary.id} list.
 #' @param type a choice of amplification type, either "shift", "scale1" or "scale2" for either location shift
-#' or scale change. By default \code{type = "shift"}.
+#' or scale change. By default, \code{type = "shift"}.
 #' Location shift moves the entire specified arrays up or down by a constant.
 #' Scale change 1 within each array, re-scales expressions that are in inter-quartiles towards the first and the third quartiles;
 #' expressions that are outside of the inter-quartile range remain unchanged.

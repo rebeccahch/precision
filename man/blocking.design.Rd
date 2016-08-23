@@ -4,22 +4,26 @@
 \alias{blocking.design}
 \title{Blocking Design}
 \usage{
-blocking.design(seed, num.smp)
+blocking.design(seed, num.per.slide = 8, num.smp)
 }
 \arguments{
 \item{seed}{an integer used to initialize a pseudorandom number generator.}
 
-\item{num.smp}{number of arrays. It must be a multiple of 8.}
+\item{num.per.slide}{number of arrays per array slide. It must be a multiple of 2. By default, \code{num.per.slide = 8}.}
+
+\item{num.smp}{number of arrays. It must be a multiple of the \code{num.per.slide}.}
 }
 \value{
 a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
 As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
 }
 \description{
-Assign arrays to samples with blocking by (8-plex Agilent) array slide.
+Assign arrays to samples with blocking by array slide.
+For example Agilent comes with the 8-plex design.
+That is the number of arrays in an array slide = 8.
 }
 \examples{
-blocking.design(seed = 1, num.smp = 128)
+blocking.design(seed = 1, num.per.slide = 8, num.smp = 128)
 
 }
 \keyword{study.design}

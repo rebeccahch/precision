@@ -34,7 +34,7 @@
 #'
 #' (3) classification error estimation using both cross-validation and external validation
 #'
-#' The only difference is that here external validation is based on the test data from the uniformly-handled dataset
+#' The external validation is based on the test data from the uniformly-handled dataset
 #' and served as the gold standard for the misclassification error estimation.
 #'
 #' For a given split of samples to training set versus test set,

@@ -9,18 +9,19 @@ blocking.design(seed, num.per.slide = 8, num.smp)
 \arguments{
 \item{seed}{an integer used to initialize a pseudorandom number generator.}
 
-\item{num.per.slide}{number of arrays per array slide. It must be a multiple of 2. By default, \code{num.per.slide = 8}.}
+\item{num.per.slide}{number of arrays per array slide. It must be a multiple of 2. By default, \code{num.per.slide = 8} for Agilent microarrays.}
 
-\item{num.smp}{number of arrays. It must be a multiple of the \code{num.per.slide}.}
+\item{num.smp}{number of arrays. It must be a multiple of \code{num.per.slide}.}
 }
 \value{
 a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
-As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
+As a result, the first half of the array IDs are assigned to sample group 1 and the second half of the array IDs are assigned to sample group 2.
 }
 \description{
-Assign arrays to samples with blocking by array slide.
-For example Agilent comes with the 8-plex design.
-That is the number of arrays in an array slide = 8.
+Assign arrays to samples with blocking experimental design by array slide.
+For example Agilent comes with an eight-plex design.
+That is the number of arrays in an array slide is eight;
+within each array slide, equal number of arrays are assigned to either sample group.
 }
 \examples{
 blocking.design(seed = 1, num.per.slide = 8, num.smp = 128)

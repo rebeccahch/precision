@@ -1,15 +1,16 @@
 #' Blocking Design
 #'
-#' Assign arrays to samples with blocking by array slide.
-#' For example Agilent comes with the 8-plex design.
-#' That is the number of arrays in an array slide = 8.
+#' Assign arrays to samples with blocking experimental design by array slide.
+#' For example Agilent comes with an eight-plex design.
+#' That is the number of arrays in an array slide is eight;
+#' within each array slide, equal number of arrays are assigned to either sample group.
 #'
 #' @param seed an integer used to initialize a pseudorandom number generator.
-#' @param num.per.slide number of arrays per array slide. It must be a multiple of 2. By default, \code{num.per.slide = 8}.
-#' @param num.smp number of arrays. It must be a multiple of the \code{num.per.slide}.
+#' @param num.per.slide number of arrays per array slide. It must be a multiple of 2. By default, \code{num.per.slide = 8} for Agilent microarrays.
+#' @param num.smp number of arrays. It must be a multiple of \code{num.per.slide}.
 #' @return a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
-#  (first half of the samples belong to group 1 and second half to group 2).
-#' As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
+#  (first half of the samples belong to sample group 1 and second half to sample group 2).
+#' As a result, the first half of the array IDs are assigned to sample group 1 and the second half of the array IDs are assigned to sample group 2.
 #' @export
 #' @keywords study.design
 #' @examples

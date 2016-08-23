@@ -94,8 +94,8 @@ First, \code{precision.simulate} requires the training and test sets for both es
 The effects can be simulated as follows (using \code{estimate.smp.eff} and \code{estimate.ary.eff}).
 The uniformly-handled dataset are used to approximate the biological effect for each sample,
 and the difference between the two arrays (one from the uniformly-handled dataset and
-the other from the non-uniformly-handled dataset, subtracting the former from the latter)
-for the same sample are used to approximate the handling effect for each array in the non-uniformly-handled dataset.
+the other from the nonuniformly-handled dataset, subtracting the former from the latter)
+for the same sample are used to approximate the handling effect for each array in the nonuniformly-handled dataset.
 
 The samples are randomly split into a training set and a test set, balanced by tumor type (in Qin et al., training-to-test ratio is 2:1).
 The arrays were then non-randomly split to a training set and a test set (in Qin et al., training set n = 128 -- the first 64 and last 64 arrays
@@ -119,7 +119,7 @@ batch effects can be adjusted specified with \code{icombat}, \code{isva} and \co
 
 (3) classification error estimation using both cross-validation and external validation
 
-The only difference is that here external validation is based on the test data from the uniformly-handled dataset
+The external validation is based on the test data from the uniformly-handled dataset
 and served as the gold standard for the misclassification error estimation.
 
 For a given split of samples to training set versus test set,

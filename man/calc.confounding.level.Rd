@@ -7,12 +7,13 @@
 calc.confounding.level(data, group.id, nbe.genes)
 }
 \arguments{
-\item{data}{expression dataset. The dataset must have rows as probes and columns as samples.}
+\item{data}{expression dataset. It must have rows as probes and columns as samples.}
 
 \item{group.id}{a vector of sample-group labels for each sample of the dataset.}
 
-\item{nbe.genes}{a vector of non-biological genes indicated as TRUE.
-It must have an equal length to the number of probes in the dataset.}
+\item{nbe.genes}{a vector of non-biological genes used to filter the dataset.
+Non-biological genes are indicated as \code{TRUE}, otherwise as \code{FALSE}.
+The vector must have an equal length to the number of probes in the dataset.}
 }
 \value{
 a list of two elements:
@@ -21,7 +22,10 @@ a list of two elements:
 non-biological genes in the dataset with the sample group}
 }
 \description{
-Calculate the level of confounding between handling effects and sample group of interest for array data.
+Calculate the level of confounding between handling effects and sample group of interest
+for a dataset. First, principal component is applied on the non-biological subset of the data.
+The first five principal components are then used to build a simple linear regression model to predict the sample group.
+the highest adjusted R-squared is returned as the level of confounding.
 }
 \examples{
 \dontrun{
@@ -48,6 +52,9 @@ calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind],
                        nbe.genes = nbe.genes)
 }
 
+}
+\references{
+Leek J., Scharpf R., Bravo H., et al. Tackling the widespread and critical impact of batch effects in high-throughput data. Nat Rev Genet 11:733-9, 2010.
 }
 \keyword{data.setup}
 

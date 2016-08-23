@@ -1,11 +1,12 @@
 #' Estimated array effects
 #'
-#' Estimate array effects from taking the differences between the expressions of the non-uniformly-handled and
-#' the uniformly-handled data, matched by samples.
+#' Estimate handling effects of an array of the nonuniformly-handled dataset
+#' by taking the difference between its data and the data of
+#' its matched array in the uniformly-handled dataset.
 #'
 #' @param uhdata the uniformly-handled expression dataset.
 #' The dataset must have rows as probes and columns as samples.
-#' @param nuhdata the non-uniformly-handled expression dataset.
+#' @param nuhdata the nonuniformly-handled expression dataset.
 #' The dataset must have rows as probes and columns as samples and the same dimensions and
 #' the same probe names as the uniformly-handled dataset.
 #' @return an estimation of the array effects

@@ -16,10 +16,10 @@
 
 "uhdata.pl"
 
-#' @title The non-uniformly-handled probe-level dataset,
+#' @title The nonuniformly-handled probe-level dataset,
 #' 10 probes for each unique probe
 #'
-#' @description A five percent random subset of the non-uniformly-handled
+#' @description A five percent random subset of the nonuniformly-handled
 #' probe-level dataset, 10 probes per each unique probe.
 #' The expressions are on a log2 scale without background adjustmnet.
 #' This dataset consists of 181 unique probes, of which

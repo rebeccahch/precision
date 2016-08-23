@@ -47,7 +47,7 @@ limma.fit.uhdata<- limma.pbset(data = uhdata.psl.nc,
 
 }
 \references{
-Ritchie ME, Phipson B, Wu D, Hu Y, Law CW, Shi W and Smyth GK (2015).
+Ritchie M., Phipson B., Wu D., Hu Y., Law C., Shi W. and Smyth G. (2015).
 "limma powers differential expression analyses for RNA-sequencing and microarray studies."
 Nucleic Acids Research, 43(7), pp. e47.
 }

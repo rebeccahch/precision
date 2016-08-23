@@ -7,19 +7,20 @@
 med.norm(train = NULL, test = NULL, ref.dis = NULL)
 }
 \arguments{
-\item{train}{training dataset to be median normalized.
+\item{train}{the training dataset to be median normalized.
 The dataset must have rows as probes and columns as samples.
 This can be left unspecified if \code{ref.dis} is
 suppied for frozen normalize test set.}
 
-\item{test}{test dataset to be frozen median normalized.
+\item{test}{the test dataset to be frozen median normalized.
 The dataset must have rows as probes and columns as samples.
 The number of rows must equal to the number of rows in the training set.
 By default, the test set is not specified (\code{test = NULL}) and
 no frozen normalization will be performed.}
 
-\item{ref.dis}{reference distribution for frozen median normalize test set
-against previously normalized training set. This is required when \code{train} is not supplied.
+\item{ref.dis}{the reference distribution for frozen median normalize test set
+against previously normalized training set.
+This is required when \code{train} is not supplied.
 By default, \code{ref.dis = NULL}.}
 }
 \value{
@@ -29,9 +30,11 @@ a list of two datasets and one reference distribution:
 \item{ref.dis}{the reference distribution}
 }
 \description{
-Normalize training dataset so that each array shares
+Normalize a training dataset so that each array shares
 a same median and store the median from the training dataset
-as the reference to frozen median normalize test dataset.
+as the reference to frozen median normalize a test dataset.
+Also two other options are available: to only normalize
+a training dataset but not frozen normalize a test dataset, or vise versa.
 }
 \examples{
 set.seed(101)

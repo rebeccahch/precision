@@ -1,6 +1,6 @@
 #' Estimated Sample Effects
 #'
-#' Estimate sample effects from the expressions of the uniformly-handled data.
+#' Estimate biological effects of a sample from the uniformly-handled dataset.
 #'
 #' @param uhdata the uniformly-handled expression dataset.
 #' The dataset must have rows as probes and columns as samples.

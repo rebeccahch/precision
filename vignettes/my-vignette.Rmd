@@ -44,7 +44,7 @@ A unique pair of datasets was generated for the same set of 96 endometrial and 9
 
 [^1]: Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [here](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
-This package includes two example datasets (probe level): uniformly-handled data `uhdata.pl` and non-uniformly-handled data `nuhdata.pl`, which were the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
+This package includes two example datasets (probe level): uniformly-handled data `uhdata.pl` and nonuniformly-handled data `nuhdata.pl`, which were the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
 
 ```{r load.data, eval = FALSE}
 data("uhdata.pl")
@@ -55,7 +55,7 @@ data("nuhdata.pl")
 ```{r data.tab, results = "asis", echo = FALSE}
 knitr::kable(uhdata.pl[1:15, 1:5], caption = "Uniformly-handled Data")
 
-knitr::kable(nuhdata.pl[1:15, 1:5], caption = "Non-uniformly-handled Data")
+knitr::kable(nuhdata.pl[1:15, 1:5], caption = "nonuniformly-handled Data")
 
 ```
 
@@ -77,7 +77,7 @@ uhdata.pl.nc <- uhdata.pl[!rownames(uhdata.pl) %in% ctrl.genes, ] # nc for non-c
 
 ## Simulated Data Generation 
 
-We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the non-uniformly-handled dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
+We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the nonuniformly-handled dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
 
 ```{r est.eff, results = "hide", message = FALSE}
 smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)

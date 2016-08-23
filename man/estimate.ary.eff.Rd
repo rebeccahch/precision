@@ -10,7 +10,7 @@ estimate.ary.eff(uhdata, nuhdata)
 \item{uhdata}{the uniformly-handled expression dataset.
 The dataset must have rows as probes and columns as samples.}
 
-\item{nuhdata}{the non-uniformly-handled expression dataset.
+\item{nuhdata}{the nonuniformly-handled expression dataset.
 The dataset must have rows as probes and columns as samples and the same dimensions and
 the same probe names as the uniformly-handled dataset.}
 }
@@ -18,7 +18,7 @@ the same probe names as the uniformly-handled dataset.}
 an estimation of the array effects
 }
 \description{
-Estimate array effects from taking the differences between the expressions of the non-uniformly-handled and
+Estimate array effects from taking the differences between the expressions of the nonuniformly-handled and
 the uniformly-handled data, matched by samples.
 }
 \examples{

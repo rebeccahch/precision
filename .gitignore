@@ -5,3 +5,7 @@ setup.R
 hide.R
 precision.simulate.test.R
 precision.simulate2.R
+ary.to.smp.assign.func.R
+inst/doc
+data/nuhdata.pl.ori.rda
+data/uhdata.pl.ori.rda

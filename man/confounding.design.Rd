@@ -12,31 +12,36 @@ confounding.design(seed, num.smp, degree = "complete", rev.order = FALSE)
 \item{num.smp}{number of arrays.}
 
 \item{degree}{level of confounding. It must be either "complete" or "partial"
-for "complete confounding" or "partial confounding" design.
+for complete confounding design or partial confounding design, correspondingly.
 By default, \code{degree = "complete"}.}
 
 \item{rev.order}{whether the array-to-sample-group assignment should be flipped.
-Originally the first half arrays are designated to be assigned to group 1 (endometrial sample group)
-and the second half to group 2 (ovarian sample group).
-If the array-to-sample-group assignment is flipped (rev.order = TRUE),
+Originally, the first half arrays are designated to be assigned to sample group 1 (the endometrial sample group)
+and the second half to sample group 2 (the ovarian sample group).
+If the array-to-sample-group assignment is flipped (\code{rev.order = TRUE}),
 the first half of the array IDs will be swapped with the second half of the array IDs.
 By default, \code{rev.order = FALSE}.}
 }
 \value{
 a vector of array IDs in the order of assigning to samples that are assumed to be sorted by sample group of interest
-As a result, the first half of the array IDs are assigned to group 1 and the second half of the array IDs are assigned to group 2.
+(first half of the samples belong to sample group 1 and second half to sample group 2).
+As a result, the first half of the array IDs are assigned to sample group 1 and the second half of the array IDs are assigned to sample group 2.
 }
 \description{
-Assign arrays to samples with confounding design, intentionally assigning arrays to sample groups in the order of array collection.
-Since the non-uniformly-handled data had the earlier arrays processed by one technician and the later arrays processed by another,
+Assign arrays to samples with confounding experimental design, intentionally assigning arrays to sample groups in the order of array collection.
+Since we split the nonuniformly-handled training dataset in a particular way so that its earlier arrays were processed by one technician and the later arrays by the other,
 assigning the earlier arrays to one sample group and the later arrays to another
 results in confounding handling effects with the sample groups.
 }
 \examples{
-cc.ind <- confounding.design(seed = 1, num.smp = 128,
+
+# Completely confounding with reversed assignment
+cc.rev.ind <- confounding.design(seed = 1, num.smp = 128,
                              degree = "complete", rev.order = FALSE)
-cc.ind <- confounding.design(seed = 1, num.smp = 128,
-                             degree = "complete", rev.order = FALSE)
+
+# Partially confounding
+pc.ind <- confounding.design(seed = 1, num.smp = 128,
+                             degree = "partial")
 }
 \keyword{study.design}
 

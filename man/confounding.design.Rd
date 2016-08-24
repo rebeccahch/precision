@@ -4,12 +4,12 @@
 \alias{confounding.design}
 \title{Confounding Design}
 \usage{
-confounding.design(seed, num.smp, degree = "complete", rev.order = FALSE)
+confounding.design(seed, num.array, degree = "complete", rev.order = FALSE)
 }
 \arguments{
 \item{seed}{an integer used to initialize a pseudorandom number generator.}
 
-\item{num.smp}{number of arrays.}
+\item{num.array}{number of arrays.}
 
 \item{degree}{level of confounding. It must be either "complete" or "partial"
 for complete confounding design or partial confounding design, correspondingly.
@@ -36,11 +36,11 @@ results in confounding handling effects with the sample groups.
 \examples{
 
 # Completely confounding with reversed assignment
-cc.rev.ind <- confounding.design(seed = 1, num.smp = 128,
+cc.rev.ind <- confounding.design(seed = 1, num.array = 128,
                              degree = "complete", rev.order = FALSE)
 
 # Partially confounding
-pc.ind <- confounding.design(seed = 1, num.smp = 128,
+pc.ind <- confounding.design(seed = 1, num.array = 128,
                              degree = "partial")
 }
 \keyword{study.design}

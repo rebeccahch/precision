@@ -3,7 +3,7 @@
 #' Summarize probe-set using median of each unique probe and
 #' only takes in data matrix with the same number of probes per unique probe-set.
 #'
-#' @param data expression dataset to be summarized.
+#' @param data dataset to be summarized.
 #' The dataset must have rows as probes and columns as samples.
 #' It must be a data matrix with the same number of probes per unique probe-set.
 #' If it is already on the probe-set level, no manipulation will be done.

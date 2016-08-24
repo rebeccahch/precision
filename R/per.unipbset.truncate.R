@@ -3,7 +3,7 @@
 #' Truncate probe-level dataset so that it has a fixed number of probes per unique probe-set.
 #' We are safe to do so if the variation among replicates for the same probe is small.
 #'
-#' @param data probe-level expression dataset. The dataset must have rows as probes and columns as samples.
+#' @param data probe-level dataset. The dataset must have rows as probes and columns as samples.
 #' @param pbset.id a vector of unique probe-set names.
 #' By default, \code{pbset.id = NULL} for it to be the row names of the dataset.
 #' @param num.per.unipbset number of probes for each unique probe-set to be truncated to.

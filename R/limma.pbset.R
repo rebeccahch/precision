@@ -5,7 +5,7 @@
 #' @references Ritchie M., Phipson B., Wu D., Hu Y., Law C., Shi W. and Smyth G. (2015).
 #' "limma powers differential expression analyses for RNA-sequencing and microarray studies."
 #' Nucleic Acids Research, 43(7), pp. e47.
-#' @param data expression dataset to be analyzed.
+#' @param data dataset to be analyzed.
 #' The dataset must have rows as unique probe-sets and columns as samples.
 #' @param group.id a vector of sample-group labels for each sample of the dataset.
 #' It must be a 2-level non-numeric factor vector.

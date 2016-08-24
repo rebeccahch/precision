@@ -23,10 +23,14 @@ load(file = "prestore.obj.Rdata")
 
 When use `PRECISION`, please cite the following papers:
 
-Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
+- Huang HC, Qin LX. PRECISION: an R package for assessing study design and data normalization for molecular classification studies using a unique pair of microarray datasets (2016). GitHub repository, https://github.com/rebeccahch/precision.
 
+- Qin LX, Huang HC, Begg CB. Cautionary Note on Cross Validation in Molecular Classification. Journal of Clinical Oncology. 2016. [in press].
 
-Qin LX, Huang HC, Begg CB. Cautionary Note on Cross Validation in Molecular Classification.
+When use the datasets, please cite the following papers:
+
+- Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
+
 
 ## Load PRECISION
 
@@ -77,16 +81,16 @@ uhdata.pl.nc <- uhdata.pl[!rownames(uhdata.pl) %in% ctrl.genes, ] # nc for non-c
 
 ## Simulated Data Generation 
 
-We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the nonuniformly-handled dataset) for the same sample to approximate the array effect for each array when the dataset was not uniformly-handled. This is done with `estimate.smp.eff()` and `estimate.ary.eff()` as follows:
+We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the nonuniformly-handled dataset) for the same sample to approximate the handling effect for each array when the dataset was not uniformly-handled. This is done with `estimate.biological.effect()` and `estimate.handling.effect()` as follows:
 
 ```{r est.eff, results = "hide", message = FALSE}
-smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
+biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 
-ary.eff <- estimate.ary.eff(uhdata = uhdata.pl, 
+handling.effect <- estimate.handling.effect(uhdata = uhdata.pl, 
                              nuhdata = nuhdata.pl)
 
-smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
-ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
+biological.effect.nc <- biological.effect[!rownames(biological.effect) %in% ctrl.genes, ]
+handling.effect.nc <- handling.effect[!rownames(handling.effect) %in% ctrl.genes, ]
 
 ```
 
@@ -94,46 +98,46 @@ The 192 samples were **randomly split** in a 2:1 ratio into a training set and a
 
 ```{r data.split, comment = ">", message = FALSE, eval = FALSE}
 set.seed(101)
-group.id <- substr(colnames(smp.eff.nc), 7, 7)
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
-# randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples
-smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
-smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
+# randomly split biological effect data into training and test set with equal number of endometrial and ovarian samples
+biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
+biological.effect.test.ind <- colnames(biological.effect.nc)[!colnames(biological.effect.nc) %in% biological.effect.train.ind]
 
-# non-randomly split array effect data into training and test set
-ary.eff.train.ind <- colnames(ary.eff.nc)[c(1:64, 129:192)]
-ary.eff.test.ind <- colnames(ary.eff.nc)[65:128]
+# non-randomly split handling effect data into training and test set
+handling.effect.train.ind <- colnames(handling.effect.nc)[c(1:64, 129:192)]
+handling.effect.test.ind <- colnames(handling.effect.nc)[65:128]
 
 group.id.list <- list("all" = group.id,
-                 "tr" = substr(smp.eff.train.ind, 7, 7),
-                 "te" = substr(smp.eff.test.ind, 7, 7))
-ary.to.smp.assign <- list("all" = c(rep(c("E", "V"), each = 64),
+                 "tr" = substr(biological.effect.train.ind, 7, 7),
+                 "te" = substr(biological.effect.test.ind, 7, 7))
+array.to.sample.assign <- list("all" = c(rep(c("E", "V"), each = 64),
                                     rep(c("V", "E"), each = 32)),
                           "tr" = rep(c("E", "V"), each = 64),
                           "te" = rep(c("V", "E"), each = 32))
 
 ```
 
-Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the array effect for its assigned array. For the test set, we used the test data from the uniformly-handled dataset. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`). And, `rehybridize()` is provided to sum biological effects to array effects, following array-to-sample assignments. 
+Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the handling effect for its assigned array. For the test set, we used the test data from the uniformly-handled dataset. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`). And, `rehybridize()` is provided to sum biological effects to handling effects, following array-to-sample assignments. 
 
 ```{r study.design}
 set.seed(101)
 
 # Complete Confounding
-cc.ind <- confounding.design(seed = 1, num.smp = 128, 
+cc.ind <- confounding.design(seed = 1, num.array = 128, 
                                degree = "complete", rev.order = FALSE)
 
 # Partial Confounding Reversed
-pc.rev.ind <- confounding.design(seed = 1, num.smp = 128, 
+pc.rev.ind <- confounding.design(seed = 1, num.array = 128, 
                                degree = "partial", rev.order = TRUE)
 
 # Stratification
 batch.id <- list(1:40, 41:64, (129:160) - 64, (161:192) - 64)
-str.ind <- stratification.design(seed = 1, num.smp = 128,
+str.ind <- stratification.design(seed = 1, num.array = 128,
                                        batch.id = batch.id)
 
 # Blocking
-blk.ind <- blocking.design(seed = 1, num.smp = 128)
+blk.ind <- blocking.design(seed = 1, num.array = 128)
 
 ```
 
@@ -165,34 +169,34 @@ text(x = 64.5, y = 0.75, labels = "Blocking")
 ```
 
 ```{r rehybridize, eval = FALSE}
-assign.ind <- confounding.design(seed = 1, num.smp = 192, 
+assign.ind <- confounding.design(seed = 1, num.array = 192, 
                                degree = "complete", rev.order = FALSE)
-group.id <- substr(colnames(smp.eff.nc), 7, 7)
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
 # re-hybridize
-sim.data.raw <- rehybridize(smp.eff = smp.eff.nc,
-                            ary.eff = ary.eff.nc,
+sim.data.raw <- rehybridize(biological.effect = biological.effect.nc,
+                            handling.effect = handling.effect.nc,
                             group.id = group.id,
-                            ary.to.smp.assign = assign.ind)
+                            array.to.sample.assign = assign.ind)
 
 # re-hybridize + correct batch effects with SVA
-sim.data.sva <- rehybridize(smp.eff = smp.eff.nc,
-                            ary.eff = ary.eff.nc,
+sim.data.sva <- rehybridize(biological.effect = biological.effect.nc,
+                            handling.effect = handling.effect.nc,
                             group.id = group.id,
-                            ary.to.smp.assign = assign.ind, 
+                            array.to.sample.assign = assign.ind, 
                             isva = TRUE)
 
 # re-hybridize + correct batch effects with RUV-4
-smp.eff.ctrl <- smp.eff[rownames(smp.eff) %in% ctrl.genes, ]
-ary.eff.ctrl <- ary.eff[rownames(ary.eff) %in% ctrl.genes, ]
+biological.effect.ctrl <- biological.effect[rownames(biological.effect) %in% ctrl.genes, ]
+handling.effect.ctrl <- handling.effect[rownames(handling.effect) %in% ctrl.genes, ]
 
-sim.data.ruv <- rehybridize(smp.eff = smp.eff.nc,
-                            ary.eff = ary.eff.nc,
+sim.data.ruv <- rehybridize(biological.effect = biological.effect.nc,
+                            handling.effect = handling.effect.nc,
                             group.id = group.id,
-                            ary.to.smp.assign = assign.ind, 
+                            array.to.sample.assign = assign.ind, 
                             iruv = TRUE,
-                            smp.eff.ctrl = smp.eff.ctrl,
-                            ary.eff.ctrl = ary.eff.ctrl)
+                            biological.effect.ctrl = biological.effect.ctrl,
+                            handling.effect.ctrl = handling.effect.ctrl)
 
 ```
 
@@ -222,7 +226,7 @@ set.seed(101)
 group.id <- substr(colnames(sim.data.raw), 7, 7)
 
 # randomly split data into training and test set with equal number of endometrial and ovarian samples
-train.ind <- colnames(smp.eff)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))]
+train.ind <- colnames(biological.effect)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))]
 
 train.dat <- sim.data.raw[, train.ind]
 test.dat <- sim.data.raw[, !colnames(sim.data.raw) %in%train.ind]
@@ -254,42 +258,42 @@ uhdata.psl <- med.sum.pbset(data = uhdata.pl,
 Regardless of classification methods, internal cross-validation should be used to build a classifier and tune parameter(s) and external validation should be used to validate the performance. In our simulation study, we reported results of two classification methods: one non-parametric method, prediction analysis for microarrays (PAM)[^5] and one parametric method, the least absolute shrinkage and selection operator (LASSO)[^6]. Examples of model-building and predicting functions in `PRECISION` are `pam.intcv()` and `pam.predict()` for PAM and `lasso.intcv()` and `lasso.predict()` for LASSO.
 
 [^5]: Tibshirani R, Hastie T, Narasimhan B, Chu G: Diagnosis of multiple cancer types by shrunken centroids of gene expression. Proceedings of the National Academy of Sciences of the United States of America 2002, 99(10):6567-6572.
-Hastie T, R., Narasimhan B, Chu G: pamr: Pam: prediction analysis for microarrays; 2014.
+Hastie T, Tibshirani R., Narasimhan B, Chu G: pamr: Pam: prediction analysis for microarrays; 2014.
 
 [^6]: Tibshirani R: Regression shrinkage and selection via the Lasso. J Roy Stat Soc B Met 1996, 58(1):267-288.
 Friedman J, Hastie T, Tibshirani R: Regularization Paths for Generalized Linear Models via Coordinate Descent. J Stat Softw 2010, 33(1):1-22.
 
 ```{r classification, eval = FALSE}
 set.seed(101)
-# randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples
-smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
-smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
+# randomly split biological effect data into training and test set with equal number of endometrial and ovarian samples
+biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
+biological.effect.test.ind <- colnames(biological.effect.nc)[!colnames(biological.effect.nc) %in% biological.effect.train.ind]
 
-smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
-smp.eff.nc.te <- smp.eff.nc[, smp.eff.test.ind]
+biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
+biological.effect.nc.te <- biological.effect.nc[, biological.effect.test.ind]
 
 # build a PAM classifier
-pam.int <- pam.intcv(X = smp.eff.nc.tr,
-                     y = substr(colnames(smp.eff.nc.tr), 7, 7),
+pam.int <- pam.intcv(X = biological.effect.nc.tr,
+                     y = substr(colnames(biological.effect.nc.tr), 7, 7),
                      kfold = 5, seed = 1)
 
 # predict with the PAM classifier
 pam.pred <- pam.predict(pam.intcv.model = pam.int, 
-                        pred.obj = smp.eff.nc.te, 
-                        pred.obj.group.id = substr(colnames(smp.eff.nc.te), 7, 7))
+                        pred.obj = biological.effect.nc.te, 
+                        pred.obj.group.id = substr(colnames(biological.effect.nc.te), 7, 7))
 
 pam.int$mc
 pam.pred$mc
 
 # build a LASSO classifier
-lasso.int <- lasso.intcv(X = smp.eff.nc.tr,
-                     y = substr(colnames(smp.eff.nc.tr), 7, 7),
+lasso.int <- lasso.intcv(X = biological.effect.nc.tr,
+                     y = substr(colnames(biological.effect.nc.tr), 7, 7),
                      kfold = 5, seed = 1, alp = 1)
 
 # predict with the LASSO classifier
 lasso.pred <- lasso.predict(lasso.intcv.model = lasso.int, 
-                        pred.obj = smp.eff.nc.te, 
-                        pred.obj.group.id = substr(colnames(smp.eff.nc.te), 7, 7))
+                        pred.obj = biological.effect.nc.te, 
+                        pred.obj.group.id = substr(colnames(biological.effect.nc.te), 7, 7))
 
 lasso.int$mc
 lasso.pred$mc
@@ -302,11 +306,11 @@ Finally, the main functionality of `PRECISION` is to provide users with an effic
 
 ### Analysis with uniformly-handled data
 
-The analysis with uniformly-handled data is based on `N` number of random training-and-test-set splits on the uniformly-handled data; `uni.handled.simulate()` is used. Users can control the signal level of the estimated sample effects being inputted as well as the normalization and classification methods being compared.
+The analysis with uniformly-handled data is based on `N` number of random training-and-test-set splits on the uniformly-handled data; `uni.handled.simulate()` is used. Users can control the signal level of the estimated biological effects being inputted as well as the normalization and classification methods being compared.
 
 ```{r uni.handled.simulate, results = "hide", eval = FALSE}
 uni.handled.results <- uni.handled.simulate(seed = 1, N = 3,
-                                            smp.eff = smp.eff.nc,
+                                            biological.effect = biological.effect.nc,
                                             norm.list = c("NN", "QN"),
                                             class.list = c("PAM", "LASSO"))
 
@@ -320,61 +324,61 @@ knitr::kable(data.frame(uni.handled.results$error_store[2, ]),
 
 ### Analysis with confounding handling
 
-The analysis with confounding handling is based on `N` number of array-to-sample reassignments on the simulated data using `precision.simulate()`. Users can control the signal level of the estimated sample effects, the confounding level of the estimated array effects, array-to-sample study design, the normalization, the batch adjustment, and the classification methods.
+The analysis with confounding handling is based on `N` number of array-to-sample reassignments on the simulated data using `precision.simulate()`. Users can control the signal level of the estimated biological effects, the confounding level of the estimated handling effects, array-to-sample study design, the normalization, the batch adjustment, and the classification methods.
 
 ```{r precision.simulate, results = "hide", eval = FALSE}
 set.seed(101)
-group.id <- substr(colnames(smp.eff.nc), 7, 7)
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
-# randomly split sample effect data into training and test set with equal number of endometrial and ovarian samples
-smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
-smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
+# randomly split biological effect data into training and test set with equal number of endometrial and ovarian samples
+biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))] 
+biological.effect.test.ind <- colnames(biological.effect.nc)[!colnames(biological.effect.nc) %in% biological.effect.train.ind]
 
-smp.eff.train.test.split =
-  list("tr" = smp.eff.train.ind,
-       "te" = smp.eff.test.ind)
+biological.effect.train.test.split =
+  list("tr" = biological.effect.train.ind,
+       "te" = biological.effect.test.ind)
 
-# non-randomly split array effect data into training and test set; technician effect as proxy
-ary.eff.train.test.split =
+# non-randomly split handling effect data into training and test set; technician effect as proxy
+handling.effect.train.test.split =
   list("tr" = c(1:64, 129:192),
        "te" = 65:128)
 
-smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
-smp.eff.nc.te <- smp.eff.nc[, smp.eff.test.ind]
-ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
-ary.eff.nc.te <- ary.eff.nc[, 65:128]
+biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
+biological.effect.nc.te <- biological.effect.nc[, biological.effect.test.ind]
+handling.effect.nc.tr <- handling.effect.nc[, c(1:64, 129:192)]
+handling.effect.nc.te <- handling.effect.nc[, 65:128]
 
 # Simulation without batch adjustment
 precision.results <- precision.simulate(seed = 1, N = 3,
-                          smp.eff.tr = smp.eff.nc.tr,    
-                          smp.eff.te = smp.eff.nc.te,
-                          ary.eff.tr = ary.eff.nc.tr,
-                          ary.eff.te = ary.eff.nc.te,
-                          group.id.tr = substr(colnames(smp.eff.nc.tr), 7, 7),
-                          group.id.te = substr(colnames(smp.eff.nc.te), 7, 7),
+                          biological.effect.tr = biological.effect.nc.tr,    
+                          biological.effect.te = biological.effect.nc.te,
+                          handling.effect.tr = handling.effect.nc.tr,
+                          handling.effect.te = handling.effect.nc.te,
+                          group.id.tr = substr(colnames(biological.effect.nc.tr), 7, 7),
+                          group.id.te = substr(colnames(biological.effect.nc.te), 7, 7),
                           design.list = c("PC-", "STR"),
                           norm.list = c("NN", "QN"),
                           class.list = c("PAM", "LASSO"),
                           batch.id = list(1:40, 41:64, (129:160) - 64, (161:192) - 64))
 
 # Simulation with RUV-4 batch adjustment
-smp.eff.tr.ctrl <- smp.eff.ctrl[, smp.eff.train.test.split$tr]
-ary.eff.tr.ctrl <- ary.eff.ctrl[, ary.eff.train.test.split$tr]
+biological.effect.tr.ctrl <- biological.effect.ctrl[, biological.effect.train.test.split$tr]
+handling.effect.tr.ctrl <- handling.effect.ctrl[, handling.effect.train.test.split$tr]
 
 precision.ruv4.results <- precision.simulate(seed = 1, N = 3,
-                              smp.eff.tr = smp.eff.nc.tr,    
-                              smp.eff.te = smp.eff.nc.te,
-                              ary.eff.tr = ary.eff.nc.tr,
-                              ary.eff.te = ary.eff.nc.te,
-                              group.id.tr = substr(colnames(smp.eff.nc.tr), 7, 7),
-                              group.id.te = substr(colnames(smp.eff.nc.te), 7, 7),
+                              biological.effect.tr = biological.effect.nc.tr,    
+                              biological.effect.te = biological.effect.nc.te,
+                              handling.effect.tr = handling.effect.nc.tr,
+                              handling.effect.te = handling.effect.nc.te,
+                              group.id.tr = substr(colnames(biological.effect.nc.tr), 7, 7),
+                              group.id.te = substr(colnames(biological.effect.nc.te), 7, 7),
                               design.list = c("PC-", "STR"),
                               norm.list = c("NN", "QN"),
                               class.list = c("PAM", "LASSO"),
                               batch.id = list(1:40, 41:64, (129:160) - 64, (161:192) - 64), 
                               iruv = TRUE,
-                              smp.eff.tr.ctrl = smp.eff.tr.ctrl, 
-                              ary.eff.tr.ctrl = ary.eff.tr.ctrl)
+                              biological.effect.tr.ctrl = biological.effect.tr.ctrl, 
+                              handling.effect.tr.ctrl = handling.effect.tr.ctrl)
 
 ```
 
@@ -415,7 +419,7 @@ A user-defined normalization method function must allow two input parameters: `t
 }
 
 uni.handled.results.rn <- uni.handled.simulate(seed = 1, N = 3,
-                                       smp.eff = smp.eff.nc,
+                                       biological.effect = biological.effect.nc,
                                        norm.list = c("NN", "QN", "RN"),
                                        class.list = c("PAM", "LASSO"), 
                                        norm.funcs = "rand.norm")
@@ -448,7 +452,7 @@ For each user-defined classification method, the user must provide two functions
 # Ridge has the same prediction function as LASSO
 
 uni.handled.results.ridge <- uni.handled.simulate(seed = 1, N = 3,
-                                   smp.eff = smp.eff.nc,
+                                   biological.effect = biological.effect.nc,
                                    norm.list = c("NN", "RN"),
                                    class.list = c("LASSO", "Ridge"), 
                                    norm.funcs = "rand.norm",
@@ -492,48 +496,48 @@ It may be necessary to manipulate the level of signal (i.e., the mean group diff
 
 ```{r reduce.signal, eval = FALSE}
 # reduced signal by half
-group.id <- substr(colnames(smp.eff.nc), 7, 7)
-redhalf.smp.eff.nc <- reduce.signal(smp.eff = smp.eff.nc,
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
+redhalf.biological.effect.nc <- reduce.signal(biological.effect = biological.effect.nc,
                             group.id = group.id,
                             group.id.level = c("E", "V"),
                             reduce.multiplier = 1/2)
 
 
 # extract differential expressed genes
-smp.eff.nc.psl <- med.sum.pbset(smp.eff.nc)
-s.e.limma.fit <- limma.pbset(data = smp.eff.nc.psl,
+biological.effect.nc.psl <- med.sum.pbset(biological.effect.nc)
+s.e.limma.fit <- limma.pbset(data = biological.effect.nc.psl,
                          group.id = group.id,
                          group.id.level = c("E", "V"))
 de.ind <- s.e.limma.fit$P.Value < 0.01
 
-de.gene.name <- rownames(redhalf.smp.eff.nc)[which(de.ind)][2]
-nonde.gene.name <- rownames(redhalf.smp.eff.nc)[-which(de.ind)][2]
+de.gene.name <- rownames(redhalf.biological.effect.nc)[which(de.ind)][2]
+nonde.gene.name <- rownames(redhalf.biological.effect.nc)[-which(de.ind)][2]
 
-smp.eff.nc.de <- smp.eff.nc[de.gene.name, ]
-redhalf.smp.eff.nc.de <- redhalf.smp.eff.nc[de.gene.name, ]
+biological.effect.nc.de <- biological.effect.nc[de.gene.name, ]
+redhalf.biological.effect.nc.de <- redhalf.biological.effect.nc[de.gene.name, ]
 
-smp.eff.nc.nonde <- smp.eff.nc[nonde.gene.name, ]
-redhalf.smp.eff.nc.nonde <- redhalf.smp.eff.nc[nonde.gene.name, ]
+biological.effect.nc.nonde <- biological.effect.nc[nonde.gene.name, ]
+redhalf.biological.effect.nc.nonde <- redhalf.biological.effect.nc[nonde.gene.name, ]
 
 ```
 
 ```{r reduce.signal.fig, echo = FALSE, fig.align = "hold", fig.width = 4, fig.height = 4}
-group.id <- substr(colnames(smp.eff.nc), 7, 7)
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
 # plot
 par(mfrow = c(2, 2), mar = c(2, 2, 2, 1))
 # for DE genes, the difference has been shrunken in half...
-boxplot(smp.eff.nc.de ~ group.id == "E", main = "DE")
-boxplot(redhalf.smp.eff.nc.de ~ group.id == "E", main = "DE")
+boxplot(biological.effect.nc.de ~ group.id == "E", main = "DE")
+boxplot(redhalf.biological.effect.nc.de ~ group.id == "E", main = "DE")
 # for non-DE genes, the difference has not been changed
-boxplot(smp.eff.nc.nonde ~ group.id == "E", main = "Non-DE")
-boxplot(redhalf.smp.eff.nc.nonde ~ group.id == "E", main = "Non-DE")
+boxplot(biological.effect.nc.nonde ~ group.id == "E", main = "Non-DE")
+boxplot(redhalf.biological.effect.nc.nonde ~ group.id == "E", main = "Non-DE")
 
 ```
 
-#### Amplify array effects
+#### Amplify handling effects
 
-Again, it may be necessary to manipulate the confounding level of array effects in the simulation study in order to evaluate normalization or classification methods in the presence of array effect. We offer three amplification methods in `amplify.ary.eff()`: 
+Again, it may be necessary to manipulate the confounding level of handling effects in the simulation study in order to evaluate normalization or classification methods in the presence of handling effect. We offer three amplification methods in `amplify.handling.effect()`: 
 
 1. location shift - per selected array, shifting all probe expressions up or down by a constant.
 
@@ -542,55 +546,55 @@ Again, it may be necessary to manipulate the confounding level of array effects 
 3. scaling 2 - scaling all probe expressions in arrays by the power of constants that are different for each batch. In our training data, there are four batches.
 
 
-```{r amplify.ary.eff, fig.align = "hold", fig.width = 7, fig.height = 7}
-ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
+```{r amplify.handling.effect, fig.align = "hold", fig.width = 7, fig.height = 7}
+handling.effect.nc.tr <- handling.effect.nc[, c(1:64, 129:192)]
 
 # shift
-ary.eff.nc.tr.shift <- amplify.ary.eff(ary.eff = ary.eff.nc.tr,
-       amplify.ary.id = colnames(ary.eff.nc.tr)[1:64],
+handling.effect.nc.tr.shift <- amplify.handling.effect(handling.effect = handling.effect.nc.tr,
+       amplify.array.id = colnames(handling.effect.nc.tr)[1:64],
        amplify.level = 2, type = "shift")
 
 # scale 1
-ary.eff.nc.tr.scale1 <- amplify.ary.eff(ary.eff = ary.eff.nc.tr,
-       amplify.ary.id = colnames(ary.eff.nc.tr)[1:64],
+handling.effect.nc.tr.scale1 <- amplify.handling.effect(handling.effect = handling.effect.nc.tr,
+       amplify.array.id = colnames(handling.effect.nc.tr)[1:64],
        amplify.level = 2, type = "scale1")
 
 # scale 2
-amplify.ary.id <- list(1:40, 41:64, (129:160) - 64, (161:192) - 64)
-for(i in 1:length(amplify.ary.id)) 
-  amplify.ary.id[[i]] <- colnames(ary.eff.nc.tr)[amplify.ary.id[[i]]]
+amplify.array.id <- list(1:40, 41:64, (129:160) - 64, (161:192) - 64)
+for(i in 1:length(amplify.array.id)) 
+  amplify.array.id[[i]] <- colnames(handling.effect.nc.tr)[amplify.array.id[[i]]]
 amplify.level <- c(1.2, 1.3, 1/3, 2/3)
 
-ary.eff.nc.tr.scale2 <- amplify.ary.eff(ary.eff = ary.eff.nc.tr,
-       amplify.ary.id = amplify.ary.id,
+handling.effect.nc.tr.scale2 <- amplify.handling.effect(handling.effect = handling.effect.nc.tr,
+       amplify.array.id = amplify.array.id,
        amplify.level = amplify.level,
        type = "scale2")
 
 par(mfrow = c(2, 2), mar = c(2, 2, 2, 1))
-rng <- range(ary.eff.nc.tr, ary.eff.nc.tr.shift, 
-             ary.eff.nc.tr.scale1, ary.eff.nc.tr.scale2)
-boxplot(ary.eff.nc.tr, main = "Original",
+rng <- range(handling.effect.nc.tr, handling.effect.nc.tr.shift, 
+             handling.effect.nc.tr.scale1, handling.effect.nc.tr.scale2)
+boxplot(handling.effect.nc.tr, main = "Original",
         ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
-boxplot(ary.eff.nc.tr.shift, main = "Shift",
+boxplot(handling.effect.nc.tr.shift, main = "Shift",
         ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
-boxplot(ary.eff.nc.tr.scale1, main = "Scaling 1",
+boxplot(handling.effect.nc.tr.scale1, main = "Scaling 1",
         ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
-boxplot(ary.eff.nc.tr.scale2, main = "Scaling 2",
+boxplot(handling.effect.nc.tr.scale2, main = "Scaling 2",
         ylim = rng, pch = 20, cex = 0.2, xaxt = "n")
 
 ```
 
-### Calculate confounding level between array effects and sample groups
+### Calculate confounding level between handling effects and sample groups
 
-We used a measurement to quantify confounding level between array effects and sample group of interest[^7]. We used this measurement to cross-check our results based on confounding and balanced study designs.
+We used a measurement to quantify confounding level between handling effects and sample group of interest[^7]. We used this measurement to cross-check our results based on confounding and balanced study designs.
 
 [^7]: Leek JT, Scharpf RB, Bravo HC, Simcha D, Langmead B, Johnson WE, Geman D, Baggerly K, Irizarry RA: Tackling the widespread and critical impact of batch effects in high-throughput data. Nature reviews Genetics 2010, 11(10):733-739.
 
 ```{r calc.confounding.level, comment = ">", message = FALSE, eval = FALSE}
 # calculate confounding level 
 nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE)
-calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind], 
-                       group.id = substr(smp.eff.train.ind, 7, 7), 
+calc.confounding.level(data = biological.effect.nc[, biological.effect.train.ind], 
+                       group.id = substr(biological.effect.train.ind, 7, 7), 
                        nbe.genes = nbe.genes)
 
 ```

@@ -7,7 +7,7 @@
 limma.pbset(data, group.id, group.id.level = c("E", "V"), pbset.id = NULL)
 }
 \arguments{
-\item{data}{expression dataset to be analyzed.
+\item{data}{dataset to be analyzed.
 The dataset must have rows as unique probe-sets and columns as samples.}
 
 \item{group.id}{a vector of sample-group labels for each sample of the dataset.

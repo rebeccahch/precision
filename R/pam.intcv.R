@@ -6,7 +6,7 @@
 #' @references T. Hastie, R. Tibshirani, Balasubramanian Narasimhan and Gil Chu (2014).
 #' pamr: Pam: prediction analysis for microarrays. R package version 1.55.
 #' https://CRAN.R-project.org/package=pamr
-#' @param X expression dataset to be trained.
+#' @param X dataset to be trained.
 #' This dataset must have rows as probes and columns as samples.
 #' @param y a vector of sample group of each sample for the dataset to be trained.
 #' It must have an equal length to the number of samples in \code{X}.

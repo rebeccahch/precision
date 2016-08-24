@@ -7,7 +7,7 @@
 pam.intcv(X, y, vt.k = NULL, n.k = 30, kfold = 5, folds = NULL, seed)
 }
 \arguments{
-\item{X}{expression dataset to be trained.
+\item{X}{dataset to be trained.
 This dataset must have rows as probes and columns as samples.}
 
 \item{y}{a vector of sample group of each sample for the dataset to be trained.

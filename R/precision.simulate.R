@@ -5,8 +5,8 @@
 #' @references http://clincancerres.aacrjournals.org/content/20/13/3371.long
 #' @details The classification anlaysis of simulation study consists of the following main steps:
 #'
-#' First, \code{precision.simulate} requires the training and test sets for both estimated sample effects and estimated array effects.
-#' The effects can be simulated as follows (using \code{estimate.smp.eff} and \code{estimate.ary.eff}).
+#' First, \code{precision.simulate} requires the training and test sets for both estimated biological effects and estimated handling effects.
+#' The effects can be simulated as follows (using \code{estimate.biological.effect} and \code{estimate.handling.effect}).
 #' The uniformly-handled dataset are used to approximate the biological effect for each sample,
 #' and the difference between the two arrays (one from the uniformly-handled dataset and
 #' the other from the nonuniformly-handled dataset, subtracting the former from the latter)
@@ -17,7 +17,7 @@
 #' in the order of array processing; test set n = 64 -- the middle 64 arrays).
 #' This setup allows different pairings of arrays and samples by various different training-and-test-set splits.
 #' Furthermore, biological signal strength and confounding level of the handling effects can be modified
-#' (using \code{reduce.signal} and \code{amplify.ary.eff}).
+#' (using \code{reduce.signal} and \code{amplify.handling.effect}).
 #'
 #' Second, for the training set, data are simulated through "virtual re-hybridization" (using \code{rehybridize})
 #' by first assigning arrays to sample groups using a confounding design or a balanced design, and
@@ -43,16 +43,16 @@
 #'
 #' @param seed an integer used to initialize a pseudorandom number generator.
 #' @param N number of simulation runs.
-#' @param smp.eff.tr the training set of the estimated sample effects. This dataset must have rows as probes and columns as samples.
-#' @param smp.eff.te the test set of the estimated sample effects. This dataset must have rows as probes and columns as samples.
-#' It must have the same number of probes and the same probe names as the training set of the estimated sample effects.
-#' @param ary.eff.tr the training set of the estimated array effects. This dataset must have rows as probes and columns as samples.
-#' It must have the same dimensions and the same probe names as the training set of the estimated sample effects.
-#' @param ary.eff.te the test set of the estimated array effects. This dataset must have rows as probes, columns as samples.
-#' It must have the same dimensions and the same probe names as the training set of the estimated array effects.
-#' @param group.id.tr a vector of sample-group labels for each sample of the training set of the estimated sample effects.
+#' @param biological.effect.tr the training set of the estimated biological effects. This dataset must have rows as probes and columns as samples.
+#' @param biological.effect.te the test set of the estimated biological effects. This dataset must have rows as probes and columns as samples.
+#' It must have the same number of probes and the same probe names as the training set of the estimated biological effects.
+#' @param handling.effect.tr the training set of the estimated handling effects. This dataset must have rows as probes and columns as samples.
+#' It must have the same dimensions and the same probe names as the training set of the estimated biological effects.
+#' @param handling.effect.te the test set of the estimated handling effects. This dataset must have rows as probes, columns as samples.
+#' It must have the same dimensions and the same probe names as the training set of the estimated handling effects.
+#' @param group.id.tr a vector of sample-group labels for each sample of the training set of the estimated biological effects.
 #' It must be a 2-level non-numeric factor vector.
-#' @param group.id.te a vector of sample-group labels for each sample of the test set of the estimated sample effects.
+#' @param group.id.te a vector of sample-group labels for each sample of the test set of the estimated biological effects.
 #' It must be a 2-level non-numeric factor vector.
 #' @param design.list a list of strings for study designs to be compared in the simulation study.
 #' The built-in designs are "CC+", "CC-", "PC+", "PC-", "BLK", and "STR" for "Complete Confounding 1", "Complete Confounding 2",
@@ -73,12 +73,12 @@
 #' @param icombat an indicator for combat adjustment. By default, \code{icombat = FALSE} for no ComBat adjustment.
 #' @param isva an indicator for sva adjustment. By default, \code{isva = FALSE} for no sva adjustment.
 #' @param iruv an indicator for RUV-4 adjustment. By default, \code{iruv = FALSE} for no RUV-4 adjustment.
-#' @param smp.eff.tr.ctrl the training set of the negative-control probe sample effect data if \code{iruv = TRUE}.
+#' @param biological.effect.tr.ctrl the training set of the negative-control probe biological effect data if \code{iruv = TRUE}.
 #' This dataset must have rows as probes and columns as samples.
-#' It also must have the same number of samples and the same sample names as \code{smp.eff.tr}.
-#' @param ary.eff.tr.ctrl the training set of the negative-control probe array effect data if \code{iruv = TRUE}.
+#' It also must have the same number of samples and the same sample names as \code{biological.effect.tr}.
+#' @param handling.effect.tr.ctrl the training set of the negative-control probe handling effect data if \code{iruv = TRUE}.
 #' This dataset must have rows as probes and columns as samples.
-#' It also must have the same dimensions and the same probe names as \code{smp.eff.tr.ctrl}.
+#' It also must have the same dimensions and the same probe names as \code{biological.effect.tr.ctrl}.
 #' @param norm.funcs a list of strings for names of user-defined normalization method functions, in the order of \code{norm.list},
 #' excluding any built-in normalization methods.
 #' @param class.funcs a list of strings for names of user-defined classification model-building functions, in the order of \code{class.list},
@@ -96,44 +96,44 @@
 #' @examples
 #' \dontrun{
 #' set.seed(101)
-#' smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
-#' ary.eff <- estimate.ary.eff(uhdata = uhdata.pl,
+#' biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
+#' handling.effect <- estimate.handling.effect(uhdata = uhdata.pl,
 #'                              nuhdata = nuhdata.pl)
 #'
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 #'
-#' smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
-#' ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
+#' biological.effect.nc <- biological.effect[!rownames(biological.effect) %in% ctrl.genes, ]
+#' handling.effect.nc <- handling.effect[!rownames(handling.effect) %in% ctrl.genes, ]
 #'
-#' group.id <- substr(colnames(smp.eff.nc), 7, 7)
+#' group.id <- substr(colnames(biological.effect.nc), 7, 7)
 #'
-#' # randomly split sample effect data into training and test set with
+#' # randomly split biological effect data into training and test set with
 #' # equal number of endometrial and ovarian samples
-#' smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64),
+#' biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
 #'                                           sample(which(group.id == "V"), size = 64))]
-#' smp.eff.test.ind <- colnames(smp.eff.nc)[!colnames(smp.eff.nc) %in% smp.eff.train.ind]
-#' smp.eff.train.test.split =
-#'   list("tr" = smp.eff.train.ind,
-#'        "te" = smp.eff.test.ind)
+#' biological.effect.test.ind <- colnames(biological.effect.nc)[!colnames(biological.effect.nc) %in% biological.effect.train.ind]
+#' biological.effect.train.test.split =
+#'   list("tr" = biological.effect.train.ind,
+#'        "te" = biological.effect.test.ind)
 #'
-#' # non-randomly split array effect data into training and test set
-#' ary.eff.train.test.split =
+#' # non-randomly split handling effect data into training and test set
+#' handling.effect.train.test.split =
 #'   list("tr" = c(1:64, 129:192),
 #'        "te" = 65:128)
 #'
-#' smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
-#' smp.eff.nc.te <- smp.eff.nc[, smp.eff.test.ind]
-#' ary.eff.nc.tr <- ary.eff.nc[, c(1:64, 129:192)]
-#' ary.eff.nc.te <- ary.eff.nc[, 65:128]
+#' biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
+#' biological.effect.nc.te <- biological.effect.nc[, biological.effect.test.ind]
+#' handling.effect.nc.tr <- handling.effect.nc[, c(1:64, 129:192)]
+#' handling.effect.nc.te <- handling.effect.nc[, 65:128]
 #'
 #' # Simulation without batch adjustment
 #' precision.results <- precision.simulate(seed = 1, N = 3,
-#'                                         smp.eff.tr = smp.eff.nc.tr,
-#'                                         smp.eff.te = smp.eff.nc.te,
-#'                                         ary.eff.tr = ary.eff.nc.tr,
-#'                                         ary.eff.te = ary.eff.nc.te,
-#'                                         group.id.tr = substr(colnames(smp.eff.nc.tr), 7, 7),
-#'                                         group.id.te = substr(colnames(smp.eff.nc.te), 7, 7),
+#'                                         biological.effect.tr = biological.effect.nc.tr,
+#'                                         biological.effect.te = biological.effect.nc.te,
+#'                                         handling.effect.tr = handling.effect.nc.tr,
+#'                                         handling.effect.te = handling.effect.nc.te,
+#'                                         group.id.tr = substr(colnames(biological.effect.nc.tr), 7, 7),
+#'                                         group.id.te = substr(colnames(biological.effect.nc.te), 7, 7),
 #'                                         design.list = c("PC-", "STR"),
 #'                                         norm.list = c("NN", "QN"),
 #'                                         class.list = c("PAM", "LASSO"),
@@ -143,19 +143,19 @@
 #'                                                         (161:192) - 64))
 #'
 #' # Simulation with RUV-4 batch adjustment
-#' smp.eff.ctrl <- smp.eff[rownames(smp.eff) %in% ctrl.genes, ]
-#' ary.eff.ctrl <- ary.eff[rownames(ary.eff) %in% ctrl.genes, ]
+#' biological.effect.ctrl <- biological.effect[rownames(biological.effect) %in% ctrl.genes, ]
+#' handling.effect.ctrl <- handling.effect[rownames(handling.effect) %in% ctrl.genes, ]
 #'
-#' smp.eff.tr.ctrl <- smp.eff.ctrl[, smp.eff.train.test.split$tr]
-#' ary.eff.tr.ctrl <- ary.eff.ctrl[, ary.eff.train.test.split$tr]
+#' biological.effect.tr.ctrl <- biological.effect.ctrl[, biological.effect.train.test.split$tr]
+#' handling.effect.tr.ctrl <- handling.effect.ctrl[, handling.effect.train.test.split$tr]
 #'
 #' precision.ruv4.results <- precision.simulate(seed = 1, N = 3,
-#'                                              smp.eff.tr = smp.eff.nc.tr,
-#'                                              smp.eff.te = smp.eff.nc.te,
-#'                                              ary.eff.tr = ary.eff.nc.tr,
-#'                                              ary.eff.te = ary.eff.nc.te,
-#'                                              group.id.tr = substr(colnames(smp.eff.nc.tr), 7, 7),
-#'                                              group.id.te = substr(colnames(smp.eff.nc.te), 7, 7),
+#'                                              biological.effect.tr = biological.effect.nc.tr,
+#'                                              biological.effect.te = biological.effect.nc.te,
+#'                                              handling.effect.tr = handling.effect.nc.tr,
+#'                                              handling.effect.te = handling.effect.nc.te,
+#'                                              group.id.tr = substr(colnames(biological.effect.nc.tr), 7, 7),
+#'                                              group.id.te = substr(colnames(biological.effect.nc.te), 7, 7),
 #'                                              design.list = c("PC-", "STR"),
 #'                                              norm.list = c("NN", "QN"),
 #'                                              class.list = c("PAM", "LASSO"),
@@ -164,21 +164,21 @@
 #'                                                              (129:160) - 64,
 #'                                                              (161:192) - 64),
 #'                                              iruv = TRUE,
-#'                                              smp.eff.tr.ctrl = smp.eff.tr.ctrl,
-#'                                              ary.eff.tr.ctrl = ary.eff.tr.ctrl)
+#'                                              biological.effect.tr.ctrl = biological.effect.tr.ctrl,
+#'                                              handling.effect.tr.ctrl = handling.effect.tr.ctrl)
 #' }
 
 "precision.simulate" <- function(seed, N,
-                                 smp.eff.tr, smp.eff.te,
-                                 ary.eff.tr, ary.eff.te,
+                                 biological.effect.tr, biological.effect.te,
+                                 handling.effect.tr, handling.effect.te,
                                  group.id.tr, group.id.te,
                                  design.list = c("CC+", "CC-", "PC+", "PC-"),
                                  norm.list = c("NN", "QN"),
                                  class.list = c("PAM", "LASSO"),
                                  batch.id = NULL,
                                  icombat = FALSE, isva = FALSE, iruv = FALSE,
-                                 smp.eff.tr.ctrl = NULL,
-                                 ary.eff.tr.ctrl = NULL,
+                                 biological.effect.tr.ctrl = NULL,
+                                 handling.effect.tr.ctrl = NULL,
                                  norm.funcs = NULL,
                                  class.funcs = NULL,
                                  pred.funcs = NULL){
@@ -208,24 +208,24 @@
     cat(k, "round seed used:", seed + k, "\n")
     #cat("- setup simulated data \n")
     for(dd in design.list){
-      if(dd == "CC+") cc1.ind <- confounding.design(seed = seed + k, num.smp = ncol(ary.eff.tr), degree = "complete", rev.order = FALSE)
-      if(dd == "CC-") cc2.ind <- confounding.design(seed = seed + k, num.smp = ncol(ary.eff.tr), degree = "complete", rev.order = TRUE)
-      if(dd == "PC+") pc1.ind <- confounding.design(seed = seed + k, num.smp = ncol(ary.eff.tr), degree = "partial", rev.order = FALSE)
-      if(dd == "PC-") pc2.ind <- confounding.design(seed = seed + k, num.smp = ncol(ary.eff.tr), degree = "partial", rev.order = TRUE)
-      if(dd == "BLK") blk.ind <- blocking.design(seed = seed + k, num.smp = ncol(ary.eff.tr))
-      if(dd == "STR") str.ind <- stratification.design(seed = seed + k, num.smp = ncol(ary.eff.tr), batch.id = batch.id)
+      if(dd == "CC+") cc1.ind <- confounding.design(seed = seed + k, num.array = ncol(handling.effect.tr), degree = "complete", rev.order = FALSE)
+      if(dd == "CC-") cc2.ind <- confounding.design(seed = seed + k, num.array = ncol(handling.effect.tr), degree = "complete", rev.order = TRUE)
+      if(dd == "PC+") pc1.ind <- confounding.design(seed = seed + k, num.array = ncol(handling.effect.tr), degree = "partial", rev.order = FALSE)
+      if(dd == "PC-") pc2.ind <- confounding.design(seed = seed + k, num.array = ncol(handling.effect.tr), degree = "partial", rev.order = TRUE)
+      if(dd == "BLK") blk.ind <- blocking.design(seed = seed + k, num.array = ncol(handling.effect.tr))
+      if(dd == "STR") str.ind <- stratification.design(seed = seed + k, num.array = ncol(handling.effect.tr), batch.id = batch.id)
 
       dd2 <- tolower(gsub("[-]", "2", gsub("[+]", "1", dd)))
 
       param <- ifelse(icombat, ", icombat = TRUE",
                       ifelse(isva, ", isva = TRUE",
                              ifelse(iruv, ", iruv = TRUE,
-                                    smp.eff.ctrl = smp.eff.tr.ctrl,
-                                    ary.eff.ctrl = ary.eff.tr.ctrl", "")))
+                                    biological.effect.ctrl = biological.effect.tr.ctrl,
+                                    handling.effect.ctrl = handling.effect.tr.ctrl", "")))
 
-      eval(parse(text = paste0(dd2, ".tr <- rehybridize(smp.eff = smp.eff.tr,
-                               ary.eff = ary.eff.tr, group.id = group.id.tr,
-                               ary.to.smp.assign = ", dd2, ".ind", param, ")")))
+      eval(parse(text = paste0(dd2, ".tr <- rehybridize(biological.effect = biological.effect.tr,
+                               handling.effect = handling.effect.tr, group.id = group.id.tr,
+                               array.to.sample.assign = ", dd2, ".ind", param, ")")))
 
       eval(parse(text = paste0("assign_store['assign', ][['", dd,
                                "']]$train.[[k]] <- list(", dd2, ".ind)")))
@@ -234,12 +234,12 @@
 
         eval(parse(text = paste0("fsvaobj <- fsva(", dd2, ".tr$trainData, ",
                                  dd2, ".tr$trainMod, ",
-                                 dd2, ".tr$trainSV, smp.eff.te)")))
+                                 dd2, ".tr$trainSV, biological.effect.te)")))
 
         eval(parse(text = paste0(dd2, ".tr <- fsvaobj$db # train.sva")))
-        eval(parse(text = "smp.eff.te2 <- fsvaobj$new # test.fsva"))
+        eval(parse(text = "biological.effect.te2 <- fsvaobj$new # test.fsva"))
       } else {
-        smp.eff.te2 <- smp.eff.te
+        biological.effect.te2 <- biological.effect.te
       }
 
       #cat("- preprocess data \n")
@@ -250,7 +250,7 @@
 
         if(norm.met != "NN"){
           # normalize
-          eval(parse(text = paste0("temp <- ", norm.func,"(", dd2, ".tr, smp.eff.te2)")))
+          eval(parse(text = paste0("temp <- ", norm.func,"(", dd2, ".tr, biological.effect.te2)")))
           eval(parse(text = paste0(dd2, ".tr.", norm.met2, " <- temp$train.", norm.met2)))
           eval(parse(text = paste0("gs.", dd2, ".f", norm.met2, " <- temp$test.f", norm.met2)))
 
@@ -260,8 +260,8 @@
 
         } else{
           eval(parse(text = paste0(dd2, ".tr.nn.fin <- med.sum.pbset(", dd2, ".tr)")))
-          #eval(parse(text = paste0("gs.", dd2, ".fnn.fin <- med.sum.pbset(smp.eff.te2)")))
-          eval(parse(text = paste0("temp <- quant.norm(", dd2, ".tr, smp.eff.te2)")))
+          #eval(parse(text = paste0("gs.", dd2, ".fnn.fin <- med.sum.pbset(biological.effect.te2)")))
+          eval(parse(text = paste0("temp <- quant.norm(", dd2, ".tr, biological.effect.te2)")))
           eval(parse(text = paste0("gs.", dd2, ".fqn <- temp$test.fqn")))
           eval(parse(text = paste0("gs.", dd2, ".fqn.fin <- med.sum.pbset(gs.", dd2, ".fqn)")))
         }

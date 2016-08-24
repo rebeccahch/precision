@@ -4,11 +4,11 @@
 \alias{reduce.signal}
 \title{Biological signal reduction}
 \usage{
-reduce.signal(smp.eff, group.id, group.id.level = c("E", "V"),
+reduce.signal(sample.effect, group.id, group.id.level = c("E", "V"),
   reduce.multiplier = 1/2, pbset.id = NULL)
 }
 \arguments{
-\item{smp.eff}{the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
+\item{sample.effect}{the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
 It can only take in probe-level dataset with a fixed number of probes per unique probe-set.}
 
 \item{group.id}{a vector of sample-group labels for each sample of the estimated sample effect dataset.}
@@ -29,17 +29,17 @@ estimated sample effect data, with reduced biological signal
 Reduce biological signal by decreasing the mean group difference between sample groups.
 }
 \examples{
-smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
-ary.eff <- estimate.ary.eff(uhdata = uhdata.pl,
+sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
+array.effect <- estimate.array.effect(uhdata = uhdata.pl,
                              nuhdata = nuhdata.pl)
 
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
-smp.eff.nc <- smp.eff[!rownames(smp.eff) \%in\% ctrl.genes, ]
-ary.eff.nc <- ary.eff[!rownames(ary.eff) \%in\% ctrl.genes, ]
-group.id <- substr(colnames(smp.eff.nc), 7, 7)
+sample.effect.nc <- sample.effect[!rownames(sample.effect) \%in\% ctrl.genes, ]
+array.effect.nc <- array.effect[!rownames(array.effect) \%in\% ctrl.genes, ]
+group.id <- substr(colnames(sample.effect.nc), 7, 7)
 
-redhalf.smp.eff.nc <- reduce.signal(smp.eff = smp.eff.nc,
+redhalf.sample.effect.nc <- reduce.signal(sample.effect = sample.effect.nc,
                                     group.id = group.id,
                                     group.id.level = c("E", "V"),
                                     reduce.multiplier = 1/2)

@@ -4,7 +4,7 @@
 \alias{uni.handled.simulate}
 \title{Classification analysis of uniformly-handled data}
 \usage{
-uni.handled.simulate(seed, N, smp.eff, norm.list = c("NN", "QN"),
+uni.handled.simulate(seed, N, sample.effect, norm.list = c("NN", "QN"),
   class.list = c("PAM", "LASSO"), norm.funcs = NULL, class.funcs = NULL,
   pred.funcs = NULL)
 }
@@ -13,7 +13,7 @@ uni.handled.simulate(seed, N, smp.eff, norm.list = c("NN", "QN"),
 
 \item{N}{number of simulation runs.}
 
-\item{smp.eff}{the estimated sample effect dataset. This dataset must have rows as probes and columns as samples.}
+\item{sample.effect}{the estimated sample effect dataset. This dataset must have rows as probes and columns as samples.}
 
 \item{norm.list}{a list of strings for normalization methods to be compared in the simulation study.
 The built-in normalization methods includes "NN", "QN", "MN", "VSN" for "No Normalization", "Quantile Normalization",
@@ -72,14 +72,14 @@ For user-defined normalization method or classification method, please refer to 
 }
 \examples{
 \dontrun{
-smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
+sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
 
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
-smp.eff.nc <- smp.eff[!rownames(smp.eff) \%in\% ctrl.genes, ]
+sample.effect.nc <- sample.effect[!rownames(sample.effect) \%in\% ctrl.genes, ]
 
 uni.handled.results <- uni.handled.simulate(seed = 1, N = 3,
-                                            smp.eff = smp.eff.nc,
+                                            sample.effect = sample.effect.nc,
                                             norm.list = c("NN", "QN"),
                                             class.list = c("PAM", "LASSO"))
 }

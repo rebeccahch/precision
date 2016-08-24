@@ -12,11 +12,16 @@ library(PRECISION)
 
 ```
 
-When using `PRECISION`, please cite the following:
+When use `PRECISION`, please cite the following papers:
 
-Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
+- Huang HC, Qin LX. PRECISION: an R package for assessing study design and data normalization for molecular classification studies using a unique pair of microarray datasets (2016). GitHub repository, https://github.com/rebeccahch/precision.
 
-A Cautionary Note on using Cross-validation for Molecular Classification. Qin LX, Huang HC, Begg CB.
+- Qin LX, Huang HC, Begg CB. Cautionary Note on Cross Validation in Molecular Classification. Journal of Clinical Oncology. 2016. [in press].
+
+When use the datasets, please cite the following papers:
+
+- Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
+
 
 
 An introduction to `PRECISION` can be found in the vignette [here](https://github.com/rebeccahch/precision/tree/master/vignettes).

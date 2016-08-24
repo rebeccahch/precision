@@ -1,24 +1,24 @@
-#' Estimated array effects
+#' Estimated handling effects
 #'
 #' Estimate handling effects of an array of the nonuniformly-handled dataset
 #' by taking the difference between its data and the data of
 #' its matched array in the uniformly-handled dataset.
 #'
-#' @param uhdata the uniformly-handled expression dataset.
+#' @param uhdata the uniformly-handled dataset.
 #' The dataset must have rows as probes and columns as samples.
-#' @param nuhdata the nonuniformly-handled expression dataset.
+#' @param nuhdata the nonuniformly-handled dataset.
 #' The dataset must have rows as probes and columns as samples and the same dimensions and
 #' the same probe names as the uniformly-handled dataset.
-#' @return an estimation of the array effects
+#' @return an estimation of the handling effects
 #' @keywords data.setup
 #' @importFrom stats median
 #' @export
 #' @examples
-#' ary.eff <- estimate.ary.eff(uhdata = uhdata.pl, nuhdata = nuhdata.pl)
+#' handling.effect <- estimate.handling.effect(uhdata = uhdata.pl, nuhdata = nuhdata.pl)
 #'
 
 
-"estimate.ary.eff" <- function(uhdata, nuhdata){
+"estimate.handling.effect" <- function(uhdata, nuhdata){
 
   stopifnot(rownames(uhdata) == rownames(nuhdata))
   stopifnot(dim(uhdata) == dim(nuhdata))
@@ -29,34 +29,34 @@
                "JB4650V.b3","JB4757V.b3","JB4833V.b3",
                "GL3793V.b3","JB4933E","JB4952V")
 
-  temp.ary.eff <- NULL
+  temp.handling.effect <- NULL
   for(i in 1:ncol(nuhdata)){
     temp.name <- substr(colnames(nuhdata)[i], 1, 7)
     temp.data <- uhdata[, colnames(uhdata) == temp.name]
     temp.diff <- nuhdata[, i] - temp.data
-    temp.ary.eff <- cbind(temp.ary.eff, temp.diff)
+    temp.handling.effect <- cbind(temp.handling.effect, temp.diff)
   }
-  colnames(temp.ary.eff) <- colnames(nuhdata)[1:ncol(nuhdata)]
+  colnames(temp.handling.effect) <- colnames(nuhdata)[1:ncol(nuhdata)]
 
-  ary.eff <- NULL
+  handling.effect <- NULL
   for(i in 1:24){
     begin.n <- (i-1)*8 + 1
     end.n <- i*8
-    temp.data <- temp.ary.eff[, begin.n:end.n]
+    temp.data <- temp.handling.effect[, begin.n:end.n]
     temp.name <- colnames(temp.data)
     indi.vec <- temp.name %in% rm.list
     md.array <- apply(temp.data[, !(temp.name %in% rm.list)], 1, median)
     for(j in 1:8){
       if(indi.vec[j]){
-        ary.eff <- cbind(ary.eff, md.array)
+        handling.effect <- cbind(handling.effect, md.array)
       } else{
-        ary.eff <- cbind(ary.eff, temp.data[, j])
+        handling.effect <- cbind(handling.effect, temp.data[, j])
       }
     }
   }
 
-  colnames(ary.eff) <- paste(substr(colnames(temp.ary.eff), 1, 7),
+  colnames(handling.effect) <- paste(substr(colnames(temp.handling.effect), 1, 7),
                              seq(1, ncol(nuhdata)), sep = ".")
 
-  return(ary.eff)
+  return(handling.effect)
 }

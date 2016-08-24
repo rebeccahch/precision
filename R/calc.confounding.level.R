@@ -6,7 +6,7 @@
 #' the highest adjusted R-squared is returned as the level of confounding.
 #'
 #' @references Leek J., Scharpf R., Bravo H., et al. Tackling the widespread and critical impact of batch effects in high-throughput data. Nat Rev Genet 11:733-9, 2010.
-#' @param data expression dataset. It must have rows as probes and columns as samples.
+#' @param data microarry dataset. It must have rows as probes and columns as samples.
 #' @param group.id a vector of sample-group labels for each sample of the dataset.
 #' @param nbe.genes a vector of non-biological genes used to filter the dataset.
 #' Non-biological genes are indicated as \code{TRUE}, otherwise as \code{FALSE}.
@@ -20,26 +20,26 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
-#' ary.eff <- estimate.ary.eff(uhdata = uhdata.pl,
+#' sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
+#' array.effect <- estimate.array.effect(uhdata = uhdata.pl,
 #'                              nuhdata = nuhdata.pl)
 #'
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 #'
-#' smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
-#' ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
+#' sample.effect.nc <- sample.effect[!rownames(sample.effect) %in% ctrl.genes, ]
+#' array.effect.nc <- array.effect[!rownames(array.effect) %in% ctrl.genes, ]
 #'
-#' group.id <- substr(colnames(smp.eff.nc), 7, 7)
+#' group.id <- substr(colnames(sample.effect.nc), 7, 7)
 #'
-#' smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64),
+#' sample.effect.train.ind <- colnames(sample.effect.nc)[c(sample(which(group.id == "E"), size = 64),
 #' sample(which(group.id == "V"), size = 64))]
-#' ary.eff.train.ind <- colnames(ary.eff.nc)[c(1:64, 129:192)]
+#' array.effect.train.ind <- colnames(array.effect.nc)[c(1:64, 129:192)]
 #'
 #' # randomly created a vector of Boolean for nbe.genes
-#' nbe.genes <- sample(c(TRUE, FALSE), size = nrow(smp.eff.nc), replace = TRUE)
+#' nbe.genes <- sample(c(TRUE, FALSE), size = nrow(sample.effect.nc), replace = TRUE)
 #'
-#' calc.confounding.level(data = smp.eff.nc[, smp.eff.train.ind],
-#'                        group.id = substr(smp.eff.train.ind, 7, 7),
+#' calc.confounding.level(data = sample.effect.nc[, sample.effect.train.ind],
+#'                        group.id = substr(sample.effect.train.ind, 7, 7),
 #'                        nbe.genes = nbe.genes)
 #' }
 #'

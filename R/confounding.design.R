@@ -6,7 +6,7 @@
 #' results in confounding handling effects with the sample groups.
 #'
 #' @param seed an integer used to initialize a pseudorandom number generator.
-#' @param num.smp number of arrays.
+#' @param num.array number of arrays.
 #' @param degree level of confounding. It must be either "complete" or "partial"
 #' for complete confounding design or partial confounding design, correspondingly.
 #' By default, \code{degree = "complete"}.
@@ -24,36 +24,36 @@
 #' @examples
 #'
 #' # Completely confounding with reversed assignment
-#' cc.rev.ind <- confounding.design(seed = 1, num.smp = 128,
+#' cc.rev.ind <- confounding.design(seed = 1, num.array = 128,
 #'                              degree = "complete", rev.order = FALSE)
 #'
 #' # Partially confounding
-#' pc.ind <- confounding.design(seed = 1, num.smp = 128,
+#' pc.ind <- confounding.design(seed = 1, num.array = 128,
 #'                              degree = "partial")
 
-"confounding.design" <- function(seed, num.smp,
+"confounding.design" <- function(seed, num.array,
                                  degree = "complete",
                                  rev.order = FALSE){
   stopifnot(is.numeric(seed))
-  stopifnot(is.numeric(num.smp))
+  stopifnot(is.numeric(num.array))
   stopifnot(degree %in% c("complete", "partial"))
-  stopifnot(num.smp %% 2 == 0)
+  stopifnot(num.array %% 2 == 0)
 
   set.seed(seed)
   if(degree == "complete"){
-    g1 <- sample(1:(num.smp/2))
-    g2 <- sample((num.smp/2 + 1):num.smp)
+    g1 <- sample(1:(num.array/2))
+    g2 <- sample((num.array/2 + 1):num.array)
     if(!rev.order){
       ind <- c(g1, g2)
     } else{
       ind <- c(g2, g1)
     }
   } else{ # partial
-    swapsize <- ceiling(num.smp/2/10)
-    temp1.ind <- sample(1:(num.smp/2), size = swapsize)
-    temp2.ind <- sample((num.smp/2+1):num.smp, size = swapsize)
-    g1 <- sample(1:(num.smp/2))
-    g2 <- sample(((num.smp/2) + 1):num.smp)
+    swapsize <- ceiling(num.array/2/10)
+    temp1.ind <- sample(1:(num.array/2), size = swapsize)
+    temp2.ind <- sample((num.array/2+1):num.array, size = swapsize)
+    g1 <- sample(1:(num.array/2))
+    g2 <- sample(((num.array/2) + 1):num.array)
     g1[g1 %in% temp1.ind] <- temp2.ind
     g2[g2 %in% temp2.ind] <- temp1.ind
     rm(temp1.ind, temp2.ind)

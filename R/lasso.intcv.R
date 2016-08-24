@@ -5,7 +5,7 @@
 #' @references Friedman, J., Hastie, T. and Tibshirani, R. (2008) Regularization Paths for Generalized Linear Mod- els via Coordinate Descent,
 #' http://www.stanford.edu/~hastie/Papers/glmnet.pdf
 #' Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010
-#' @param X expression dataset to be trained. This dataset must have rows as probes and columns as samples.
+#' @param X dataset to be trained. This dataset must have rows as probes and columns as samples.
 #' @param y a vector of sample group of each sample for the dataset to be trained.
 #' It must have an equal length to the number of samples in \code{X}.
 #' @param kfold number of folds. By default, \code{kfold = 5}.
@@ -23,17 +23,17 @@
 #' @keywords classification
 #' @examples
 #' set.seed(101)
-#' smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
+#' sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
-#' smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
-#' group.id <- substr(colnames(smp.eff.nc), 7, 7)
+#' sample.effect.nc <- sample.effect[!rownames(sample.effect) %in% ctrl.genes, ]
+#' group.id <- substr(colnames(sample.effect.nc), 7, 7)
 #'
-#' smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64),
+#' sample.effect.train.ind <- colnames(sample.effect.nc)[c(sample(which(group.id == "E"), size = 64),
 #'                                          sample(which(group.id == "V"), size = 64))]
-#' smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
+#' sample.effect.nc.tr <- sample.effect.nc[, sample.effect.train.ind]
 #'
-#' lasso.int <- lasso.intcv(X = smp.eff.nc.tr,
-#'                          y = substr(colnames(smp.eff.nc.tr), 7, 7),
+#' lasso.int <- lasso.intcv(X = sample.effect.nc.tr,
+#'                          y = substr(colnames(sample.effect.nc.tr), 7, 7),
 #'                          kfold = 5, seed = 1, alp = 1)
 #'
 

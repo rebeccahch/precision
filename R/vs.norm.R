@@ -1,7 +1,10 @@
 #' Variance stabilizing normalization
 #'
 #' Normalize training dataset with vsn and
-#' store the fitted vsn model from the training dataset as the reference to frozen variance stabilizing normalize test dataset.
+#' store the fitted vsn model from the training dataset as the reference
+#' to frozen variance stabilizing normalize test dataset.
+#' Also two other options are available: to only normalize
+#' a training dataset but not frozen normalize a test dataset, or vise versa.
 #'
 #' @references Wolfgang Huber, Anja von Heydebreck, Holger Sueltmann, Annemarie Poustka and Martin Vingron.
 #' Variance Stabilization Applied to Microarray Data Calibration and to the Quantification of Differential Expression.

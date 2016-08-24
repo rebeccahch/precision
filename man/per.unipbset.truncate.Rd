@@ -7,7 +7,7 @@
 per.unipbset.truncate(data, pbset.id = NULL, num.per.unipbset = 10)
 }
 \arguments{
-\item{data}{probe-level expression dataset. The dataset must have rows as probes and columns as samples.}
+\item{data}{probe-level dataset. The dataset must have rows as probes and columns as samples.}
 
 \item{pbset.id}{a vector of unique probe-set names.
 By default, \code{pbset.id = NULL} for it to be the row names of the dataset.}

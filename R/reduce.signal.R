@@ -2,7 +2,7 @@
 #'
 #' Reduce biological signal by decreasing the mean group difference between sample groups.
 #'
-#' @param smp.eff the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
+#' @param sample.effect the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
 #' It can only take in probe-level dataset with a fixed number of probes per unique probe-set.
 #' @param group.id a vector of sample-group labels for each sample of the estimated sample effect dataset.
 #' @param group.id.level a vector of sample-group label level. It must have two and only two elements and the first element is the reference.
@@ -15,54 +15,54 @@
 #' @keywords data.setup
 #' @export
 #' @examples
-#' smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
-#' ary.eff <- estimate.ary.eff(uhdata = uhdata.pl,
+#' sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
+#' array.effect <- estimate.array.effect(uhdata = uhdata.pl,
 #'                              nuhdata = nuhdata.pl)
 #'
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 #'
-#' smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
-#' ary.eff.nc <- ary.eff[!rownames(ary.eff) %in% ctrl.genes, ]
-#' group.id <- substr(colnames(smp.eff.nc), 7, 7)
+#' sample.effect.nc <- sample.effect[!rownames(sample.effect) %in% ctrl.genes, ]
+#' array.effect.nc <- array.effect[!rownames(array.effect) %in% ctrl.genes, ]
+#' group.id <- substr(colnames(sample.effect.nc), 7, 7)
 #'
-#' redhalf.smp.eff.nc <- reduce.signal(smp.eff = smp.eff.nc,
+#' redhalf.sample.effect.nc <- reduce.signal(sample.effect = sample.effect.nc,
 #'                                     group.id = group.id,
 #'                                     group.id.level = c("E", "V"),
 #'                                     reduce.multiplier = 1/2)
 
-"reduce.signal" <- function(smp.eff,
+"reduce.signal" <- function(sample.effect,
                                  group.id,
                                  group.id.level = c("E", "V"),
                                  reduce.multiplier = 1/2,
                                  pbset.id = NULL){
-  stopifnot(nrow(smp.eff) != length(unique(rownames(smp.eff)))) # probe level
-  stopifnot(length(unique(table(rownames(smp.eff)))) == 1)
-  if(is.null(pbset.id)) pbset.id <- unique(rownames(smp.eff))
+  stopifnot(nrow(sample.effect) != length(unique(rownames(sample.effect)))) # probe level
+  stopifnot(length(unique(table(rownames(sample.effect)))) == 1)
+  if(is.null(pbset.id)) pbset.id <- unique(rownames(sample.effect))
 
-  n.p.u <- unique(table(rownames(smp.eff)))
-  smp.eff.psl <- med.sum.pbset(smp.eff, num.per.unipbset = n.p.u)
-  s.e.limma <- limma.pbset(data = smp.eff.psl,
+  n.p.u <- unique(table(rownames(sample.effect)))
+  sample.effect.psl <- med.sum.pbset(sample.effect, num.per.unipbset = n.p.u)
+  s.e.limma <- limma.pbset(data = sample.effect.psl,
                            group.id = group.id,
                            group.id.level = group.id.level,
                            pbset.id = pbset.id)
   de.ind <- s.e.limma$P.Value < 0.01
 
-  sample.g1 <- rowMeans(smp.eff[rownames(smp.eff) %in% pbset.id[de.ind],
+  sample.g1 <- rowMeans(sample.effect[rownames(sample.effect) %in% pbset.id[de.ind],
                                 group.id == group.id.level[1]])
-  sample.g2 <- rowMeans(smp.eff[rownames(smp.eff) %in% pbset.id[de.ind],
+  sample.g2 <- rowMeans(sample.effect[rownames(sample.effect) %in% pbset.id[de.ind],
                                 group.id == group.id.level[2]])
 
   half.signal <- (sample.g1 - sample.g2)*reduce.multiplier
 
-  reduced.smp.ef.de <- cbind(smp.eff[rownames(smp.eff) %in% pbset.id[de.ind],
+  reduced.sample.effect.de <- cbind(sample.effect[rownames(sample.effect) %in% pbset.id[de.ind],
                                   group.id == group.id.level[1]] - half.signal,
-                             smp.eff[rownames(smp.eff) %in% pbset.id[de.ind],
+                             sample.effect[rownames(sample.effect) %in% pbset.id[de.ind],
                                   group.id == group.id.level[2]])
 
   # combine and colnames, rownames back to original order
-  temp <- smp.eff
+  temp <- sample.effect
 
-  temp[rownames(temp) %in% pbset.id[de.ind], ] <- reduced.smp.ef.de[, colnames(smp.eff)]
+  temp[rownames(temp) %in% pbset.id[de.ind], ] <- reduced.sample.effect.de[, colnames(sample.effect)]
   redhalf.sample.effect.pl.p10 <- temp; rm(temp)
 
   return(redhalf.sample.effect.pl.p10)

@@ -30,7 +30,10 @@ a list of two datasets and one reference distribution:
 }
 \description{
 Normalize training dataset with vsn and
-store the fitted vsn model from the training dataset as the reference to frozen variance stabilizing normalize test dataset.
+store the fitted vsn model from the training dataset as the reference
+to frozen variance stabilizing normalize test dataset.
+Also two other options are available: to only normalize
+a training dataset but not frozen normalize a test dataset, or vise versa.
 }
 \examples{
 \dontrun{

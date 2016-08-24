@@ -7,7 +7,7 @@
 med.sum.pbset(data, pbset.id = NULL, num.per.unipbset = 10)
 }
 \arguments{
-\item{data}{expression dataset to be summarized.
+\item{data}{dataset to be summarized.
 The dataset must have rows as probes and columns as samples.
 It must be a data matrix with the same number of probes per unique probe-set.
 If it is already on the probe-set level, no manipulation will be done.}

@@ -29,26 +29,26 @@ the highest adjusted R-squared is returned as the level of confounding.
 }
 \examples{
 \dontrun{
-sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
-array.effect <- estimate.array.effect(uhdata = uhdata.pl,
+biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
+handling.effect <- estimate.handling.effect(uhdata = uhdata.pl,
                              nuhdata = nuhdata.pl)
 
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
-sample.effect.nc <- sample.effect[!rownames(sample.effect) \%in\% ctrl.genes, ]
-array.effect.nc <- array.effect[!rownames(array.effect) \%in\% ctrl.genes, ]
+biological.effect.nc <- biological.effect[!rownames(biological.effect) \%in\% ctrl.genes, ]
+handling.effect.nc <- handling.effect[!rownames(handling.effect) \%in\% ctrl.genes, ]
 
-group.id <- substr(colnames(sample.effect.nc), 7, 7)
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
-sample.effect.train.ind <- colnames(sample.effect.nc)[c(sample(which(group.id == "E"), size = 64),
+biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
 sample(which(group.id == "V"), size = 64))]
-array.effect.train.ind <- colnames(array.effect.nc)[c(1:64, 129:192)]
+handling.effect.train.ind <- colnames(handling.effect.nc)[c(1:64, 129:192)]
 
 # randomly created a vector of Boolean for nbe.genes
-nbe.genes <- sample(c(TRUE, FALSE), size = nrow(sample.effect.nc), replace = TRUE)
+nbe.genes <- sample(c(TRUE, FALSE), size = nrow(biological.effect.nc), replace = TRUE)
 
-calc.confounding.level(data = sample.effect.nc[, sample.effect.train.ind],
-                       group.id = substr(sample.effect.train.ind, 7, 7),
+calc.confounding.level(data = biological.effect.nc[, biological.effect.train.ind],
+                       group.id = substr(biological.effect.train.ind, 7, 7),
                        nbe.genes = nbe.genes)
 }
 

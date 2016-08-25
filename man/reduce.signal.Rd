@@ -4,14 +4,14 @@
 \alias{reduce.signal}
 \title{Biological signal reduction}
 \usage{
-reduce.signal(sample.effect, group.id, group.id.level = c("E", "V"),
+reduce.signal(biological.effect, group.id, group.id.level = c("E", "V"),
   reduce.multiplier = 1/2, pbset.id = NULL)
 }
 \arguments{
-\item{sample.effect}{the estimated sample effect dataset. The dataset must have rows as probes and columns as samples.
+\item{biological.effect}{the estimated biological effect dataset. The dataset must have rows as probes and columns as samples.
 It can only take in probe-level dataset with a fixed number of probes per unique probe-set.}
 
-\item{group.id}{a vector of sample-group labels for each sample of the estimated sample effect dataset.}
+\item{group.id}{a vector of sample-group labels for each sample of the estimated biological effect dataset.}
 
 \item{group.id.level}{a vector of sample-group label level. It must have two and only two elements and the first element is the reference.
 By default, \code{group.id.level = c("E", "V")}. That is in our study, we compare endometrial tumor samples to
@@ -23,23 +23,23 @@ ovarian tumor samples, with endometrial as our reference.}
 extracting from the row names.}
 }
 \value{
-estimated sample effect data, with reduced biological signal
+estimated biological effect data, with reduced biological signal
 }
 \description{
 Reduce biological signal by decreasing the mean group difference between sample groups.
 }
 \examples{
-sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
-array.effect <- estimate.array.effect(uhdata = uhdata.pl,
+biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
+handling.effect <- estimate.handling.effect(uhdata = uhdata.pl,
                              nuhdata = nuhdata.pl)
 
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
-sample.effect.nc <- sample.effect[!rownames(sample.effect) \%in\% ctrl.genes, ]
-array.effect.nc <- array.effect[!rownames(array.effect) \%in\% ctrl.genes, ]
-group.id <- substr(colnames(sample.effect.nc), 7, 7)
+biological.effect.nc <- biological.effect[!rownames(biological.effect) \%in\% ctrl.genes, ]
+handling.effect.nc <- handling.effect[!rownames(handling.effect) \%in\% ctrl.genes, ]
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
-redhalf.sample.effect.nc <- reduce.signal(sample.effect = sample.effect.nc,
+redhalf.biological.effect.nc <- reduce.signal(biological.effect = biological.effect.nc,
                                     group.id = group.id,
                                     group.id.level = c("E", "V"),
                                     reduce.multiplier = 1/2)

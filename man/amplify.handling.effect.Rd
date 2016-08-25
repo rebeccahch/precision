@@ -34,13 +34,13 @@ Amplify handling effect in pre-specified slides by either a location shift or a 
 }
 \examples{
 \dontrun{
-sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
+biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 handling.effect <- estimate.handling.effect(uhdata = uhdata.pl,
                             nuhdata = nuhdata.pl)
 
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 
-sample.effect.nc <- sample.effect[!rownames(sample.effect) \%in\% ctrl.genes, ]
+biological.effect.nc <- biological.effect[!rownames(biological.effect) \%in\% ctrl.genes, ]
 handling.effect.nc <- handling.effect[!rownames(handling.effect) \%in\% ctrl.genes, ]
 
 handling.effect.nc.tr <- handling.effect.nc[, c(1:64, 129:192)]

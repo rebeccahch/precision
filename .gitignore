@@ -1,12 +1,16 @@
 .Rproj.user
 .Rhistory
 .RData
+
+R/archived.R
 R/setup.R
-R/hide.R
+R/plot.precision.R
 R/precision.simulate.test.R
 R/precision.simulate2.R
 R/array.to.sample.assign.func.R
-R/plot.R
+
+vignettes/prestore.obj.R
+vignettes/prestore.obj.ori.Rdata
 
 data/nuhdata.pl.ori.rda
 data/uhdata.pl.ori.rda

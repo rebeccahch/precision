@@ -23,17 +23,17 @@
 #' @keywords classification
 #' @examples
 #' set.seed(101)
-#' sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
+#' biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
-#' sample.effect.nc <- sample.effect[!rownames(sample.effect) %in% ctrl.genes, ]
-#' group.id <- substr(colnames(sample.effect.nc), 7, 7)
+#' biological.effect.nc <- biological.effect[!rownames(biological.effect) %in% ctrl.genes, ]
+#' group.id <- substr(colnames(biological.effect.nc), 7, 7)
 #'
-#' sample.effect.train.ind <- colnames(sample.effect.nc)[c(sample(which(group.id == "E"), size = 64),
+#' biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
 #'                                          sample(which(group.id == "V"), size = 64))]
-#' sample.effect.nc.tr <- sample.effect.nc[, sample.effect.train.ind]
+#' biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
 #'
-#' lasso.int <- lasso.intcv(X = sample.effect.nc.tr,
-#'                          y = substr(colnames(sample.effect.nc.tr), 7, 7),
+#' lasso.int <- lasso.intcv(X = biological.effect.nc.tr,
+#'                          y = substr(colnames(biological.effect.nc.tr), 7, 7),
 #'                          kfold = 5, seed = 1, alp = 1)
 #'
 

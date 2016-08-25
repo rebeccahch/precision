@@ -28,25 +28,25 @@ Predict from a nearest shrunken centroid fit.
 }
 \examples{
 set.seed(101)
-sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
+biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
-sample.effect.nc <- sample.effect[!rownames(sample.effect) \%in\% ctrl.genes, ]
-group.id <- substr(colnames(sample.effect.nc), 7, 7)
+biological.effect.nc <- biological.effect[!rownames(biological.effect) \%in\% ctrl.genes, ]
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
-sample.effect.train.ind <- colnames(sample.effect.nc)[c(sample(which(group.id == "E"), size = 64),
+biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
                                           sample(which(group.id == "V"), size = 64))]
-sample.effect.test.ind <- colnames(sample.effect.nc)[!colnames(sample.effect.nc) \%in\% sample.effect.train.ind]
+biological.effect.test.ind <- colnames(biological.effect.nc)[!colnames(biological.effect.nc) \%in\% biological.effect.train.ind]
 
-sample.effect.nc.tr <- sample.effect.nc[, sample.effect.train.ind]
-sample.effect.nc.te <- sample.effect.nc[, sample.effect.test.ind]
+biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
+biological.effect.nc.te <- biological.effect.nc[, biological.effect.test.ind]
 
-pam.int <- pam.intcv(X = sample.effect.nc.tr,
-                     y = substr(colnames(sample.effect.nc.tr), 7, 7),
+pam.int <- pam.intcv(X = biological.effect.nc.tr,
+                     y = substr(colnames(biological.effect.nc.tr), 7, 7),
                      kfold = 5, seed = 1)
 
 pam.pred <- pam.predict(pam.intcv.model = pam.int,
-                        pred.obj = sample.effect.nc.te,
-                        pred.obj.group.id = substr(colnames(sample.effect.nc.te), 7, 7))
+                        pred.obj = biological.effect.nc.te,
+                        pred.obj.group.id = substr(colnames(biological.effect.nc.te), 7, 7))
 pam.int$mc
 pam.pred$mc
 

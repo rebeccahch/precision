@@ -29,7 +29,7 @@
 #'
 #' @param seed an integer used to initialize a pseudorandom number generator.
 #' @param N number of simulation runs.
-#' @param sample.effect the estimated sample effect dataset. This dataset must have rows as probes and columns as samples.
+#' @param biological.effect the estimated biological effect dataset. This dataset must have rows as probes and columns as samples.
 #' @param norm.list a list of strings for normalization methods to be compared in the simulation study.
 #' The built-in normalization methods includes "NN", "QN", "MN", "VSN" for "No Normalization", "Quantile Normalization",
 #' "Median Normalization", "Variance Stabilizing Normalization".
@@ -54,19 +54,19 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' sample.effect <- estimate.sample.effect(uhdata = uhdata.pl)
+#' biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 #'
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 #'
-#' sample.effect.nc <- sample.effect[!rownames(sample.effect) %in% ctrl.genes, ]
+#' biological.effect.nc <- biological.effect[!rownames(biological.effect) %in% ctrl.genes, ]
 #'
 #' uni.handled.results <- uni.handled.simulate(seed = 1, N = 3,
-#'                                             sample.effect = sample.effect.nc,
+#'                                             biological.effect = biological.effect.nc,
 #'                                             norm.list = c("NN", "QN"),
 #'                                             class.list = c("PAM", "LASSO"))
 #' }
 
-"uni.handled.simulate" <- function(seed, N, sample.effect,
+"uni.handled.simulate" <- function(seed, N, biological.effect,
                                    norm.list = c("NN", "QN"),
                                    class.list = c("PAM", "LASSO"),
                                    norm.funcs = NULL,
@@ -97,12 +97,12 @@
     cat("- setup simulated data \n")
 
     #** split training and test **#
-    train.ind <- sort(c(sample(which(substr(colnames(sample.effect), 7, 7) == "E"), 64),
-                        sample(which(substr(colnames(sample.effect), 7, 7) == "V"), 64)))
-    test.ind <- which(!colnames(sample.effect) %in% colnames(sample.effect)[train.ind])
+    train.ind <- sort(c(sample(which(substr(colnames(biological.effect), 7, 7) == "E"), 64),
+                        sample(which(substr(colnames(biological.effect), 7, 7) == "V"), 64)))
+    test.ind <- which(!colnames(biological.effect) %in% colnames(biological.effect)[train.ind])
 
-    train <- sample.effect[, train.ind]
-    test <- sample.effect[, test.ind]
+    train <- biological.effect[, train.ind]
+    test <- biological.effect[, test.ind]
 
     group.id.tr <- substr(colnames(train), 7, 7)
     group.id.te <- substr(colnames(test), 7, 7)

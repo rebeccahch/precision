@@ -27,4 +27,3 @@ uhdata.pl.p5 <- per.unipbset.truncate(data = uhdata.pl,
 num.per.unipbset = 5)
 }
 \keyword{data.setup}
-

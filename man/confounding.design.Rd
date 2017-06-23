@@ -44,4 +44,3 @@ pc.ind <- confounding.design(seed = 1, num.array = 128,
                              degree = "partial")
 }
 \keyword{study.design}
-

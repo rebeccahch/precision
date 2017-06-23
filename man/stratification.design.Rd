@@ -31,4 +31,3 @@ str.ind <- stratification.design(seed = 1, num.array = 128,
                                  batch.id = batch.id)
 }
 \keyword{study.design}
-

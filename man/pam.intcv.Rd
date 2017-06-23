@@ -39,17 +39,17 @@ the tuning parameter, with 5-fold cross validation as the default.
 }
 \examples{
 set.seed(101)
-smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
+biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
-smp.eff.nc <- smp.eff[!rownames(smp.eff) \%in\% ctrl.genes, ]
-group.id <- substr(colnames(smp.eff.nc), 7, 7)
+biological.effect.nc <- biological.effect[!rownames(biological.effect) \%in\% ctrl.genes, ]
+group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
-smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64),
+biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
                                          sample(which(group.id == "V"), size = 64))]
-smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
+biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
 
-pam.int <- pam.intcv(X = smp.eff.nc.tr,
-                     y = substr(colnames(smp.eff.nc.tr), 7, 7),
+pam.int <- pam.intcv(X = biological.effect.nc.tr,
+                     y = substr(colnames(biological.effect.nc.tr), 7, 7),
                      kfold = 5, seed = 1)
 
 }
@@ -59,4 +59,3 @@ pamr: Pam: prediction analysis for microarrays. R package version 1.55.
 https://CRAN.R-project.org/package=pamr
 }
 \keyword{classification}
-

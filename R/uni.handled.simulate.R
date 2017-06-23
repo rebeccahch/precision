@@ -3,7 +3,7 @@
 #' Perform classification analysis on the uniformly-handled data by re-assigning samples to training and test set.
 #' More details can be found in Qin et al. (see reference).
 #'
-#' @references http://clincancerres.aacrjournals.org/content/20/13/3371.long
+#' @references Qin LX, Huang HC, Begg CB. Cautionary note on cross validation in molecular classification. Journal of Clinical Oncology. 2016.
 #' @details The analysis for the uniformly-handled dataset consists of the following main steps:
 #'
 #' (1) randomly split the data into a training set and a test set, balanced by sample group of interest

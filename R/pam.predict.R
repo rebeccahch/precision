@@ -5,7 +5,7 @@
 #' @references T. Hastie, R. Tibshirani, Balasubramanian Narasimhan and Gil Chu (2014).
 #' pamr: Pam: prediction analysis for microarrays. R package version 1.55.
 #' https://CRAN.R-project.org/package=pamr
-#' @param pam.intcv.model a PAM classifier built with \code{pam.intcv()}.
+#' @param pam.intcv.model a PAM classifier built with \code{pam.intcv}.
 #' @param pred.obj dataset to have its sample group predicted.
 #' The dataset must have rows as probes and columns as samples.
 #' It must have an equal number of probes as the dataset being trained.

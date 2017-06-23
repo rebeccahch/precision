@@ -2,7 +2,7 @@
 #'
 #' Perform the simulation study in Qin et al. (see reference).
 #'
-#' @references http://clincancerres.aacrjournals.org/content/20/13/3371.long
+#' @references Qin LX, Huang HC, Begg CB. Cautionary note on cross validation in molecular classification. Journal of Clinical Oncology. 2016
 #' @details The classification anlaysis of simulation study consists of the following main steps:
 #'
 #' First, \code{precision.simulate} requires the training and test sets for both estimated biological effects and estimated handling effects.
@@ -167,7 +167,7 @@
 #'                                              biological.effect.tr.ctrl = biological.effect.tr.ctrl,
 #'                                              handling.effect.tr.ctrl = handling.effect.tr.ctrl)
 #' }
-
+#'
 "precision.simulate" <- function(seed, N,
                                  biological.effect.tr, biological.effect.te,
                                  handling.effect.tr, handling.effect.te,

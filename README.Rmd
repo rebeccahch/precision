@@ -1,6 +1,6 @@
 # PRECISION: PaiREd miCrorna sImulation on Study desIgn for mOlecular classificatioN 
 
-`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using a unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, classifier building and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
+`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using a unique pair of Agilent microRNA array datasets. The simulation study illustrates the intricate interplay between data generation, data preprocessing, and cross-validation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problems, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
 
 To load the package currently available on `GitHub`, type the following command in R console:
 
@@ -12,11 +12,11 @@ library(PRECISION)
 
 ```
 
-When use `PRECISION`, please cite the following papers:
+When using `PRECISION`, please cite the following papers:
 
 - Huang HC, Qin LX. PRECISION: an R package for assessing study design and data normalization for molecular classification studies using a unique pair of microarray datasets (2016). GitHub repository, https://github.com/rebeccahch/precision.
 
-- Qin LX, Huang HC, Begg CB. Cautionary Note on Cross Validation in Molecular Classification. Journal of Clinical Oncology. 2016. [in press].
+- Qin LX, Huang HC, Begg CB. Cautionary note on cross validation in molecular classification. Journal of Clinical Oncology. 2016, http://ascopubs.org/doi/abs/10.1200/JCO.2016.68.1031.
 
 
 An introduction to `PRECISION` can be found in the vignette [here](https://github.com/rebeccahch/precision/tree/master/vignettes).

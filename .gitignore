@@ -4,10 +4,6 @@
 
 R/archived.R
 R/setup.R
-R/plot.precision.R
-R/precision.simulate.test.R
-R/precision.simulate2.R
-R/array.to.sample.assign.func.R
 
 vignettes/prestore.obj.R
 vignettes/prestore.obj.ori.Rdata

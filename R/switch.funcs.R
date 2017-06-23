@@ -1,16 +1,42 @@
 "switch.norm.funcs" <- function(norm.list = c("NN", "QN"),
-                                norm.funcs = NULL){
+                                 norm.funcs = NULL){
   temp <- tolower(norm.list) %in% c("nn", "mn", "qn", "vsn")
-  stopifnot(length(norm.list[!temp]) == length(norm.funcs))
+  stopifnot(length(unique(norm.list[!temp])) == length(norm.funcs))
 
   new.norm.funcs <- tolower(norm.list)
-  new.norm.funcs <- gsub("mn", "med.norm",
-                         gsub("qn", "quant.norm",
-                              gsub("vsn", "vs.norm", tolower(new.norm.funcs))))
+  new.norm.funcs <- gsub("nn", "nn.norm",
+                         gsub("mn", "med.norm",
+                              gsub("qn", "quant.norm",
+                                   gsub("vsn", "vs.norm",
+                                        tolower(new.norm.funcs)))))
   new.norm.funcs <- c(new.norm.funcs[temp], norm.funcs)
   return(new.norm.funcs)
 }
 
+"switch.norm.funcs.flex" <- function(norm.list = c("NN", "QN"),
+                                norm.funcs = NULL){
+
+  temp <- tolower(norm.list) %in% c("nn", "mn", "qn", "vsn")
+  stopifnot(length(unique(norm.list[!temp])) == length(norm.funcs))
+
+  new.norm.funcs <- tolower(norm.list)
+
+  switch_x <- sapply(new.norm.funcs, function(x) switch(x,
+                                                        "nn" = "nn.norm",
+                                                        "mn" = "med.norm",
+                                                        "qn" = "quant.norm",
+                                                        "vsn" = "vs.norm"))
+
+  switch_x <- as.character(switch_x)
+  switch_x[which(switch_x == "NULL")] <-
+    paste0(tolower(norm.list)[which(switch_x == "NULL")], ".norm")
+  new.norm.funcs <- switch_x
+
+  stopifnot(new.norm.funcs %in% c("nn.norm", "med.norm", "quant.norm", "vs.norm",
+                                  norm.funcs))
+
+  return(new.norm.funcs)
+}
 
 "switch.classifier.funcs" <- function(class.list = c("PAM", "LASSO"),
                                       class.funcs = NULL,

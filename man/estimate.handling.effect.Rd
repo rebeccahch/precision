@@ -27,4 +27,3 @@ handling.effect <- estimate.handling.effect(uhdata = uhdata.pl, nuhdata = nuhdat
 
 }
 \keyword{data.setup}
-

@@ -65,4 +65,3 @@ Variance Stabilization Applied to Microarray Data Calibration and to the Quantif
 Bioinformatics 18, S96-S104 (2002).
 }
 \keyword{preprocess}
-

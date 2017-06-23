@@ -7,7 +7,7 @@
 lasso.predict(lasso.intcv.model, pred.obj, pred.obj.group.id)
 }
 \arguments{
-\item{lasso.intcv.model}{a LASSO classifier built with \code{lasso.intcv()}.}
+\item{lasso.intcv.model}{a LASSO classifier built with \code{lasso.intcv}.}
 
 \item{pred.obj}{dataset to have its sample group predicted.
 The dataset must have rows as probes and columns as samples.
@@ -56,4 +56,3 @@ Regularization Paths for Generalized Linear Mod- els via Coordinate Descent,
 http://www.stanford.edu/~hastie/Papers/glmnet.pdf Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010
 }
 \keyword{classification}
-

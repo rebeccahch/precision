@@ -1,17 +1,13 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^PRECISION\.pdf$
+^PRECISION2\.pdf$
 ^cran-comments\.md$
 ^README\.Rmd$
 ^README-.*\.png$
 ^README\.html$
 
-^archived\.R$
 ^setup\.R$
-^plot.precision\.R$
-^precision.simulate2\.R$
-^precision.simulate.test\.R$
-^array.to.sample.assign.func\.R$
 
 ^prestore.obj.ori\.R$
 ^prestore.obj.ori\.Rdata$

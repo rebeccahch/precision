@@ -5,7 +5,7 @@
 #' @references Friedman, J., Hastie, T. and Tibshirani, R. (2008)
 #' Regularization Paths for Generalized Linear Mod- els via Coordinate Descent,
 #' http://www.stanford.edu/~hastie/Papers/glmnet.pdf Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010
-#' @param lasso.intcv.model a LASSO classifier built with \code{lasso.intcv()}.
+#' @param lasso.intcv.model a LASSO classifier built with \code{lasso.intcv}.
 #' @param pred.obj dataset to have its sample group predicted.
 #' The dataset must have rows as probes and columns as samples.
 #' It must have an equal number of probes as the dataset being trained.

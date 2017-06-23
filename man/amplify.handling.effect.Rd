@@ -82,4 +82,3 @@ boxplot(handling.effect.nc.tr.scale2, main = "scaled 2",
 
 }
 \keyword{data.setup}
-

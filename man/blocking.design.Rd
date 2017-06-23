@@ -28,4 +28,3 @@ blocking.design(seed = 1, num.per.slide = 8, num.array = 128)
 
 }
 \keyword{study.design}
-

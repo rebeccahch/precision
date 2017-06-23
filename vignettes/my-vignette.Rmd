@@ -9,13 +9,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-### Introduction
+## Introduction
 
-`PRECISION` is a package that allows users to conduct a simulation study for molecular classification, using a unique pair of Agilent microRNA array datasets [^1]. This simulation study illustrates the intricate interplay between data generation, data preprocessing, classification error estimation for molecular classification. Our primary goal is to offer insights on the desired practice of study design and data analysis for classification problem, so that research sources can be optimized to generate high-quality molecular data and allow the development of reproducible classifiers.
+`PRECISION` is a package that allows users to conduct a re-sampling-based simulation study for molecular classification, using a unique pair of Agilent microRNA array datasets [^1]<sup>, </sup>[^1b]. This simulation study is to illustrate the intricate interplay between data generation, data preprocessing, and classification error estimation for molecular classification. It offers insights into the desired practice of study design and data analysis for molecular classification, so that research sources can be optimized to generate high-quality molecular data and develop reproducible classifiers.
 
-This document familiarizes users with the data and the functions available in the package. It also allows users to explore further on the topic using various normalization and classification methods for comparative studies.
+This document familiarizes users with the data and the functions available in the package. It also allows users to explore further on the topic using additional normalization and classification methods.
 
-[^1]: Qin LX, Huang HC, Begg CB. Cautionary Note on Cross-Validation in Molecular Classification. Journal of Clinical Oncology. 2016. [in press].
+[^1]: Qin LX, Huang HC, Begg CB. Cautionary note on cross validation in molecular classification. Journal of Clinical Oncology. 2016, http://ascopubs.org/doi/abs/10.1200/JCO.2016.68.1031.
+
+[^1b]: Huang HC, Qin LX. PRECISION: an R package for assessing study design and data normalization for molecular classification studies using a unique pair of microarray datasets (2016). GitHub repository, https://github.com/rebeccahch/precision.
 
 ```{r prestore.obj, echo = FALSE, error = FALSE, warning = FALSE, results = "hide"}
 # load pre-stored R objects for the vignette.
@@ -23,20 +25,25 @@ load(file = "prestore.obj.Rdata")
 
 ```
 
-When use `PRECISION`, please cite the following papers:
+When using `PRECISION`, please cite the following papers:
 
 - Huang HC, Qin LX. PRECISION: an R package for assessing study design and data normalization for molecular classification studies using a unique pair of microarray datasets (2016). GitHub repository, https://github.com/rebeccahch/precision.
 
-- Qin LX, Huang HC, Begg CB. Cautionary Note on Cross-Validation in Molecular Classification. Journal of Clinical Oncology. 2016. [in press].
+- Qin LX, Huang HC, Begg CB. Cautionary note on cross validation in molecular classification. Journal of Clinical Oncology. 2016, http://ascopubs.org/doi/abs/10.1200/JCO.2016.68.1031.
 
 <!-- When use the datasets, please cite the following papers: -->
 
 <!-- - Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [http://clincancerres.aacrjournals.org/content/20/13/3371.long](http://clincancerres.aacrjournals.org/content/20/13/3371.long) -->
 
 
-## Load PRECISION
+## Package Overview
 
 The first step is to install `PRECISION` from `CRAN` by typing the following command in R console:
+
+```{r echo = FALSE, message = FALSE}
+source(file = "../R/extract.precision.error.R")
+source(file = "../R/plot.precision.R")
+```
 
 ```{r load.pkg, message = FALSE}
 if(!require(PRECISION)) install.packages("PRECISION")
@@ -44,13 +51,13 @@ library(PRECISION)
 
 ```
 
-## Empirical Data Collection
+## Data Description
 
-A unique pair of datasets was generated for the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples with blocking and randomization (by array slide). The second dataset was handled by two technicians in multiple batches and its arrays were assigned in the order of sample collection without blocking or randomization to mimic typical practice. More details on the data collection can be found in Qin et al.[^2] The datasets are publicly available on `GEO` [here](http://www.ncbi.nlm.nih.gov/geo/).
+Two datasets was generated for the same set of 96 endometrial and 96 ovarian tumor samples using different experimental handling designs. The first dataset was handled by one technician in one run and its arrays were randomly assigned to tumor samples with blocking (by array slide, uniformly-handled data). The second dataset was handled by two technicians in multiple batches and its arrays were assigned in the order of sample collection (without blocking or randomization), to mimic typical practice (nonuniformly-handled data). More details on the data collection can be found in Qin et al.[^2] The datasets are publicly available at `GEO` [here](http://www.ncbi.nlm.nih.gov/geo/).
 
 [^2]: Qin LX, Zhou Q, Bogomolniy F, Villafania L, Olvera N, Cavatore M, Satagopan JM, Begg CB, Levine DA. Blocking and randomization to improve molecular biomarker discovery. Clinical Cancer Research 2014, 20:3371-3378 [here](http://clincancerres.aacrjournals.org/content/20/13/3371.long)
 
-This package includes two example datasets (probe level): uniformly-handled data `uhdata.pl` and nonuniformly-handled data `nuhdata.pl`, which were the 5% random subset of the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To call the data, simply use the commands below:
+To save time for package loading, this package includes two example datasets (probe level): uniformly-handled data `uhdata.pl` and nonuniformly-handled data `nuhdata.pl`, which are the 5% random subset of markers from the original data. Here is a glimpse of the datasets. The last character of the sample labels "E" or "V" indicates whether the sample is an endometrial or ovarian tumor. To load the data, simply use the commands below:
 
 ```{r load.data, eval = FALSE}
 data("uhdata.pl")
@@ -65,14 +72,17 @@ knitr::kable(nuhdata.pl[1:15, 1:5], caption = "Nonuniformly-handled Data")
 
 ```
 
-Originally, each probe has 10 to 40 replicates. We recommend truncating the number of replicates to a fixed number across probes to save data preprocessing time. We are safe to do so because we have previously observed that the variation among replicates for the same probe is small. Here, we provide `per.unipbset.truncate()` to truncate the number of replicates in data. In our simulation study, we used only the first 10 replicates for each unique probe.
+## Probe Selection 
+
+Initially, the number of replicates for each marker/probe varies between 10 and 40. We recommend truncating the number of replicates to a fixed number across probes to save data preprocessing time. We are confident in recommending this practice because we have previously observed that the variation among replicates for the same probe is small. Here, we provide `per.unipbset.truncate()` to truncate the number of replicates in data. In our simulation study, we used only the first 10 replicates for each unique probe.
 
 ```{r per.unipbset.truncate, eval = FALSE}
+## Example of taking only the first 5 replicates for each unique probe
 uhdata.pl.p5 <- per.unipbset.truncate(data = uhdata.pl,
                                       num.per.unipbset = 5)
 ```
 
-Agilent platform includes control probes, but in most of the analyses, only **non-control probe** data were used. An exception was when batch effects were adjusted by RUV-4 (explained in a later section). The following code identifies and **filters** out the control probes from the data.
+The Agilent platform includes control probes, but most of the analyses demonstrated in this document will use only **non-control probe** data. An exception is when batch effects are adjusted by RUV-4 (explained in a later section). The following code identifies and **filters** out the control probes from the data.
 
 ```{r ctrl.genes}
 # negative control probes
@@ -81,9 +91,9 @@ ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl))
 uhdata.pl.nc <- uhdata.pl[!rownames(uhdata.pl) %in% ctrl.genes, ] # nc for non-control probes
 ```
 
-## Simulated Data Generation 
+## Data Simulation 
 
-We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the nonuniformly-handled dataset) for the same sample to approximate the handling effect for each array when the dataset was not uniformly-handled. This is done with `estimate.biological.effect()` and `estimate.handling.effect()` as follows:
+We used the uniformly-handled dataset to approximate the biological effect for each sample, and the difference between the two arrays (one from the uniformly-handled dataset and the other from the nonuniformly-handled dataset) for the same sample to approximate the handling effect for each array in the nonuniformly-handled dataset. This is done with `estimate.biological.effect()` and `estimate.handling.effect()` as follows:
 
 ```{r est.eff, results = "hide", message = FALSE}
 biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
@@ -95,7 +105,7 @@ handling.effect.nc <- handling.effect[!rownames(handling.effect) %in% ctrl.genes
 
 ```
 
-The 192 samples were **randomly split** in a 2:1 ratio into a training set and a test set, balanced by tumor type; the 192 arrays were **non-randomly** split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing) and a test set (n=64, the middle 64 arrays). This array split is intentional because the first 80 arrays were profiled by one technician and the rest by the other technician; both technicians are then sufficiently represented in the training set. 
+The 192 samples were **randomly split** in a 2:1 ratio into a training set and a test set, balanced by tumor type. The 192 arrays were **non-randomly** split to a training set (n=128, the first 64 and last 64 arrays in the order of array processing). The first 80 arrays were profiled by one technician and the rest by the other technician. 
 
 ```{r data.split, comment = ">", message = FALSE, eval = FALSE}
 set.seed(101)
@@ -119,7 +129,7 @@ array.to.sample.assign <- list("all" = c(rep(c("E", "V"), each = 64),
 
 ```
 
-Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the handling effect for its assigned array. For the test set, we used the test data from the uniformly-handled dataset. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`). And, `rehybridize()` is provided to sum biological effects to handling effects, following array-to-sample assignments. 
+Next, for the training set, data were simulated through "virtual re-hybridization" by first assigning arrays to sample groups using a confounding design or a balanced design, and then summing the biological effect for a sample and the handling effect for its assigned array. For the test set, we used onlyt the biological effect data from the uniformly-handled dataset. Three study design functions assign arrays to samples (`confounding.design()`, `stratification.design()`, `blocking.design()`). Finally, `rehybridize()` is provided to sum biological effects to handling effects, following array-to-sample assignments. 
 
 ```{r study.design}
 # complete confounding
@@ -140,7 +150,7 @@ blk.ind <- blocking.design(seed = 4, num.array = 128)
 
 ```
 
-Here is one of the possible array-to-sample-group splits for the study designs. Each vertical stripe represents an array and the color of each stripe represents which sample group the array is assigned to.
+Below is one of the possible array-to-sample-group splits for the study designs. Each vertical bar represents an array and the color of each stripe represents which sample group the array is assigned to.
 
 ```{r study.design.fig, fig.align = "hold", fig.height = 4, fig.width = 6, echo = FALSE}
 par(mar = c(1, 1, 1, 1))
@@ -199,24 +209,24 @@ sim.data.ruv <- rehybridize(biological.effect = biological.effect.nc,
 
 ```
 
-Batch effect correction[^3] is available in the re-hybridization step. The adjustment can be turned on by specifying `icombat = TRUE`, `isva = TRUE` or `iruv = TRUE`, or else by default, no batch adjustment will be performed. Note that when RUV-4 (`iruv = TRUE`) is selected, control-probe data must be supplied. 
+Batch effect correction is available in the re-hybridization step. The adjustment can be turned on by specifying `icombat = TRUE`, `isva = TRUE` or `iruv = TRUE` for ComBat[^3a], sva[^3a], and RUV-4[^3b]; if none of these is selected, no batch adjustment will be performed. Note that when RUV-4 (`iruv = TRUE`) is selected, control-probe data must be supplied. 
 
-[^3]: ComBat and sva: Leek JT, Johnson WE, Parker HS, Fertig EJ, Jaffe AE and Storey JD (2016). sva: Surrogate Variable Analysis. R package version 3.20.0. 
-RUV: Johann Gagnon-Bartsch (2015). ruv: Detect and Remove Unwanted Variation using Negative Controls. R package version 0.9.6.
+[^3a]: Leek JT, Johnson WE, Parker HS, Fertig EJ, Jaffe AE and Storey JD (2016). Surrogate Variable Analysis. R package version 3.20.0. 
+[^3b]: RUV: Johann Gagnon-Bartsch (2015). Detect and Remove Unwanted Variation using Negative Controls. R package version 0.9.6.
 
 ## Data Preprocessing
 
 Data preprocessing in the study includes three steps: 
 
-1. log2 transformation. Logged-2 was performed at the step of generating data matrix.
+1. log2 transformation; 
 
-2. normalization for training data and frozen normalization for test data (that is, mapping the empirical distribution of each individual test-set sample to the "frozen" empirical distribution of the normalized training data).
+2. normalization for training data and frozen normalization for test data (that is, mapping the empirical distribution of each individual test-set sample to the "frozen" empirical distribution of the normalized training data); 
 
 3. probe-replicate summarization using the median.
 
 We provide `med.norm()`, `quant.norm()`, and `vs.norm()` for median normalization, quantile normalization[^4], and variance stabilizing normalization[^5], respectively. 
 <!-- When parameter `test` is not supplied, the functions only normalize on training data and return `NULL` on the frozen normalized test.  -->
-Note: as number of probes increases, VSN can be computationally intensive.
+<!-- Note: as the number of probes increases, VSN becomes more computationally intensive. -->
 
 [^4]: Bolstad BM, Irizarry RA, Astrand M, Speed TP: A comparison of normalization methods for high density oligonucleotide array data based on variance and bias. Bioinformatics 2003, 19(2):185-193.
 Bolstad BM: preprocessCore: A collection of pre-processing functions. R package version 1.34.0. 2016.
@@ -253,9 +263,9 @@ To summarize replicate level data to unique probe level, based on within-probe m
 uhdata.psl <- med.sum.pbset(data = uhdata.pl, num.per.unipbset = 10)
 ```
 
-## Classification and Error Estimation
+## Classifier Development and Error Estimation
 
-Regardless of classification methods, internal cross-validation should be used to build a classifier and tune parameter(s) and external validation should be used to validate the performance. In our simulation study, we reported results of two classification methods: one non-parametric method, prediction analysis for microarrays (PAM)[^6] and one parametric method, the least absolute shrinkage and selection operator (LASSO)[^7]. Examples of model-building and predicting functions in `PRECISION` are `pam.intcv()` and `pam.predict()` for PAM and `lasso.intcv()` and `lasso.predict()` for LASSO.
+Regardless of classification methods, internal cross-validation can be used to select the tuning parameter(s) and external validation should be used to validate the performance. In our simulation study, we reported results from the use of two classification methods: one non-parametric method (prediction analysis for microarrays (PAM)[^6]) and one parametric method (THE least absolute shrinkage and selection operator (LASSO)[^7]). Examples of model-building and predicting functions in `PRECISION` are `pam.intcv()` and `pam.predict()` for PAM and `lasso.intcv()` and `lasso.predict()` for LASSO.
 
 [^6]: Tibshirani R, Hastie T, Narasimhan B, Chu G: Diagnosis of multiple cancer types by shrunken centroids of gene expression. Proceedings of the National Academy of Sciences of the United States of America 2002, 99(10):6567-6572.
 Hastie T, Tibshirani R., Narasimhan B, Chu G: pamr: Pam: prediction analysis for microarrays; 2014.
@@ -304,13 +314,13 @@ lasso.pred$mc
 
 ```
 
-## Wrapper Functions for Conducting Simulation
+## Wrapper Functions for Running Simulations
 
-Finally, the main functionality of `PRECISION` is to provide users with an efficient way to reproduce our simulation studies in molecular classification. Two wrapper functions are available to do so: one for the analysis of the uniformly-handled data and one for the analysis with confounding handling (i.e. the analysis of simulated data)
+Finally, the main functionality of `PRECISION` is to provide users with an efficient way to reproduce our simulation studies reported in JCO in press. Two wrapper functions are available to do so: one for the analysis of the uniformly-handled data and the other for the analysis of data with confounding handling (i.e. the analysis of simulated data)
 
 ### Analysis of the uniformly-handled data
 
-The analysis of the uniformly-handled data is based on `N` number of random training-and-test-set splits on the uniformly-handled data; `uni.handled.simulate()` is used. Users can control the signal level of the estimated biological effects being inputted as well as the normalization and classification methods being compared.
+The analysis of the uniformly-handled data is based on `N` splits of training-and-test-set for the uniformly-handled data; `uni.handled.simulate()` is used. Users can manipulate the signal level of the estimated biological effects and choose the method for data normalization and classification.
 
 ```{r uni.handled.simulate, results = "hide", eval = FALSE}
 uni.handled.results <- uni.handled.simulate(seed = 1, N = 3,
@@ -328,7 +338,7 @@ knitr::kable(data.frame(uni.handled.results$error_store[2, ]),
 
 ### Analysis with confounding handling
 
-The analysis with confounding handling is based on `N` number of array-to-sample reassignments on the simulated data using `precision.simulate()`. Users can control the signal level of the estimated biological effects, the confounding level of the estimated handling effects, array-to-sample study design, the normalization, the batch adjustment, and the classification methods.
+The analysis of data with confounding handling is based on `N` array-to-sample reassignments using `precision.simulate()`. Users can control the signal level of the estimated biological effects, the confounding level of the estimated handling effects, array-to-sample study design, the normalization method, the batch adjustment method, and the classification methods.
 
 ```{r precision.simulate, results = "hide", eval = FALSE}
 set.seed(101)
@@ -439,7 +449,7 @@ knitr::kable(data.frame(uni.handled.results.rn$error_store[2, ]),
 
 ```
 
-For each user-defined classification method, the user must provide two functions: one for building model and one for predicting. The build function must allow input parameters `kfold`, `X`, `y`, `seed`, and must return a list of outputs at minimal including `mc`, `model` (naming must match). The predict function must allow three input parameters for the build model, object to be predicted, and group ID of the object to be predicted (note: order matters). Lastly, the predict function must return a list of outputs at minimal including `mc` for misclassification error rate (naming must match). It is not required but is highly recommended to return predicted probabilities and selected features for future uses.
+For each user-defined classification method, the user must provide two functions: one for building a model and one for predicting. The build function must allow input parameters `kfold`, `X`, `y`, `seed`, and must return a list of outputs at minimum including `mc`, `model` (naming must match). The predict function must allow three input parameters for the build model, object to be predicted, and group ID of the object to be predicted (note: order matters). Lastly, the predict function must return a list of outputs at minimum including `mc` for misclassification error rate (naming must match). It is not required but is highly recommended to return predicted probabilities and selected features for future uses.
 
 ```{r class.func.extend, eval = FALSE}
 # example of user-defined classification method functions:
@@ -476,9 +486,116 @@ knitr::kable(data.frame(uni.handled.results.ridge$error_store[2, ]),
 
 ```
 
+## A More Flexible Wrapper Function for Running Simulations
+
+A more flexible function `precision.simulate.flex()` is built upon the aforementioned `precision.simulate()` that can not only perform analyses reported in the JCO paper faster but can also allow two external validation methods and different array-to-sample study designs and data normalization methods in training and test sets. 
+
+The two external validation methods offered by this function are either using `uniformly-handled test set` or using `nonuniformly-handled test set` as the independent validation set. The first method is the method used in the JCO paper. 
+
+Furthermore, the function enables in-depth study of the interplay between array-to-sample study designs and data normalization methods. Along with the previously mentioned user-defined normalization method function, users can compare different combinations of normalization method on a training set and frozen normalization method on a test set as well. Below is an example set-up for the simulation analysis using `precision.simulate.flex()`:
+
+```{r precision.simulate.flex, eval = FALSE}
+
+precision.results.flex <- precision.simulate.flex(seed = 1, N = 3, 
+  # additional external validation method
+  valid.list = c("int", "ext.uh", "ext.sim.nuh"), 
+  biological.effect.tr = biological.effect.nc.tr,
+  biological.effect.te = biological.effect.nc.te,
+  handling.effect.tr = handling.effect.nc.tr,
+  handling.effect.te = handling.effect.nc.te,
+  group.id.tr = substr(colnames(biological.effect.nc.tr), 7, 7),
+  group.id.te = substr(colnames(biological.effect.nc.te), 7, 7),
+  # specify different study designs on the nonuniformly-handled data
+  design.tr.list = c("PC-", "PC-", "STR", "STR"), 
+  design.te.list = c("PC-", "STR", "PC-", "STR"), 
+  # allow different data normalization on training and test set
+  norm.tr.list = c("NN", "QN", "NN", "QN"), 
+  norm.te.list = c("NN", "NN", "QN", "QN"),
+  class.list = c("PAM", "LASSO"),
+  batch.id.tr = list(1:40,
+    41:64,
+    (129:160) - 64,
+    (161:192) - 64),
+  batch.id.te = list(1:32, 33:64))
+
+```
+
+Even _Analysis with uniformly-handled data_ can be done using `precision.simulate.flex()`. A possible solution is as follows.
+
+```{r precision.simulate.flex.uh, eval = FALSE}
+
+# create empty nonuniformly-handled training and test sets (of the same dimension as the uniformly-handled training and test sets)
+emp.handling.effect.nc.tr <- matrix(0, 
+                                    ncol = ncol(biological.effect.nc.tr),
+                                    nrow = nrow(biological.effect.nc.tr))
+
+emp.handling.effect.nc.te <- matrix(0, 
+                                    ncol = ncol(biological.effect.nc.te),
+                                    nrow = nrow(biological.effect.nc.te))
+
+
+# create a fucntion to randomly split the biological set into training and test?
+"biological.effect.train.test.split.func" <- function(seed){
+  set.seed(seed)
+  
+  biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(
+    group.id == "E"), size = 64), sample(which(group.id == "V"), size = 64))]
+  biological.effect.test.ind <- colnames(biological.effect.nc)[!colnames(
+    biological.effect.nc) %in% biological.effect.train.ind]
+  biological.effect.train.test.split =
+    list("tr" = biological.effect.train.ind,
+         "te" = biological.effect.test.ind)
+  
+  return(biological.effect.train.test.split)
+}
+
+# use sapply
+uni.handled.results.flex <- sapply(1:10, function(x){
+  
+  # random split
+  biological.effect.train.test.split <- biological.effect.train.test.split.func(x)
+  
+  # simulate
+  precision.results.flex <- precision.simulate.flex(seed = 1, N = 1,
+    biological.effect.tr = biological.effect.nc.tr,
+    biological.effect.te = biological.effect.nc.te,
+    handling.effect.tr = emp.handling.effect.nc.tr,
+    handling.effect.te = emp.handling.effect.nc.te,
+    group.id.tr = substr(colnames(biological.effect.nc.tr), 7, 7),
+    group.id.te = substr(colnames(biological.effect.nc.te), 7, 7),
+    design.tr.list = c("BLK", "CC+"),
+    design.te.list = c("BLK", "CC+"),
+    norm.tr.list = c("QN", "NN"),
+    norm.te.list = c("NN", "QN"),
+    class.list = c("PAM", "LASSO"))
+})
+
+```
+
+## Simulation Result Manipulation and Visualization
+
+`PRECISION` output `R` objects resulted from `precision.simulate()` can be tidied into a list of data frames by `extract.precision.error()`. The list of data frames is easier to manipulate. A plotting function `plot.precision()` is offered to have a quick visualization on the simulation results. 
+
+```{r precision.vis, eval = TRUE, fig.width = 8, fig.height = 6}
+
+# for outputs from either precision.simulate() or precision.simulate.flex()
+precision.err.df <- extract.precision.error(
+  precision.obj.name = "precision.results")
+
+# for PRECISION output from precision.simulate()
+plot.precision(data = precision.err.df, iflex = FALSE, 
+               mytitle = "PRECISION results (misclassification error rate)")
+
+```
+
+```{r precision.vis.flex, eval = FALSE}
+# for PRECISION output from precision.simulate.flex()
+plot.precision(data = precision.results.flex)
+```
+
 #### Differential expression analysis
 
-Simple per-marker comparison methods such as differential expression analysis can be particularly useful when making preliminary data analysis decision. For instance, when reducing biological signal, we first identified differentially expressed markers and then shrunk sample group differences of each of the markers. Therefore, we provide `limma.pbset` to perform differential expression analysis.
+We provide `limma.pbset` to perform differential expression analysis. For instance, when reducing a biological signal, we first identified differentially expressed markers and then shrunk the sample group differences of each of the markers.
 
 ```{r dea, eval = FALSE}
 uhdata.psl.nc <- uhdata.psl[!rownames(uhdata.psl) %in% ctrl.genes, ] # nc for non-control probes
@@ -499,9 +616,9 @@ knitr::kable(tab, rownames = NULL)
 
 ```
 
-#### Reduce signal
+#### Biological signal reduction
 
-It may be necessary to manipulate the level of signal (i.e., the mean group difference between sample group) in a molecular classification study, so that the normalization effects or classification methods can be distinguishable. To manipulate the level of signal, `reduce.signal()` can be used.
+It may be necessary to manipulate the level of the biological signal (i.e., the mean group difference between sample group) in a molecular classification study. To manipulate the level of the signal, `reduce.signal()` can be used.
 
 ```{r reduce.signal, eval = FALSE}
 # reduced signal by half
@@ -544,7 +661,7 @@ boxplot(redhalf.biological.effect.nc.nonde ~ group.id == "E", main = "Non-DE")
 
 ```
 
-#### Amplify handling effects
+#### Handling effect amplification
 
 Again, it may be necessary to manipulate the confounding level of handling effects in the simulation study in order to evaluate normalization or classification methods in the presence of handling effect. We offer three amplification methods in `amplify.handling.effect()`: 
 
@@ -593,18 +710,18 @@ boxplot(handling.effect.nc.tr.scale2, main = "Scaling 2",
 
 ```
 
-### Calculate confounding level between handling effects and sample groups
+<!-- ### Calculate confounding level between handling effects and sample groups -->
 
-We used a measurement to quantify confounding level between handling effects and sample group of interest[^8]. We used this measurement to cross-check our results based on confounding and balanced study designs.
+<!-- We used a measurement to quantify confounding level between handling effects and sample group of interest[^8]. We used this measurement to cross-check our results based on confounding and balanced study designs. -->
 
-[^8]: Leek JT, Scharpf RB, Bravo HC, Simcha D, Langmead B, Johnson WE, Geman D, Baggerly K, Irizarry RA: Tackling the widespread and critical impact of batch effects in high-throughput data. Nature reviews Genetics 2010, 11(10):733-739.
+<!-- [^8]: Leek JT, Scharpf RB, Bravo HC, Simcha D, Langmead B, Johnson WE, Geman D, Baggerly K, Irizarry RA: Tackling the widespread and critical impact of batch effects in high-throughput data. Nature reviews Genetics 2010, 11(10):733-739. -->
 
-```{r calc.confounding.level, comment = ">", message = FALSE, eval = FALSE}
-# calculate confounding level 
-nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE)
-calc.confounding.level(data = biological.effect.nc[, biological.effect.train.ind], 
-                       group.id = substr(biological.effect.train.ind, 7, 7), 
-                       nbe.genes = nbe.genes)
+<!-- ```{r calc.confounding.level, comment = ">", message = FALSE, eval = FALSE} -->
+<!-- # calculate confounding level  -->
+<!-- nbe.genes <- ifelse(gene.cat == -1, TRUE, FALSE) -->
+<!-- calc.confounding.level(data = biological.effect.nc[, biological.effect.train.ind],  -->
+<!--                        group.id = substr(biological.effect.train.ind, 7, 7),  -->
+<!--                        nbe.genes = nbe.genes) -->
 
-```
+<!-- ``` -->
 

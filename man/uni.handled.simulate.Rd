@@ -85,7 +85,6 @@ uni.handled.results <- uni.handled.simulate(seed = 1, N = 3,
 }
 }
 \references{
-http://clincancerres.aacrjournals.org/content/20/13/3371.long
+Qin LX, Huang HC, Begg CB. Cautionary note on cross validation in molecular classification. Journal of Clinical Oncology. 2016.
 }
 \keyword{simulation}
-

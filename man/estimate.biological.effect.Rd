@@ -21,4 +21,3 @@ biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 
 }
 \keyword{data.setup}
-

@@ -7,7 +7,7 @@
 pam.predict(pam.intcv.model, pred.obj, pred.obj.group.id)
 }
 \arguments{
-\item{pam.intcv.model}{a PAM classifier built with \code{pam.intcv()}.}
+\item{pam.intcv.model}{a PAM classifier built with \code{pam.intcv}.}
 
 \item{pred.obj}{dataset to have its sample group predicted.
 The dataset must have rows as probes and columns as samples.
@@ -57,4 +57,3 @@ pamr: Pam: prediction analysis for microarrays. R package version 1.55.
 https://CRAN.R-project.org/package=pamr
 }
 \keyword{classification}
-

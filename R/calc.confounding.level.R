@@ -26,12 +26,14 @@
 #'
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
 #'
-#' biological.effect.nc <- biological.effect[!rownames(biological.effect) %in% ctrl.genes, ]
+#' biological.effect.nc <- biological.effect[!rownames(biological.effect)
+#'   %in% ctrl.genes, ]
 #' handling.effect.nc <- handling.effect[!rownames(handling.effect) %in% ctrl.genes, ]
 #'
 #' group.id <- substr(colnames(biological.effect.nc), 7, 7)
 #'
-#' biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
+#' biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(
+#'   group.id == "E"), size = 64),
 #' sample(which(group.id == "V"), size = 64))]
 #' handling.effect.train.ind <- colnames(handling.effect.nc)[c(1:64, 129:192)]
 #'

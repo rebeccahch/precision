@@ -52,4 +52,3 @@ Ritchie M., Phipson B., Wu D., Hu Y., Law C., Shi W. and Smyth G. (2015).
 Nucleic Acids Research, 43(7), pp. e47.
 }
 \keyword{DEA}
-

@@ -34,11 +34,13 @@ Build a LASSO classifier using internal cross validation to choose the turning p
 set.seed(101)
 biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
-biological.effect.nc <- biological.effect[!rownames(biological.effect) \%in\% ctrl.genes, ]
+biological.effect.nc <- biological.effect[!rownames(biological.effect)
+  \%in\% ctrl.genes, ]
 group.id <- substr(colnames(biological.effect.nc), 7, 7)
 
-biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
-                                         sample(which(group.id == "V"), size = 64))]
+biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(
+  group.id == "E"), size = 64),
+  sample(which(group.id == "V"), size = 64))]
 biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
 
 lasso.int <- lasso.intcv(X = biological.effect.nc.tr,
@@ -52,4 +54,3 @@ http://www.stanford.edu/~hastie/Papers/glmnet.pdf
 Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010
 }
 \keyword{classification}
-

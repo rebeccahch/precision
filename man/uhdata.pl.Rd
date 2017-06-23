@@ -22,4 +22,3 @@ whether a sample is endometrial or ovarian tumor sample. There are
 96 endometrial and 96 ovarian tumor samples.
 }
 \keyword{example.data}
-

@@ -28,38 +28,38 @@
 #' @keywords classification
 #' @examples
 #' set.seed(101)
-#' smp.eff <- estimate.smp.eff(uhdata = uhdata.pl)
+#' biological.effect <- estimate.biological.effect(uhdata = uhdata.pl)
 #' ctrl.genes <- unique(rownames(uhdata.pl))[grep("NC", unique(rownames(uhdata.pl)))]
-#' smp.eff.nc <- smp.eff[!rownames(smp.eff) %in% ctrl.genes, ]
-#' group.id <- substr(colnames(smp.eff.nc), 7, 7)
+#' biological.effect.nc <- biological.effect[!rownames(biological.effect) %in% ctrl.genes, ]
+#' group.id <- substr(colnames(biological.effect.nc), 7, 7)
 #'
-#' smp.eff.train.ind <- colnames(smp.eff.nc)[c(sample(which(group.id == "E"), size = 64),
+#' biological.effect.train.ind <- colnames(biological.effect.nc)[c(sample(which(group.id == "E"), size = 64),
 #'                                          sample(which(group.id == "V"), size = 64))]
-#' smp.eff.nc.tr <- smp.eff.nc[, smp.eff.train.ind]
+#' biological.effect.nc.tr <- biological.effect.nc[, biological.effect.train.ind]
 #'
-#' pam.int <- pam.intcv(X = smp.eff.nc.tr,
-#'                      y = substr(colnames(smp.eff.nc.tr), 7, 7),
+#' pam.int <- pam.intcv(X = biological.effect.nc.tr,
+#'                      y = substr(colnames(biological.effect.nc.tr), 7, 7),
 #'                      kfold = 5, seed = 1)
 #'
 
-"pam.intcv" <- function(X, y, vt.k=NULL, n.k=30, kfold = 5, folds=NULL, seed){
+"pam.intcv" <- function(X, y, vt.k = NULL, n.k = 30, kfold = 5, folds = NULL, seed){
 
   ptm <- proc.time()
   set.seed(seed)
-  data.pam  <- list(x=X, y=factor(y), geneids = rownames(X), genenames = rownames(X))
-  fit.pam	<- pamr::pamr.train(data.pam, threshold=vt.k, n.threshold=n.k)
-  fit.cv <-  new.pamr.cv(fit=fit.pam, data=data.pam, nfold = kfold)
-  best.threshold <- fit.cv$threshold[max(which(fit.cv$error==min(fit.cv$error)))]
+  data.pam  <- list(x = X, y = factor(y), geneids = rownames(X), genenames = rownames(X))
+  fit.pam	<- pamr::pamr.train(data.pam, threshold=vt.k, n.threshold = n.k)
+  fit.cv <-  new.pamr.cv(fit = fit.pam, data = data.pam, nfold = kfold)
+  best.threshold <- fit.cv$threshold[max(which(fit.cv$error == min(fit.cv$error)))]
 
   mc <- fit.cv$error[which.min(fit.cv$error)]
 
-  model <- pamr::pamr.train(data.pam, threshold=best.threshold, n.threshold=n.k)
+  model <- pamr::pamr.train(data.pam, threshold = best.threshold, n.threshold = n.k)
 
   ## if nonzero == 0 (no feature selected)
   coefs <- trycatch.func(pamr::pamr.listgenes(model, data.pam, threshold = best.threshold))
 
   time <- proc.time() - ptm
-  return(list(mc=mc, time=time, model = model, cfs = coefs))
+  return(list(mc = mc, time = time, model = model, cfs = coefs))
 }
 
 

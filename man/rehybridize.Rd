@@ -90,4 +90,3 @@ sim.data.ruv <- rehybridize(biological.effect = biological.effect.nc,
 }
 }
 \keyword{data.setup}
-

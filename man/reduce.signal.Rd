@@ -45,4 +45,3 @@ redhalf.biological.effect.nc <- reduce.signal(biological.effect = biological.eff
                                     reduce.multiplier = 1/2)
 }
 \keyword{data.setup}
-

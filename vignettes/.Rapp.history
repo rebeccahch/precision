@@ -1,0 +1,43 @@
+load("/Users/huangh4/Desktop/Backup 08252016/omega4/PRECISION2/vignettes/prestore.obj.Rdata")
+ls()
+precision.results
+"plot.precision" <- function(data,#
+                             mytitle = "PRECISION results (misclass. error rates)",#
+                             design.order = NULL,#
+                             ylim = c(0, 0.5)){#
+  if(is.null(design.order)) design.order <- 1:length(data$error_store[1, ])#
+  rn <- rownames(data$error_store)#
+  boxplot(data$error_store[rn == "ext.uh", ][[design.order]],#
+          at = 1:length(design.order) - 0.4,#
+          las = 2, cex.axis = 0.8,#
+          ylab = "Misclassification error rate",#
+          xlim = c(0.4, length(design.order) + 0.2),#
+          ylim = ylim, boxwex = 0.35,#
+          col = adjustcolor("skyblue", alpha.f = 0.6),#
+          border = "deepskyblue3", xaxt = "n", pch = 4,#
+          main = mytitle)#
+  boxplot(data$ext.sim.nuh[, design.order],#
+          at = 1:length(design.order) - 0.4,#
+          las = 2, add = TRUE, border = "darkgrey", boxwex = 0.20,#
+          col = adjustcolor("lightgrey", alpha.f = 0.6),#
+          xaxt = "n", yaxt = "n", pch = 3)#
+  boxplot(data$int[, design.order],#
+          at = 1:ncol(data$int[, design.order]),#
+          las = 2, add = TRUE, border = "red", col = NA, boxwex = 0.35,#
+          xaxt = "n", yaxt = "n", pch = 2)#
+  grid(nx = NA, ny = NULL, lwd = 2)#
+  labs <- names(data$int[, design.order])#
+  axis(1, cex.axis = 0.6, at = 1:length(labs) - 0.2,#
+       col = NA, las = 2,#
+       labels = labs)#
+  #abline(h = gs.hline, col = "red", lty = "dashed")#
+  abline(v = 1:(ncol(data$int[, design.order]) - 1) + 0.3,#
+         lty = "dashed", col = "dimgrey")#
+  # legend("topleft",#
+  #        legend = c("Cross Validation",#
+  #                   "External Validation"),#
+  #        border = c("red", "deepskyblue3"),#
+  #        # bg = "white",#
+  #        fill = c(NA, adjustcolor("skyblue", alpha.f = 0.6)))#
+}
+plot.precision(precision.results)

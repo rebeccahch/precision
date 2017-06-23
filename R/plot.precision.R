@@ -1,61 +1,129 @@
-# df.int <- data.frame(precision.results$error_store[1, ])
-# df.ext.uh <- data.frame(precision.results$error_store[2, ])
-# df.ext.sim.nuh <- data.frame(precision.results$error_store[3, ])
-#
-# ylim <- c(0, 0.4)
-# mytitle <- ""
-# design.tr.list = c("CC+", "CC+", "STR", "STR");
-# design.te.list = c("CC+", "STR", "CC+", "STR");
-# norm.list = c("QN", "NN");
-# class.list = c("PAM");
-# valid.list = c("int", "ext.uh", "ext.sim.nuh");
-# design.tr.list2 <- tolower(gsub("[-]", "2", gsub("[+]", "1", design.tr.list)))
-# design.te.list2 <- tolower(gsub("[-]", "2", gsub("[+]", "1", design.te.list)))
-#
-#
-# comb.design <- paste(design.tr.list2, design.te.list2, sep = ".")
-# (design.order <-  paste(rep(rep(comb.design, each = length(norm.list)), each = length(class.list)),
-#                         rep(class.list, each = length(design.tr.list2)*length(norm.list)),
-#                         rep(norm.list, length(design.tr.list2)*length(class.list)),
-#                         sep = "."))
-#
-# boxplot(df.ext.uh[, design.order],
-#         las = 2, cex.axis = 0.8,
-#         ylab = "Misclassification error rate",
-#         xlim = c(0.4, ncol(df.ext.uh[, design.order]) + 0.2),
-#         ylim = ylim, boxwex = 0.35,
-#         col = adjustcolor("skyblue", alpha.f = 0.6),
-#         border = "deepskyblue3", xaxt = "n", pch = 4,
-#         main = mytitle)
-#
-# boxplot(df.int[, design.order],
-#         at = 1:ncol(df.int[, design.order]),
-#         las = 2,
-#         add = TRUE, border = "red", col = NA, boxwex = 0.2,
-#         xaxt = "n", yaxt = "n", pch = 2)
-# grid(nx = NA, ny = NULL, lwd = 2)
-#
-# labs <- gsub("STR", "Stratification",
-#              gsub("BLK", "Blocking",
-#                   gsub("PC2", "Partial Confounding 2",
-#                        gsub("PC1", "Partial Confounding 1",
-#                             gsub("CC2", "Complete Confounding 2",
-#                                  gsub("CC1", "Complete Confounding 1",
-#                                            gsub("LASSO.", "",
-#                                                 gsub("PAM.", "",
-#                                                      gsub("NN", ", No Normalization",
-#                                                           gsub("QN", ", Quantile Normalization",
-#                                                                toupper(design.order)))))))))))
-# labs <- gsub("[.]", " -\n", gsub(".,", ",\n", labs))
-#
-# axis(1, cex.axis = 0.6, at = 1:length(labs),
-#      col = NA,
-#      labels = labs)
-#
-# legend("topleft",
-#        legend = c("Cross Validation",
-#                   "External Validation"),
-#        border = c("red", "deepskyblue3"),
-#        bg = "white",
-#        fill = c(NA, adjustcolor("skyblue", alpha.f = 0.6)))
-#
+#' Plot misclassification error rates from PRECISION (both non-FLEX and FLEX) output
+#'
+#' Plot error rates from PRECISION output that is being extracted by \code{extract.precision.error}
+#'
+#' @param data a resulted PRECISION output from \code{extract.precision.error}.
+#' @param design.order indices in the order of what user would like to plot from the resulted output from \code{extract.precision.error}. By default, every simulation is plotted.
+#' @param mytitle the title of the plot.
+#' @param ylim y limit. By default, \code{ylim = c(0, 0.5)}.
+#' @param iflex whether data if a PRECISION output from \code{precision.simulate} or \code{precision.simulate.flex}. By default, \code{iflex = TRUE} indicating that the data are from \code{precision.simulate.flex}.
+#' @return a boxplot of misclassification error rates
+#' @keywords result.manage
+#' @export
+#' @examples
+#' \dontrun{
+#' ## PRECISION output
+#' plot.precision(data = precision.results.err.df, 
+#'   design.order = 1:10,
+#'   mytitle = "My PRECISION results", iflex = FALSE)
+#' 
+#' ## PRECISION FLEX output
+#' plot.precision(data = precision.results.flex.err.df, 
+#'   design.order = 1:10,
+#'   mytitle = "My PRECISION FLEX results")
+#'           
+#' # exclude ext.uh
+#' plot.precision(data = precision.results.flex.err.df[!names(precision.results.flex.err.df) %in% "ext.uh"], 
+#'   design.order = 1:10,
+#'   mytitle = "My PRECISION FLEX results")
+#' }
+#'
+"plot.precision" <- function(data,
+                             mytitle = "PRECISION results (misclass. error rates)",
+                             design.order = NULL,
+                             ylim = c(0, 0.5), iflex = TRUE){
+  
+  if(is.null(design.order)) design.order <- 1:ncol(data[[1]])
+  
+  # set up frame
+  boxplot(data[[1]][, design.order],
+          at = 1:length(design.order) - 0.4,
+          las = 2, cex.axis = 0.8,
+          ylab = "Misclassification error rate",
+          xlim = c(0.4, length(design.order) + 0.2),
+          ylim = ylim, boxwex = 0.35,
+          col = NULL, border = NA, xaxt = "n", pch = 4,
+          main = mytitle)
+  
+  if(iflex){
+    if(!is.null(data$ext.uh)){
+      boxplot(data$ext.uh[, design.order], add = TRUE, 
+              at = 1:length(design.order) - 0.4,
+              las = 2, cex.axis = 0.8,
+              boxwex = 0.35,
+              col = adjustcolor("skyblue", alpha.f = 0.6),
+              border = "deepskyblue3", xaxt = "n", pch = 4)
+    }
+    
+    if(!is.null(data$ext.sim.nuh)){
+      boxplot(data$ext.sim.nuh[, design.order],
+              at = 1:length(design.order) - 0.4,
+              las = 2, add = TRUE, border = "darkgrey", boxwex = 0.20,
+              col = adjustcolor("lightgrey", alpha.f = 0.6),
+              xaxt = "n", yaxt = "n", pch = 3)
+    }
+    
+    if(!is.null(data$int)){
+      boxplot(data$int[, design.order],
+              at = 1:ncol(data$int[, design.order]),
+              las = 2, add = TRUE, border = "red", col = NA, boxwex = 0.35,
+              xaxt = "n", yaxt = "n", pch = 2)
+    }
+  } else{
+    
+    if(!is.null(data$external)){
+      boxplot(data$external[, design.order], add = TRUE, 
+              at = 1:length(design.order) - 0.4,
+              las = 2, cex.axis = 0.8,
+              boxwex = 0.35,
+              col = adjustcolor("skyblue", alpha.f = 0.6),
+              border = "deepskyblue3", xaxt = "n", pch = 4)
+    }
+    
+    if(!is.null(data$internal)){
+      boxplot(data$internal[, design.order],
+              at = 1:ncol(data$internal[, design.order]),
+              las = 2, add = TRUE, border = "red", col = NA, boxwex = 0.35,
+              xaxt = "n", yaxt = "n", pch = 2)
+    }
+  }
+  
+  grid(nx = NA, ny = NULL, lwd = 2)
+  labs <- names(data[[1]][, design.order])
+  axis(1, cex.axis = 0.6, at = 1:length(labs) - 0.2,
+       col = NA, las = 2,
+       labels = labs)
+  abline(v = 1:(ncol(data[[1]][, design.order]) - 1) + 0.3,
+         lty = "dashed", col = "dimgrey")
+  
+  legend.names <- as.character(sapply(names(data), 
+    function(x) switch(x, 
+      "int" = "Cross Validation", 
+      "internal" = "Cross Validation", 
+      "ext.uh" = "E.V. with UH", 
+      "external" = "E.V. with UH", 
+      "ext.sim.nuh" = "E.V. with Non-UH")))
+    
+  border.cols <- as.character(sapply(names(data), 
+    function(x) switch(x, 
+      "int" = "red", 
+      "internal" = "red", 
+      "ext.uh" = "deepskyblue3", 
+      "external" = "deepskyblue3", 
+      "ext.sim.nuh" = "darkgrey")))
+  
+  fill.cols <- as.character(sapply(names(data), 
+    function(x) switch(x, 
+      "int" = NA, 
+      "internal" = NA, 
+      "ext.uh" = adjustcolor("skyblue", alpha.f = 0.6), 
+      "external" = adjustcolor("skyblue", alpha.f = 0.6), 
+      "ext.sim.nuh"  = adjustcolor("lightgrey", alpha.f = 0.6))))
+    
+  legend("topleft", cex = 0.5,
+         legend = legend.names,
+         border = border.cols,
+         fill = fill.cols)  
+  
+}
+
